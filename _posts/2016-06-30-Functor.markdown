@@ -1,0 +1,31 @@
+---
+layout: post
+title:  "Functor"
+date:   2016-06-30 
+categories: FP
+---
+
+### IO
+```javascript
+var IO = function(f) {
+  this.__value = f;
+};
+
+IO.of = function(x) {
+  return new IO(function() {
+    return x;
+  });
+};
+ Compose(map(map(f), this.getCompose)) 
+IO.prototype.map = function(f) {
+  return new IO(_.compose(f, this.__value));
+};
+```
+返回包裹着结果的函数，使得其无副作用
+
+.value方法就好像炸弹的拉环
+
+### Async
+JQuery 中的 Promise is not pure.
+
+promise中的.then可以想成.map

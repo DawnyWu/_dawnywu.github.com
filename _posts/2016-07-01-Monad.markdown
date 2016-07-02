@@ -1,0 +1,45 @@
+---
+layout: post
+title:  "Monad"
+date:   2016-06-30 
+categories: FP
+---
+
+***Monad***
+
+Monads are pointed functors that can flatten
+
+Any functor which defines a join method, has an of method, and obeys a few laws is a monad. 
+
+***join***
+
+```javascript
+// 本质就是去掉一层Container
+Maybe.prototype.join = function() {
+  return this.isNothing() ? Maybe.of(null) : this.__value;
+}
+```
+
+```javascript
+IO.prototype.join = function() {
+  var thiz = this;
+  return new IO(function() {
+    return thiz.unsafePerformIO().unsafePerformIO();
+  });
+};
+```
+
+***chain***
+
+called >>= (pronounced bind) or flatMap 
+
+```javascript
+var chain = curry(function(f, m){
+  return m.map(f).join(); // or compose(join, map(f))(m)
+});
+```
+map(f)后join
+
+f是一个会添加一层Container的函数
+
+整体效果是对一个Container执行一个函数，增加另一层，然后又去掉一层，结果还是只有一个Container
