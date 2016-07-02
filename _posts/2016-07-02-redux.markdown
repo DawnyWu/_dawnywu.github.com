@@ -1,0 +1,35 @@
+---
+layout: post
+title:  "Redux"
+date:   2016-07-02
+categories: redux
+---
+
+***Simplify the arrow function***
+
+如果arrow function只是返回一个object,那么可以用如下写法
+
+```js
+// 原来
+export const addTodo = (text) => {
+  return {
+  type: 'ADD_TODO',
+  id: (nextTodoId++).toString(),
+  text, }
+};
+// 现在
+export const addTodo = (text) => ({
+  type: 'ADD_TODO',
+  id: (nextTodoId++).toString(),
+  text,
+});
+```
+如果是object里有函数，那么还可以这样写
+
+```
+const mapDispatchToProps = (dispatch) => ({
+  onTodoClick(id) {
+    dispatch(toggleTodo(id));
+  },
+});
+```

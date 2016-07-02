@@ -6,12 +6,11 @@
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
   <meta name="viewport" content="width=device-width, initial-scale=1">
 
-  <title>Dawny Wu&#39;s blog</title>
-  <meta name="description" content="Write an awesome description for your new site here. You can edit this line in _config.yml. It will appear in your document head meta (for Google search results) and in your feed.xml site description.
-">
+  <title>webpack</title>
+  <meta name="description" content="Monad">
 
   <link rel="stylesheet" href="/css/main.css">
-  <link rel="canonical" href="http://yourdomain.com/">
+  <link rel="canonical" href="http://yourdomain.com/fp/2016/06/30/webpack.html">
   <link rel="alternate" type="application/rss+xml" title="Dawny Wu's blog" href="http://yourdomain.com/feed.xml">
 </head>
 
@@ -55,73 +54,56 @@
 
     <div class="page-content">
       <div class="wrapper">
-        <div class="home">
+        <article class="post" itemscope itemtype="http://schema.org/BlogPosting">
 
-  <h1 class="page-heading">Posts</h1>
+  <header class="post-header">
+    <h1 class="post-title" itemprop="name headline">webpack</h1>
+    <p class="post-meta"><time datetime="2016-06-30T00:00:00+08:00" itemprop="datePublished">Jun 30, 2016</time></p>
+  </header>
 
-  <ul class="post-list">
-    
-      <li>
-        <span class="post-meta">Jul 2, 2016</span>
+  <div class="post-content" itemprop="articleBody">
+    <p><strong><em>Monad</em></strong></p>
 
-        <h2>
-          <a class="post-link" href="/webpack/2016/07/02/webpack.html">Webpack</a>
-        </h2>
-      </li>
-    
-      <li>
-        <span class="post-meta">Jul 2, 2016</span>
+<p>Monads are pointed functors that can flatten</p>
 
-        <h2>
-          <a class="post-link" href="/redux/2016/07/02/redux.html">Redux</a>
-        </h2>
-      </li>
-    
-      <li>
-        <span class="post-meta">Jun 30, 2016</span>
+<p>Any functor which defines a join method, has an of method, and obeys a few laws is a monad.</p>
 
-        <h2>
-          <a class="post-link" href="/fp/2016/06/30/applicative-functors.html">Applicative Functor</a>
-        </h2>
-      </li>
-    
-      <li>
-        <span class="post-meta">Jun 30, 2016</span>
+<p><strong><em>join</em></strong></p>
 
-        <h2>
-          <a class="post-link" href="/fp/2016/06/30/Monad.html">Monad</a>
-        </h2>
-      </li>
-    
-      <li>
-        <span class="post-meta">Jun 30, 2016</span>
-
-        <h2>
-          <a class="post-link" href="/fp/2016/06/30/Functor.html">Functor</a>
-        </h2>
-      </li>
-    
-      <li>
-        <span class="post-meta">Jun 5, 2016</span>
-
-        <h2>
-          <a class="post-link" href="/jekyll/update/2016/06/05/Functional-Programming.html">Functional Programming</a>
-        </h2>
-      </li>
-    
-      <li>
-        <span class="post-meta">Jun 5, 2016</span>
-
-        <h2>
-          <a class="post-link" href="/jekyll/update/2016/06/05/welcome-to-jekyll.html">Welcome to Jekyll!</a>
-        </h2>
-      </li>
-    
-  </ul>
-
-  <p class="rss-subscribe">subscribe <a href="/feed.xml">via RSS</a></p>
-
+<div class="language-javascript highlighter-rouge"><pre class="highlight"><code><span class="c1">// 本质就是去掉一层Container</span>
+<span class="nx">Maybe</span><span class="p">.</span><span class="nx">prototype</span><span class="p">.</span><span class="nx">join</span> <span class="o">=</span> <span class="kd">function</span><span class="p">()</span> <span class="p">{</span>
+  <span class="k">return</span> <span class="k">this</span><span class="p">.</span><span class="nx">isNothing</span><span class="p">()</span> <span class="p">?</span> <span class="nx">Maybe</span><span class="p">.</span><span class="nx">of</span><span class="p">(</span><span class="kc">null</span><span class="p">)</span> <span class="p">:</span> <span class="k">this</span><span class="p">.</span><span class="nx">__value</span><span class="p">;</span>
+<span class="p">}</span>
+</code></pre>
 </div>
+
+<div class="language-javascript highlighter-rouge"><pre class="highlight"><code><span class="nx">IO</span><span class="p">.</span><span class="nx">prototype</span><span class="p">.</span><span class="nx">join</span> <span class="o">=</span> <span class="kd">function</span><span class="p">()</span> <span class="p">{</span>
+  <span class="kd">var</span> <span class="nx">thiz</span> <span class="o">=</span> <span class="k">this</span><span class="p">;</span>
+  <span class="k">return</span> <span class="k">new</span> <span class="nx">IO</span><span class="p">(</span><span class="kd">function</span><span class="p">()</span> <span class="p">{</span>
+    <span class="k">return</span> <span class="nx">thiz</span><span class="p">.</span><span class="nx">unsafePerformIO</span><span class="p">().</span><span class="nx">unsafePerformIO</span><span class="p">();</span>
+  <span class="p">});</span>
+<span class="p">};</span>
+</code></pre>
+</div>
+
+<p><strong><em>chain</em></strong></p>
+
+<p>called »= (pronounced bind) or flatMap</p>
+
+<div class="language-javascript highlighter-rouge"><pre class="highlight"><code><span class="kd">var</span> <span class="nx">chain</span> <span class="o">=</span> <span class="nx">curry</span><span class="p">(</span><span class="kd">function</span><span class="p">(</span><span class="nx">f</span><span class="p">,</span> <span class="nx">m</span><span class="p">){</span>
+  <span class="k">return</span> <span class="nx">m</span><span class="p">.</span><span class="nx">map</span><span class="p">(</span><span class="nx">f</span><span class="p">).</span><span class="nx">join</span><span class="p">();</span> <span class="c1">// or compose(join, map(f))(m)</span>
+<span class="p">});</span>
+</code></pre>
+</div>
+<p>map(f)后join</p>
+
+<p>f是一个会添加一层Container的函数</p>
+
+<p>整体效果是对一个Container执行一个函数，增加另一层，然后又去掉一层，结果还是只有一个Container</p>
+
+  </div>
+
+</article>
 
       </div>
     </div>

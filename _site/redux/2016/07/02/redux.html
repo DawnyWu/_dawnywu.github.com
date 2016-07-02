@@ -6,12 +6,11 @@
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
   <meta name="viewport" content="width=device-width, initial-scale=1">
 
-  <title>Dawny Wu&#39;s blog</title>
-  <meta name="description" content="Write an awesome description for your new site here. You can edit this line in _config.yml. It will appear in your document head meta (for Google search results) and in your feed.xml site description.
-">
+  <title>Redux</title>
+  <meta name="description" content="Simplify the arrow function">
 
   <link rel="stylesheet" href="/css/main.css">
-  <link rel="canonical" href="http://yourdomain.com/">
+  <link rel="canonical" href="http://yourdomain.com/redux/2016/07/02/redux.html">
   <link rel="alternate" type="application/rss+xml" title="Dawny Wu's blog" href="http://yourdomain.com/feed.xml">
 </head>
 
@@ -55,73 +54,46 @@
 
     <div class="page-content">
       <div class="wrapper">
-        <div class="home">
+        <article class="post" itemscope itemtype="http://schema.org/BlogPosting">
 
-  <h1 class="page-heading">Posts</h1>
+  <header class="post-header">
+    <h1 class="post-title" itemprop="name headline">Redux</h1>
+    <p class="post-meta"><time datetime="2016-07-02T00:00:00+08:00" itemprop="datePublished">Jul 2, 2016</time></p>
+  </header>
 
-  <ul class="post-list">
-    
-      <li>
-        <span class="post-meta">Jul 2, 2016</span>
+  <div class="post-content" itemprop="articleBody">
+    <p><strong><em>Simplify the arrow function</em></strong></p>
 
-        <h2>
-          <a class="post-link" href="/webpack/2016/07/02/webpack.html">Webpack</a>
-        </h2>
-      </li>
-    
-      <li>
-        <span class="post-meta">Jul 2, 2016</span>
+<p>如果arrow function只是返回一个object,那么可以用如下写法</p>
 
-        <h2>
-          <a class="post-link" href="/redux/2016/07/02/redux.html">Redux</a>
-        </h2>
-      </li>
-    
-      <li>
-        <span class="post-meta">Jun 30, 2016</span>
-
-        <h2>
-          <a class="post-link" href="/fp/2016/06/30/applicative-functors.html">Applicative Functor</a>
-        </h2>
-      </li>
-    
-      <li>
-        <span class="post-meta">Jun 30, 2016</span>
-
-        <h2>
-          <a class="post-link" href="/fp/2016/06/30/Monad.html">Monad</a>
-        </h2>
-      </li>
-    
-      <li>
-        <span class="post-meta">Jun 30, 2016</span>
-
-        <h2>
-          <a class="post-link" href="/fp/2016/06/30/Functor.html">Functor</a>
-        </h2>
-      </li>
-    
-      <li>
-        <span class="post-meta">Jun 5, 2016</span>
-
-        <h2>
-          <a class="post-link" href="/jekyll/update/2016/06/05/Functional-Programming.html">Functional Programming</a>
-        </h2>
-      </li>
-    
-      <li>
-        <span class="post-meta">Jun 5, 2016</span>
-
-        <h2>
-          <a class="post-link" href="/jekyll/update/2016/06/05/welcome-to-jekyll.html">Welcome to Jekyll!</a>
-        </h2>
-      </li>
-    
-  </ul>
-
-  <p class="rss-subscribe">subscribe <a href="/feed.xml">via RSS</a></p>
-
+<div class="language-js highlighter-rouge"><pre class="highlight"><code><span class="c1">// 原来</span>
+<span class="kr">export</span> <span class="kr">const</span> <span class="nx">addTodo</span> <span class="o">=</span> <span class="p">(</span><span class="nx">text</span><span class="p">)</span> <span class="o">=&gt;</span> <span class="p">{</span>
+  <span class="k">return</span> <span class="p">{</span>
+  <span class="na">type</span><span class="p">:</span> <span class="s1">'ADD_TODO'</span><span class="p">,</span>
+  <span class="na">id</span><span class="p">:</span> <span class="p">(</span><span class="nx">nextTodoId</span><span class="o">++</span><span class="p">).</span><span class="nx">toString</span><span class="p">(),</span>
+  <span class="nx">text</span><span class="p">,</span> <span class="p">}</span>
+<span class="p">};</span>
+<span class="c1">// 现在</span>
+<span class="kr">export</span> <span class="kr">const</span> <span class="nx">addTodo</span> <span class="o">=</span> <span class="p">(</span><span class="nx">text</span><span class="p">)</span> <span class="o">=&gt;</span> <span class="p">({</span>
+  <span class="na">type</span><span class="p">:</span> <span class="s1">'ADD_TODO'</span><span class="p">,</span>
+  <span class="na">id</span><span class="p">:</span> <span class="p">(</span><span class="nx">nextTodoId</span><span class="o">++</span><span class="p">).</span><span class="nx">toString</span><span class="p">(),</span>
+  <span class="nx">text</span><span class="p">,</span>
+<span class="p">});</span>
+</code></pre>
 </div>
+<p>如果是object里有函数，那么还可以这样写</p>
+
+<div class="highlighter-rouge"><pre class="highlight"><code>const mapDispatchToProps = (dispatch) =&gt; ({
+  onTodoClick(id) {
+    dispatch(toggleTodo(id));
+  },
+});
+</code></pre>
+</div>
+
+  </div>
+
+</article>
 
       </div>
     </div>
