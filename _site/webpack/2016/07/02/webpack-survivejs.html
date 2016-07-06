@@ -1,0 +1,982 @@
+<!DOCTYPE html>
+<html>
+
+  <head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  <title>Webpack Survivejs</title>
+  <meta name="description" content="split webpack.config.js file">
+
+  <link rel="stylesheet" href="/css/main.css">
+  <link rel="canonical" href="http://yourdomain.com/webpack/2016/07/02/webpack-survivejs.html">
+  <link rel="alternate" type="application/rss+xml" title="Dawny Wu's blog" href="http://yourdomain.com/feed.xml">
+</head>
+
+
+  <body>
+
+    <header class="site-header">
+
+  <div class="wrapper">
+
+    <a class="site-title" href="/">Dawny Wu's blog</a>
+
+    <nav class="site-nav">
+      <a href="#" class="menu-icon">
+        <svg viewBox="0 0 18 15">
+          <path fill="#424242" d="M18,1.484c0,0.82-0.665,1.484-1.484,1.484H1.484C0.665,2.969,0,2.304,0,1.484l0,0C0,0.665,0.665,0,1.484,0 h15.031C17.335,0,18,0.665,18,1.484L18,1.484z"/>
+          <path fill="#424242" d="M18,7.516C18,8.335,17.335,9,16.516,9H1.484C0.665,9,0,8.335,0,7.516l0,0c0-0.82,0.665-1.484,1.484-1.484 h15.031C17.335,6.031,18,6.696,18,7.516L18,7.516z"/>
+          <path fill="#424242" d="M18,13.516C18,14.335,17.335,15,16.516,15H1.484C0.665,15,0,14.335,0,13.516l0,0 c0-0.82,0.665-1.484,1.484-1.484h15.031C17.335,12.031,18,12.696,18,13.516L18,13.516z"/>
+        </svg>
+      </a>
+
+      <div class="trigger">
+        
+          
+          <a class="page-link" href="/about/">About</a>
+          
+        
+          
+        
+          
+        
+          
+        
+      </div>
+    </nav>
+
+  </div>
+
+</header>
+
+
+    <div class="page-content">
+      <div class="wrapper">
+        <article class="post" itemscope itemtype="http://schema.org/BlogPosting">
+
+  <header class="post-header">
+    <h1 class="post-title" itemprop="name headline">Webpack Survivejs</h1>
+    <p class="post-meta"><time datetime="2016-07-02T00:00:00+08:00" itemprop="datePublished">Jul 2, 2016</time></p>
+  </header>
+
+  <div class="post-content" itemprop="articleBody">
+    <p><strong><em>split webpack.config.js file</em></strong></p>
+
+<p>不同环境使用不同的webpack配置，大致有如下三种方法</p>
+
+<ul>
+  <li>Maintain configuration in multiple files and point Webpack to each through –config parameter. Share configuration through module imports. You can see this approach in action at webpack/react-starter.</li>
+  <li>Push configuration to a library which you then consume. Example: HenrikJoreteg/hjs-webpack.</li>
+  <li>Maintain configuration within a single file and branch there. If we trigger a script through npm (i.e., npm run test), npm sets this information in an environment variable. We can match against it and return the configuration we want.</li>
+</ul>
+
+<p>这里使用第三种</p>
+
+<div class="language-js highlighter-rouge"><pre class="highlight"><code><span class="kr">const</span> <span class="nx">path</span> <span class="o">=</span> <span class="nx">require</span><span class="p">(</span><span class="s1">'path'</span><span class="p">);</span>
+<span class="kr">const</span> <span class="nx">HtmlWebpackPlugin</span> <span class="o">=</span> <span class="nx">require</span><span class="p">(</span><span class="s1">'html-webpack-plugin'</span><span class="p">);</span>
+
+<span class="kr">const</span> <span class="nx">merge</span> <span class="o">=</span> <span class="nx">require</span><span class="p">(</span><span class="s1">'webpack-merge'</span><span class="p">);</span>
+
+
+<span class="kr">const</span> <span class="nx">PATHS</span> <span class="o">=</span> <span class="p">{</span>
+  <span class="na">app</span><span class="p">:</span> <span class="nx">path</span><span class="p">.</span><span class="nx">join</span><span class="p">(</span><span class="nx">__dirname</span><span class="p">,</span> <span class="s1">'app'</span><span class="p">),</span>
+  <span class="na">build</span><span class="p">:</span> <span class="nx">path</span><span class="p">.</span><span class="nx">join</span><span class="p">(</span><span class="nx">__dirname</span><span class="p">,</span> <span class="s1">'build'</span><span class="p">)</span>
+<span class="p">};</span>
+
+
+<span class="nx">module</span><span class="p">.</span><span class="nx">exports</span> <span class="o">=</span> <span class="p">{</span>
+
+
+<span class="kr">const</span> <span class="nx">common</span> <span class="o">=</span> <span class="p">{</span>
+
+  <span class="c1">// Entry accepts a path or an object of entries.</span>
+  <span class="c1">// We'll be using the latter form given it's</span>
+  <span class="c1">// convenient with more complex configurations.</span>
+  <span class="na">entry</span><span class="p">:</span> <span class="p">{</span>
+    <span class="na">app</span><span class="p">:</span> <span class="nx">PATHS</span><span class="p">.</span><span class="nx">app</span>
+  <span class="p">},</span>
+  <span class="na">output</span><span class="p">:</span> <span class="p">{</span>
+    <span class="na">path</span><span class="p">:</span> <span class="nx">PATHS</span><span class="p">.</span><span class="nx">build</span><span class="p">,</span>
+    <span class="na">filename</span><span class="p">:</span> <span class="s1">'[name].js'</span>
+  <span class="p">},</span>
+  <span class="na">plugins</span><span class="p">:</span> <span class="p">[</span>
+    <span class="k">new</span> <span class="nx">HtmlWebpackPlugin</span><span class="p">({</span>
+      <span class="na">title</span><span class="p">:</span> <span class="s1">'Webpack demo'</span>
+    <span class="p">})</span>
+  <span class="p">]</span>
+<span class="p">};</span>
+
+
+<span class="kd">var</span> <span class="nx">config</span><span class="p">;</span>
+
+<span class="c1">// Detect how npm is run and branch based on that</span>
+<span class="k">switch</span><span class="p">(</span><span class="nx">process</span><span class="p">.</span><span class="nx">env</span><span class="p">.</span><span class="nx">npm_lifecycle_event</span><span class="p">)</span> <span class="p">{</span>
+  <span class="k">case</span> <span class="s1">'build'</span><span class="p">:</span>
+    <span class="nx">config</span> <span class="o">=</span> <span class="nx">merge</span><span class="p">(</span><span class="nx">common</span><span class="p">,</span> <span class="p">{});</span>
+    <span class="k">break</span><span class="p">;</span>
+  <span class="nl">default</span><span class="p">:</span>
+    <span class="nx">config</span> <span class="o">=</span> <span class="nx">merge</span><span class="p">(</span><span class="nx">common</span><span class="p">,</span> <span class="p">{});</span>
+<span class="p">}</span>
+
+<span class="nx">module</span><span class="p">.</span><span class="nx">exports</span> <span class="o">=</span> <span class="nx">config</span><span class="p">;</span>
+</code></pre>
+</div>
+
+<p><strong><em>webpack validator</em></strong></p>
+
+<div class="language-js highlighter-rouge"><pre class="highlight"><code><span class="kr">const</span> <span class="nx">path</span> <span class="o">=</span> <span class="nx">require</span><span class="p">(</span><span class="s1">'path'</span><span class="p">);</span>
+<span class="kr">const</span> <span class="nx">HtmlWebpackPlugin</span> <span class="o">=</span> <span class="nx">require</span><span class="p">(</span><span class="s1">'html-webpack-plugin'</span><span class="p">);</span>
+<span class="kr">const</span> <span class="nx">merge</span> <span class="o">=</span> <span class="nx">require</span><span class="p">(</span><span class="s1">'webpack-merge'</span><span class="p">);</span>
+
+<span class="kr">const</span> <span class="nx">validate</span> <span class="o">=</span> <span class="nx">require</span><span class="p">(</span><span class="s1">'webpack-validator'</span><span class="p">);</span>
+
+
+<span class="p">...</span>
+
+
+<span class="nx">module</span><span class="p">.</span><span class="nx">exports</span> <span class="o">=</span> <span class="nx">config</span><span class="p">;</span>
+
+
+<span class="nx">module</span><span class="p">.</span><span class="nx">exports</span> <span class="o">=</span> <span class="nx">validate</span><span class="p">(</span><span class="nx">config</span><span class="p">);</span>
+</code></pre>
+</div>
+
+<p><strong><em>Hot Module Replacement</em></strong></p>
+
+<div class="language-js highlighter-rouge"><pre class="highlight"><code><span class="kr">const</span> <span class="nx">webpack</span> <span class="o">=</span> <span class="nx">require</span><span class="p">(</span><span class="s1">'webpack'</span><span class="p">);</span>
+
+<span class="nx">exports</span><span class="p">.</span><span class="nx">devServer</span> <span class="o">=</span> <span class="kd">function</span><span class="p">(</span><span class="nx">options</span><span class="p">)</span> <span class="p">{</span>
+  <span class="k">return</span> <span class="p">{</span>
+    <span class="na">devServer</span><span class="p">:</span> <span class="p">{</span>
+      <span class="c1">// Enable history API fallback so HTML5 History API based</span>
+      <span class="c1">// routing works. This is a good default that will come</span>
+      <span class="c1">// in handy in more complicated setups.</span>
+      <span class="na">historyApiFallback</span><span class="p">:</span> <span class="kc">true</span><span class="p">,</span>
+
+      <span class="c1">// Unlike the cli flag, this doesn't set</span>
+      <span class="c1">// HotModuleReplacementPlugin!</span>
+      <span class="na">hot</span><span class="p">:</span> <span class="kc">true</span><span class="p">,</span>
+      <span class="na">inline</span><span class="p">:</span> <span class="kc">true</span><span class="p">,</span>
+
+      <span class="c1">// Display only errors to reduce the amount of output.</span>
+      <span class="na">stats</span><span class="p">:</span> <span class="s1">'errors-only'</span><span class="p">,</span>
+
+      <span class="c1">// Parse host and port from env to allow customization.</span>
+      <span class="c1">//</span>
+      <span class="c1">// If you use Vagrant or Cloud9, set</span>
+      <span class="c1">// host: options.host || '0.0.0.0';</span>
+      <span class="c1">//</span>
+      <span class="c1">// 0.0.0.0 is available to all network devices</span>
+      <span class="c1">// unlike default `localhost`.</span>
+      <span class="na">host</span><span class="p">:</span> <span class="nx">options</span><span class="p">.</span><span class="nx">host</span><span class="p">,</span> <span class="c1">// Defaults to `localhost`</span>
+      <span class="na">port</span><span class="p">:</span> <span class="nx">options</span><span class="p">.</span><span class="nx">port</span> <span class="c1">// Defaults to 8080</span>
+    <span class="p">},</span>
+    <span class="na">plugins</span><span class="p">:</span> <span class="p">[</span>
+      <span class="c1">// Enable multi-pass compilation for enhanced performance</span>
+      <span class="c1">// in larger projects. Good default.</span>
+      <span class="k">new</span> <span class="nx">webpack</span><span class="p">.</span><span class="nx">HotModuleReplacementPlugin</span><span class="p">({</span>
+        <span class="na">multiStep</span><span class="p">:</span> <span class="kc">true</span>
+      <span class="p">})</span>
+    <span class="p">]</span>
+  <span class="p">};</span>
+<span class="p">}</span>
+</code></pre>
+</div>
+
+<p><strong><em>webpack dev server</em></strong></p>
+
+<p><code class="highlighter-rouge">localhost:8080/webpack-dev-server/</code> instead of the root. It will provide status information within the browser itself at the top of the application.</p>
+
+<p>The quickest way to enable automatic browser refresh for our project is to run <code class="highlighter-rouge">webpack-dev-server --inline</code>. –inline, runs the server in so called inline mode that writes the webpack-dev-server client to the resulting code.</p>
+
+<p>Hot Module Replacement builds on top the webpack-dev-server</p>
+
+<p><code class="highlighter-rouge">webpack-dev-server --inline --hot</code></p>
+
+<p><strong><em>source map</em></strong></p>
+
+<p>Webpack can generate both inline sourcemaps included within bundles or separate sourcemap files.</p>
+
+<p>The former is useful during development due to better performance while the latter is handy for production usage as it will keep the bundle size small.</p>
+
+<div class="language-js highlighter-rouge"><pre class="highlight"><code><span class="k">switch</span><span class="p">(</span><span class="nx">process</span><span class="p">.</span><span class="nx">env</span><span class="p">.</span><span class="nx">npm_lifecycle_event</span><span class="p">)</span> <span class="p">{</span>
+  <span class="k">case</span> <span class="s1">'build'</span><span class="err">:</span>
+    <span class="nx">config</span> <span class="o">=</span> <span class="nx">merge</span><span class="p">(</span>
+      <span class="nx">common</span><span class="p">,</span>
+
+      <span class="p">{</span>
+        <span class="na">devtool</span><span class="p">:</span> <span class="s1">'source-map'</span>
+      <span class="p">},</span>
+
+      <span class="nx">parts</span><span class="p">.</span><span class="nx">setupCSS</span><span class="p">(</span><span class="nx">PATHS</span><span class="p">.</span><span class="nx">app</span><span class="p">)</span>
+    <span class="p">);</span>
+  <span class="nl">default</span><span class="p">:</span>
+    <span class="nx">config</span> <span class="o">=</span> <span class="nx">merge</span><span class="p">(</span>
+      <span class="nx">common</span><span class="p">,</span>
+
+      <span class="p">{</span>
+        <span class="na">devtool</span><span class="p">:</span> <span class="s1">'eval-source-map'</span>
+      <span class="p">},</span>
+
+      <span class="nx">parts</span><span class="p">.</span><span class="nx">setupCSS</span><span class="p">(</span><span class="nx">PATHS</span><span class="p">.</span><span class="nx">app</span><span class="p">),</span>
+      <span class="p">...</span>
+    <span class="p">);</span>
+<span class="p">}</span>
+
+<span class="nx">module</span><span class="p">.</span><span class="nx">exports</span> <span class="o">=</span> <span class="nx">validate</span><span class="p">(</span><span class="nx">config</span><span class="p">);</span>
+</code></pre>
+</div>
+
+<p><code class="highlighter-rouge">eval-source-map(default)</code> builds slowly initially, but it provides fast rebuild speed and yields real files.</p>
+
+<p>Faster development specific options, such as <code class="highlighter-rouge">cheap-module-eval-source-map</code> and <code class="highlighter-rouge">eval</code>, produce lower quality sourcemaps. All eval options will emit sourcemaps as a part of your JavaScript code.</p>
+
+<p><strong><em>Minifying the Code</em></strong></p>
+
+<p>The easiest way to enable minification is to call <code class="highlighter-rouge">webpack -p</code></p>
+
+<p><code class="highlighter-rouge">-p</code> is a shortcut for <code class="highlighter-rouge">--optimize-minimize</code>, you can think it as <code class="highlighter-rouge">-p</code> for “production”.</p>
+
+<p>或者用插件</p>
+
+<div class="language-js highlighter-rouge"><pre class="highlight"><code>
+<span class="nx">exports</span><span class="p">.</span><span class="nx">minify</span> <span class="o">=</span> <span class="kd">function</span><span class="p">()</span> <span class="p">{</span>
+  <span class="k">return</span> <span class="p">{</span>
+    <span class="na">plugins</span><span class="p">:</span> <span class="p">[</span>
+      <span class="k">new</span> <span class="nx">webpack</span><span class="p">.</span><span class="nx">optimize</span><span class="p">.</span><span class="nx">UglifyJsPlugin</span><span class="p">({</span>
+        <span class="na">compress</span><span class="p">:</span> <span class="p">{</span>
+          <span class="na">warnings</span><span class="p">:</span> <span class="kc">false</span>
+        <span class="p">}</span>
+      <span class="p">})</span>
+    <span class="p">]</span>
+  <span class="p">};</span>
+<span class="p">}</span>
+</code></pre>
+</div>
+<p><strong><em>UglifyJs</em></strong></p>
+
+<p>有时候需要控制Uglifyjs</p>
+
+<p>An UglifyJS feature known as <code class="highlighter-rouge">mangling</code> will be enabled by default. The feature will reduce local function and variable names to a minimum, usually to a single character.</p>
+
+<p>Given these transformations can break your code, you have to be a little careful. A good example of this is Angular 1 and its dependency injection system. As it relies on strings, you must be careful not to mangle those or else it will fail to work.</p>
+
+<div class="language-js highlighter-rouge"><pre class="highlight"><code><span class="k">new</span> <span class="nx">webpack</span><span class="p">.</span><span class="nx">optimize</span><span class="p">.</span><span class="nx">UglifyJsPlugin</span><span class="p">({</span>
+  <span class="c1">// Don't beautify output (enable for neater output)</span>
+  <span class="na">beautify</span><span class="p">:</span> <span class="kc">false</span><span class="p">,</span>
+
+  <span class="c1">// Eliminate comments</span>
+  <span class="na">comments</span><span class="p">:</span> <span class="kc">false</span><span class="p">,</span>
+
+  <span class="c1">// Compression specific options</span>
+  <span class="na">compress</span><span class="p">:</span> <span class="p">{</span>
+    <span class="na">warnings</span><span class="p">:</span> <span class="kc">false</span><span class="p">,</span>
+
+    <span class="c1">// Drop `console` statements</span>
+    <span class="na">drop_console</span><span class="p">:</span> <span class="kc">true</span>
+  <span class="p">},</span>
+
+  <span class="c1">// Mangling specific options</span>
+  <span class="na">mangle</span><span class="p">:</span> <span class="p">{</span>
+    <span class="c1">// Don't mangle $</span>
+    <span class="na">except</span><span class="p">:</span> <span class="p">[</span><span class="s1">'$'</span><span class="p">],</span>
+
+    <span class="c1">// Don't care about IE8</span>
+    <span class="na">screw_ie8</span> <span class="p">:</span> <span class="kc">true</span><span class="p">,</span>
+
+    <span class="c1">// Don't mangle function names</span>
+    <span class="na">keep_fnames</span><span class="p">:</span> <span class="kc">true</span>
+  <span class="p">}</span>
+<span class="p">})</span>
+</code></pre>
+</div>
+
+<p>If you enable mangling, it is a good idea to set except: [‘webpackJsonp’] to avoid mangling the Webpack runtime.</p>
+
+<p><strong><em>DefinePlugin</em></strong></p>
+
+<p>It is able to rewrite matching free variables.</p>
+
+<div class="language-js highlighter-rouge"><pre class="highlight"><code><span class="kd">var</span> <span class="nx">foo</span><span class="p">;</span>
+
+<span class="c1">// Not free, not ok to replace</span>
+<span class="k">if</span><span class="p">(</span><span class="nx">foo</span> <span class="o">===</span> <span class="s1">'bar'</span><span class="p">)</span> <span class="p">{</span>
+  <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="s1">'bar'</span><span class="p">);</span>
+<span class="p">}</span>
+
+<span class="c1">// Free, ok to replace</span>
+<span class="k">if</span><span class="p">(</span><span class="nx">bar</span> <span class="o">===</span> <span class="s1">'bar'</span><span class="p">)</span> <span class="p">{</span>
+  <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="s1">'bar'</span><span class="p">);</span>
+<span class="p">}</span>
+</code></pre>
+</div>
+
+<div class="language-js highlighter-rouge"><pre class="highlight"><code><span class="kd">var</span> <span class="nx">foo</span><span class="p">;</span>
+
+<span class="c1">// Not free, not ok to replace</span>
+<span class="k">if</span><span class="p">(</span><span class="nx">foo</span> <span class="o">===</span> <span class="s1">'bar'</span><span class="p">)</span> <span class="p">{</span>
+  <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="s1">'bar'</span><span class="p">);</span>
+<span class="p">}</span>
+
+<span class="c1">// Free, ok to replace</span>
+<span class="k">if</span><span class="p">(</span><span class="s1">'bar'</span> <span class="o">===</span> <span class="s1">'bar'</span><span class="p">)</span> <span class="p">{</span>
+  <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="s1">'bar'</span><span class="p">);</span>
+<span class="p">}</span>
+</code></pre>
+</div>
+
+<p>so UglifyJS gives us</p>
+
+<div class="language-js highlighter-rouge"><pre class="highlight"><code><span class="kd">var</span> <span class="nx">foo</span><span class="p">;</span>
+
+<span class="c1">// Not free, not ok to replace</span>
+<span class="k">if</span><span class="p">(</span><span class="nx">foo</span> <span class="o">===</span> <span class="s1">'bar'</span><span class="p">)</span> <span class="p">{</span>
+  <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="s1">'bar'</span><span class="p">);</span>
+<span class="p">}</span>
+
+<span class="c1">// Free, ok to replace</span>
+<span class="k">if</span><span class="p">(</span><span class="kc">true</span><span class="p">)</span> <span class="p">{</span>
+  <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="s1">'bar'</span><span class="p">);</span>
+<span class="p">}</span>
+</code></pre>
+</div>
+
+<div class="language-js highlighter-rouge"><pre class="highlight"><code><span class="kd">var</span> <span class="nx">foo</span><span class="p">;</span>
+
+<span class="c1">// Not free, not ok to replace</span>
+<span class="k">if</span><span class="p">(</span><span class="nx">foo</span> <span class="o">===</span> <span class="s1">'bar'</span><span class="p">)</span> <span class="p">{</span>
+  <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="s1">'bar'</span><span class="p">);</span>
+<span class="p">}</span>
+
+<span class="c1">// Free, ok to replace</span>
+<span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="s1">'bar'</span><span class="p">);</span>
+</code></pre>
+</div>
+
+<p>use in webpack</p>
+
+<div class="language-js highlighter-rouge"><pre class="highlight"><code>
+<span class="nx">exports</span><span class="p">.</span><span class="nx">setFreeVariable</span> <span class="o">=</span> <span class="kd">function</span><span class="p">(</span><span class="nx">key</span><span class="p">,</span> <span class="nx">value</span><span class="p">)</span> <span class="p">{</span>
+  <span class="kr">const</span> <span class="nx">env</span> <span class="o">=</span> <span class="p">{};</span>
+  <span class="nx">env</span><span class="p">[</span><span class="nx">key</span><span class="p">]</span> <span class="o">=</span> <span class="nx">JSON</span><span class="p">.</span><span class="nx">stringify</span><span class="p">(</span><span class="nx">value</span><span class="p">);</span>
+
+  <span class="k">return</span> <span class="p">{</span>
+    <span class="na">plugins</span><span class="p">:</span> <span class="p">[</span>
+      <span class="k">new</span> <span class="nx">webpack</span><span class="p">.</span><span class="nx">DefinePlugin</span><span class="p">(</span><span class="nx">env</span><span class="p">)</span>
+    <span class="p">]</span>
+  <span class="p">};</span>
+<span class="p">}</span>
+</code></pre>
+</div>
+
+<div class="language-js highlighter-rouge"><pre class="highlight"><code><span class="c1">// Detect how npm is run and branch based on that</span>
+<span class="k">switch</span><span class="p">(</span><span class="nx">process</span><span class="p">.</span><span class="nx">env</span><span class="p">.</span><span class="nx">npm_lifecycle_event</span><span class="p">)</span> <span class="p">{</span>
+  <span class="k">case</span> <span class="s1">'build'</span><span class="err">:</span>
+    <span class="nx">config</span> <span class="o">=</span> <span class="nx">merge</span><span class="p">(</span>
+      <span class="nx">common</span><span class="p">,</span>
+      <span class="p">{</span>
+        <span class="na">devtool</span><span class="p">:</span> <span class="s1">'source-map'</span>
+      <span class="p">},</span>
+
+      <span class="nx">parts</span><span class="p">.</span><span class="nx">setFreeVariable</span><span class="p">(</span>
+        <span class="s1">'process.env.NODE_ENV'</span><span class="p">,</span>
+        <span class="s1">'production'</span>
+      <span class="p">),</span>
+
+      <span class="nx">parts</span><span class="p">.</span><span class="nx">minify</span><span class="p">(),</span>
+      <span class="nx">parts</span><span class="p">.</span><span class="nx">setupCSS</span><span class="p">(</span><span class="nx">PATHS</span><span class="p">.</span><span class="nx">style</span><span class="p">)</span>
+    <span class="p">);</span>
+    <span class="k">break</span><span class="p">;</span>
+  <span class="nl">default</span><span class="p">:</span>
+    <span class="p">...</span>
+<span class="p">}</span>
+
+<span class="nx">module</span><span class="p">.</span><span class="nx">exports</span> <span class="o">=</span> <span class="nx">validate</span><span class="p">(</span><span class="nx">config</span><span class="p">);</span>
+</code></pre>
+</div>
+
+<p><strong><em>bundle splitting</em></strong></p>
+
+<p><a href="http://survivejs.com/webpack/building-with-webpack/splitting-bundles/#setting-up-a-vendor-bundle">http://survivejs.com/webpack/building-with-webpack/splitting-bundles/#setting-up-a-vendor-bundle</a></p>
+
+<p>To improve the situation, we can define a vendor entry containing React. This is done by matching the dependency name.</p>
+
+<div class="language-js highlighter-rouge"><pre class="highlight"><code><span class="kr">const</span> <span class="nx">common</span> <span class="o">=</span> <span class="p">{</span>
+  <span class="c1">// Entry accepts a path or an object of entries.</span>
+  <span class="c1">// We'll be using the latter form given it's</span>
+  <span class="c1">// convenient with more complex configurations.</span>
+  <span class="na">entry</span><span class="p">:</span> <span class="p">{</span>
+
+    <span class="na">app</span><span class="p">:</span> <span class="nx">PATHS</span><span class="p">.</span><span class="nx">app</span><span class="p">,</span>
+    <span class="na">vendor</span><span class="p">:</span> <span class="p">[</span><span class="s1">'react'</span><span class="p">]</span>
+
+  <span class="p">},</span>
+  <span class="na">output</span><span class="p">:</span> <span class="p">{</span>
+    <span class="na">path</span><span class="p">:</span> <span class="nx">PATHS</span><span class="p">.</span><span class="nx">build</span><span class="p">,</span>
+    <span class="na">filename</span><span class="p">:</span> <span class="s1">'[name].js'</span>
+  <span class="p">},</span>
+  <span class="na">plugins</span><span class="p">:</span> <span class="p">[</span>
+    <span class="k">new</span> <span class="nx">HtmlWebpackPlugin</span><span class="p">({</span>
+      <span class="na">title</span><span class="p">:</span> <span class="s1">'Webpack demo'</span>
+    <span class="p">})</span>
+  <span class="p">]</span>
+<span class="p">};</span>
+</code></pre>
+</div>
+<p>这样就得到了两个bundle文件，然后有时候我们会发现，这两个文件加起来的大小大于原本的bundle文件。这是因为这两个文件共同包含了某些模块。</p>
+
+<p>这时候我们可以用<code class="highlighter-rouge">CommonsChunkPlugin</code>来帮助我们</p>
+
+<div class="language-js highlighter-rouge"><pre class="highlight"><code>
+<span class="nx">exports</span><span class="p">.</span><span class="nx">extractBundle</span> <span class="o">=</span> <span class="kd">function</span><span class="p">(</span><span class="nx">options</span><span class="p">)</span> <span class="p">{</span>
+  <span class="kr">const</span> <span class="nx">entry</span> <span class="o">=</span> <span class="p">{};</span>
+  <span class="nx">entry</span><span class="p">[</span><span class="nx">options</span><span class="p">.</span><span class="nx">name</span><span class="p">]</span> <span class="o">=</span> <span class="nx">options</span><span class="p">.</span><span class="nx">entries</span><span class="p">;</span>
+
+  <span class="k">return</span> <span class="p">{</span>
+    <span class="c1">// Define an entry point needed for splitting.</span>
+    <span class="na">entry</span><span class="p">:</span> <span class="nx">entry</span><span class="p">,</span>
+    <span class="na">plugins</span><span class="p">:</span> <span class="p">[</span>
+      <span class="c1">// Extract bundle and manifest files. Manifest is</span>
+      <span class="c1">// needed for reliable caching.</span>
+      <span class="k">new</span> <span class="nx">webpack</span><span class="p">.</span><span class="nx">optimize</span><span class="p">.</span><span class="nx">CommonsChunkPlugin</span><span class="p">({</span>
+        <span class="na">names</span><span class="p">:</span> <span class="p">[</span><span class="nx">options</span><span class="p">.</span><span class="nx">name</span><span class="p">,</span> <span class="s1">'manifest'</span><span class="p">]</span>
+      <span class="p">})</span>
+    <span class="p">]</span>
+  <span class="p">};</span>
+<span class="p">}</span>
+
+<span class="nx">parts</span><span class="p">.</span><span class="nx">extractBundle</span><span class="p">({</span>
+  <span class="na">name</span><span class="p">:</span> <span class="s1">'vendor'</span><span class="p">,</span>
+  <span class="na">entries</span><span class="p">:</span> <span class="p">[</span><span class="s1">'react'</span><span class="p">]</span>
+<span class="p">}),</span>
+
+</code></pre>
+</div>
+
+<p><strong><em>placeholder</em></strong></p>
+
+<ul>
+  <li>[path] - Returns entry path.</li>
+  <li>[name] - Returns entry name.</li>
+  <li>[hash] - Returns build hash.</li>
+  <li>[chunkhash] - Returns a chunk specific hash.</li>
+</ul>
+
+<div class="language-js highlighter-rouge"><pre class="highlight"><code><span class="c1">// Detect how npm is run and branch based on that</span>
+<span class="k">switch</span><span class="p">(</span><span class="nx">process</span><span class="p">.</span><span class="nx">env</span><span class="p">.</span><span class="nx">npm_lifecycle_event</span><span class="p">)</span> <span class="p">{</span>
+  <span class="k">case</span> <span class="s1">'build'</span><span class="err">:</span>
+    <span class="nx">config</span> <span class="o">=</span> <span class="nx">merge</span><span class="p">(</span>
+      <span class="nx">common</span><span class="p">,</span>
+      <span class="p">{</span>
+
+        <span class="na">devtool</span><span class="p">:</span> <span class="s1">'source-map'</span><span class="p">,</span>
+        <span class="na">output</span><span class="p">:</span> <span class="p">{</span>
+          <span class="na">path</span><span class="p">:</span> <span class="nx">PATHS</span><span class="p">.</span><span class="nx">build</span><span class="p">,</span>
+          <span class="na">filename</span><span class="p">:</span> <span class="s1">'[name].[chunkhash].js'</span><span class="p">,</span>
+          <span class="c1">// This is used for require.ensure. The setup</span>
+          <span class="c1">// will work without but this is useful to set.</span>
+          <span class="na">chunkFilename</span><span class="p">:</span> <span class="s1">'[chunkhash].js'</span>
+        <span class="p">}</span>
+
+      <span class="p">},</span>
+      <span class="p">...</span>
+    <span class="p">);</span>
+    <span class="k">break</span><span class="p">;</span>
+  <span class="nl">default</span><span class="p">:</span>
+    <span class="p">...</span>
+<span class="p">}</span>
+
+<span class="nx">module</span><span class="p">.</span><span class="nx">exports</span> <span class="o">=</span> <span class="nx">validate</span><span class="p">(</span><span class="nx">config</span><span class="p">);</span>
+</code></pre>
+</div>
+
+<p><strong><em>separating-css</em></strong></p>
+
+<p>We can achieve this using the <code class="highlighter-rouge">ExtractTextPlugin</code>.</p>
+
+<p>It comes with overhead during the compilation phase, and it won’t work with Hot Module Replacement (HMR) by design. Given we are using it only for production, that won’t be a problem.</p>
+
+<p>The plugin operates in two parts.</p>
+
+<ul>
+  <li>There’s a loader, <code class="highlighter-rouge">ExtractTextPlugin.extract</code>, that marks the assets to be extracted.</li>
+  <li>The plugin itself will then use that information to write the file. In a function form the idea looks like this:</li>
+</ul>
+
+<div class="language-js highlighter-rouge"><pre class="highlight"><code><span class="kr">const</span> <span class="nx">ExtractTextPlugin</span> <span class="o">=</span> <span class="nx">require</span><span class="p">(</span><span class="s1">'extract-text-webpack-plugin'</span><span class="p">);</span>
+
+<span class="nx">exports</span><span class="p">.</span><span class="nx">extractCSS</span> <span class="o">=</span> <span class="kd">function</span><span class="p">(</span><span class="nx">paths</span><span class="p">)</span> <span class="p">{</span>
+  <span class="k">return</span> <span class="p">{</span>
+    <span class="na">module</span><span class="p">:</span> <span class="p">{</span>
+      <span class="na">loaders</span><span class="p">:</span> <span class="p">[</span>
+        <span class="c1">// Extract CSS during build</span>
+        <span class="p">{</span>
+          <span class="na">test</span><span class="p">:</span> <span class="sr">/</span><span class="se">\.</span><span class="sr">css$/</span><span class="p">,</span>
+          <span class="na">loader</span><span class="p">:</span> <span class="nx">ExtractTextPlugin</span><span class="p">.</span><span class="nx">extract</span><span class="p">(</span><span class="s1">'style'</span><span class="p">,</span> <span class="s1">'css'</span><span class="p">),</span>
+          <span class="na">include</span><span class="p">:</span> <span class="nx">paths</span>
+        <span class="p">}</span>
+      <span class="p">]</span>
+    <span class="p">},</span>
+    <span class="na">plugins</span><span class="p">:</span> <span class="p">[</span>
+      <span class="c1">// Output extracted CSS to a file</span>
+      <span class="k">new</span> <span class="nx">ExtractTextPlugin</span><span class="p">(</span><span class="s1">'[name].[chunkhash].css'</span><span class="p">)</span>
+    <span class="p">]</span>
+  <span class="p">};</span>
+<span class="p">}</span>
+</code></pre>
+</div>
+
+<p>原来的代码如下，虽然用ExtractTextPlugin提取出了css,浏览器可以缓存，但是 If you try to modify either index.js or main.css, the hash of both files (app.js and app.css) will change!</p>
+
+<div class="language-js highlighter-rouge"><pre class="highlight"><code>
+<span class="nx">require</span><span class="p">(</span><span class="s1">'react'</span><span class="p">);</span>
+
+<span class="nx">require</span><span class="p">(</span><span class="s1">'./main.css'</span><span class="p">);</span>
+
+</code></pre>
+</div>
+
+<p>所以要在index.js中删除<code class="highlighter-rouge">require('./main.css');</code>，然后在webpack中load相关css</p>
+
+<p><strong><em>Eliminating Unused CSS</em></strong></p>
+
+<p>It is important the plugin is used after the <code class="highlighter-rouge">ExtractTextPlugin</code> as otherwise it won’t work!</p>
+
+<div class="language-js highlighter-rouge"><pre class="highlight"><code>
+<span class="kr">const</span> <span class="nx">PurifyCSSPlugin</span> <span class="o">=</span> <span class="nx">require</span><span class="p">(</span><span class="s1">'purifycss-webpack-plugin'</span><span class="p">);</span>
+
+<span class="nx">exports</span><span class="p">.</span><span class="nx">purifyCSS</span> <span class="o">=</span> <span class="kd">function</span><span class="p">(</span><span class="nx">paths</span><span class="p">)</span> <span class="p">{</span>
+  <span class="k">return</span> <span class="p">{</span>
+    <span class="na">plugins</span><span class="p">:</span> <span class="p">[</span>
+      <span class="k">new</span> <span class="nx">PurifyCSSPlugin</span><span class="p">({</span>
+        <span class="na">basePath</span><span class="p">:</span> <span class="nx">process</span><span class="p">.</span><span class="nx">cwd</span><span class="p">(),</span>
+        <span class="c1">// `paths` is used to point PurifyCSS to files not</span>
+        <span class="c1">// visible to Webpack. You can pass glob patterns</span>
+        <span class="c1">// to it.</span>
+        <span class="na">paths</span><span class="p">:</span> <span class="nx">paths</span>
+      <span class="p">}),</span>
+    <span class="p">]</span>
+  <span class="p">}</span>
+<span class="p">}</span>
+</code></pre>
+</div>
+
+<p><strong><em>analyzing build statistics</em></strong></p>
+
+<div class="language-js highlighter-rouge"><pre class="highlight"><code><span class="c1">// package.json</span>
+<span class="p">{</span>
+  <span class="s2">"scripts"</span><span class="err">:</span> <span class="p">{</span>
+    <span class="s2">"stats"</span><span class="err">:</span> <span class="s2">"webpack --profile --json &gt; stats.json"</span><span class="p">,</span>
+  <span class="p">},</span>
+<span class="p">}</span>
+</code></pre>
+</div>
+
+<div class="language-js highlighter-rouge"><pre class="highlight"><code><span class="c1">//webpack.config.js</span>
+<span class="nx">module</span><span class="p">.</span><span class="nx">exports</span> <span class="o">=</span> <span class="nx">validate</span><span class="p">(</span><span class="nx">config</span><span class="p">,</span> <span class="p">{</span>
+  <span class="na">quiet</span><span class="p">:</span> <span class="kc">true</span>
+<span class="p">});</span>
+</code></pre>
+</div>
+
+<p>If you execute npm run stats now, you should find stats.json at your project root after it has finished processing.</p>
+
+<p><strong><em>Profile Tools</em></strong></p>
+
+<p><a href="http://survivejs.com/webpack/building-with-webpack/analyzing-build-statistics/">http://survivejs.com/webpack/building-with-webpack/analyzing-build-statistics/</a></p>
+
+<hr />
+
+<h3 id="loading-assets">Loading Assets</h3>
+
+<p><strong><em>load css</em></strong></p>
+
+<div class="language-js highlighter-rouge"><pre class="highlight"><code><span class="nx">module</span><span class="p">.</span><span class="nx">exports</span> <span class="o">=</span> <span class="p">{</span>
+  <span class="p">...</span>
+  <span class="na">module</span><span class="p">:</span> <span class="p">{</span>
+    <span class="na">loaders</span><span class="p">:</span> <span class="p">[</span>
+      <span class="p">{</span>
+        <span class="c1">// Match files against RegExp</span>
+        <span class="na">test</span><span class="p">:</span> <span class="sr">/</span><span class="se">\.</span><span class="sr">css$/</span><span class="p">,</span>
+
+        <span class="c1">// Apply loaders against it. These need to</span>
+        <span class="c1">// be installed separately. In this case our</span>
+        <span class="c1">// project would need *style-loader* and *css-loader*.</span>
+        <span class="na">loaders</span><span class="p">:</span> <span class="p">[</span><span class="s1">'style'</span><span class="p">,</span> <span class="s1">'css'</span><span class="p">],</span>
+
+        <span class="c1">// Restrict matching to a directory. This also accepts an array of paths.</span>
+        <span class="c1">// Although optional, I prefer to set this (better performance,</span>
+        <span class="c1">// clearer configuration).</span>
+        <span class="na">include</span><span class="p">:</span> <span class="nx">path</span><span class="p">.</span><span class="nx">join</span><span class="p">(</span><span class="nx">__dirname</span><span class="p">,</span> <span class="s1">'app'</span><span class="p">)</span>
+      <span class="p">}</span>
+    <span class="p">]</span>
+  <span class="p">}</span>
+<span class="p">};</span>
+</code></pre>
+</div>
+
+<h4 id="modules-in-javascript">Modules in javascript</h4>
+
+<p><strong><em>Commonjs</em></strong></p>
+
+<div class="language-js highlighter-rouge"><pre class="highlight"><code><span class="kd">var</span> <span class="nx">MyModule</span> <span class="o">=</span> <span class="nx">require</span><span class="p">(</span><span class="s1">'./MyModule'</span><span class="p">);</span>
+
+<span class="c1">// export at module root</span>
+<span class="nx">module</span><span class="p">.</span><span class="nx">exports</span> <span class="o">=</span> <span class="kd">function</span><span class="p">()</span> <span class="p">{</span> <span class="p">...</span> <span class="p">};</span>
+
+<span class="c1">// alternatively, export individual functions</span>
+<span class="nx">exports</span><span class="p">.</span><span class="nx">hello</span> <span class="o">=</span> <span class="kd">function</span><span class="p">()</span> <span class="p">{...};</span>
+</code></pre>
+</div>
+
+<p><strong><em>ES6</em></strong></p>
+
+<div class="language-js highlighter-rouge"><pre class="highlight"><code><span class="kr">import</span> <span class="nx">MyModule</span> <span class="nx">from</span> <span class="s1">'./MyModule.js'</span><span class="p">;</span>
+
+<span class="c1">// export at module root</span>
+<span class="kr">export</span> <span class="k">default</span> <span class="kd">function</span> <span class="p">()</span> <span class="p">{</span> <span class="p">...</span> <span class="p">};</span>
+
+<span class="c1">// or export as module function,</span>
+<span class="c1">// you can have multiple of these per module</span>
+<span class="kr">export</span> <span class="kd">function</span> <span class="nx">hello</span><span class="p">()</span> <span class="p">{...};</span>
+</code></pre>
+</div>
+
+<p><strong><em>AMD</em></strong></p>
+
+<div class="language-js highlighter-rouge"><pre class="highlight"><code><span class="nx">define</span><span class="p">([</span><span class="s1">'./MyModule.js'</span><span class="p">],</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">MyModule</span><span class="p">)</span> <span class="p">{</span>
+  <span class="c1">// export at module root</span>
+  <span class="k">return</span> <span class="kd">function</span><span class="p">()</span> <span class="p">{};</span>
+<span class="p">});</span>
+
+<span class="c1">// or</span>
+<span class="nx">define</span><span class="p">([</span><span class="s1">'./MyModule.js'</span><span class="p">],</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">MyModule</span><span class="p">)</span> <span class="p">{</span>
+  <span class="c1">// export as module function</span>
+  <span class="k">return</span> <span class="p">{</span>
+    <span class="na">hello</span><span class="p">:</span> <span class="kd">function</span><span class="p">()</span> <span class="p">{...}</span>
+  <span class="p">};</span>
+<span class="p">});</span>
+</code></pre>
+</div>
+
+<p><strong><em>UMD</em></strong></p>
+
+<p><strong><em>loader</em></strong></p>
+
+<p>Generally you either use <code class="highlighter-rouge">loader (accepts string)</code> or <code class="highlighter-rouge">loaders field (accepts array of strings)</code> and then pass possible query parameters using one of the available methods.</p>
+
+<p>It is good to keep in mind that Webpack’s loaders are always evaluated from right to left and from bottom to top (separate definitions).</p>
+
+<div class="language-js highlighter-rouge"><pre class="highlight"><code><span class="p">{</span>
+  <span class="nl">test</span><span class="p">:</span> <span class="sr">/</span><span class="se">\.</span><span class="sr">css$/</span><span class="p">,</span>
+  <span class="nx">loaders</span><span class="err">:</span> <span class="p">[</span><span class="s1">'style'</span><span class="p">,</span> <span class="s1">'css'</span><span class="p">],</span>
+  <span class="nx">include</span><span class="err">:</span> <span class="nx">PATHS</span><span class="p">.</span><span class="nx">app</span>
+<span class="p">}</span>
+</code></pre>
+</div>
+
+<p>等于</p>
+
+<div class="language-js highlighter-rouge"><pre class="highlight"><code><span class="p">{</span>
+  <span class="nl">test</span><span class="p">:</span> <span class="sr">/</span><span class="se">\.</span><span class="sr">css$/</span><span class="p">,</span>
+  <span class="nx">loaders</span><span class="err">:</span> <span class="p">[</span><span class="s1">'style'</span><span class="p">],</span>
+  <span class="nx">include</span><span class="err">:</span> <span class="nx">PATHS</span><span class="p">.</span><span class="nx">app</span>
+<span class="p">},</span>
+<span class="p">{</span>
+  <span class="na">test</span><span class="p">:</span> <span class="sr">/</span><span class="se">\.</span><span class="sr">css$/</span><span class="p">,</span>
+  <span class="na">loaders</span><span class="p">:</span> <span class="p">[</span><span class="s1">'css'</span><span class="p">],</span>
+  <span class="na">include</span><span class="p">:</span> <span class="nx">PATHS</span><span class="p">.</span><span class="nx">app</span>
+<span class="p">}</span>
+</code></pre>
+</div>
+
+<p><strong><em>Passing Parameters to a Loader</em></strong></p>
+
+<div class="language-js highlighter-rouge"><pre class="highlight"><code><span class="p">{</span>
+  <span class="nl">test</span><span class="p">:</span> <span class="sr">/</span><span class="se">\.</span><span class="sr">jsx</span><span class="se">?</span><span class="sr">$/</span><span class="p">,</span>
+  <span class="nx">loaders</span><span class="err">:</span> <span class="p">[</span>
+    <span class="s1">'babel?cacheDirectory,presets[]=react,presets[]=es2015'</span>
+  <span class="p">],</span>
+  <span class="nx">include</span><span class="err">:</span> <span class="nx">PATHS</span><span class="p">.</span><span class="nx">app</span>
+<span class="p">}</span>
+</code></pre>
+</div>
+
+<p>写成如下格式更加清晰</p>
+
+<div class="language-js highlighter-rouge"><pre class="highlight"><code><span class="p">{</span>
+  <span class="nl">test</span><span class="p">:</span> <span class="sr">/</span><span class="se">\.</span><span class="sr">jsx</span><span class="se">?</span><span class="sr">$/</span><span class="p">,</span>
+  <span class="nx">loader</span><span class="err">:</span> <span class="s1">'babel'</span><span class="p">,</span>
+  <span class="nx">query</span><span class="err">:</span> <span class="p">{</span>
+    <span class="nl">cacheDirectory</span><span class="p">:</span> <span class="kc">true</span><span class="p">,</span>
+    <span class="nx">presets</span><span class="err">:</span> <span class="p">[</span><span class="s1">'react'</span><span class="p">,</span> <span class="s1">'es2015'</span><span class="p">]</span>
+  <span class="p">},</span>
+  <span class="nx">include</span><span class="err">:</span> <span class="nx">PATHS</span><span class="p">.</span><span class="nx">app</span>
+<span class="p">}</span>
+</code></pre>
+</div>
+
+<p><strong><em>loading css</em></strong></p>
+
+<div class="language-js highlighter-rouge"><pre class="highlight"><code><span class="kr">const</span> <span class="nx">common</span> <span class="o">=</span> <span class="p">{</span>
+  <span class="p">...</span>
+  <span class="na">module</span><span class="p">:</span> <span class="p">{</span>
+    <span class="na">loaders</span><span class="p">:</span> <span class="p">[</span>
+      <span class="p">{</span>
+        <span class="na">test</span><span class="p">:</span> <span class="sr">/</span><span class="se">\.</span><span class="sr">css$/</span><span class="p">,</span>
+        <span class="na">loaders</span><span class="p">:</span> <span class="p">[</span><span class="s1">'style'</span><span class="p">,</span> <span class="s1">'css'</span><span class="p">],</span>
+        <span class="na">include</span><span class="p">:</span> <span class="nx">PATHS</span><span class="p">.</span><span class="nx">style</span>
+      <span class="p">}</span>
+    <span class="p">]</span>
+  <span class="p">},</span>
+  <span class="p">...</span>
+<span class="p">};</span>
+</code></pre>
+</div>
+
+<p><code class="highlighter-rouge">css-loader</code> goes through possible <code class="highlighter-rouge">@import</code> and <code class="highlighter-rouge">url()</code> statements within the matched files and treats them as regular <code class="highlighter-rouge">require</code>. This allows us to rely on various other loaders, such as <code class="highlighter-rouge">file-loader</code> or <code class="highlighter-rouge">url-loader</code>.</p>
+
+<p><code class="highlighter-rouge">style-loader</code> picks up the output and injects the CSS into the resulting bundle.</p>
+
+<p><strong><em>sass</em></strong></p>
+
+<div class="language-js highlighter-rouge"><pre class="highlight"><code><span class="p">{</span>
+  <span class="nl">test</span><span class="p">:</span> <span class="sr">/</span><span class="se">\.</span><span class="sr">scss$/</span><span class="p">,</span>
+  <span class="nx">loaders</span><span class="err">:</span> <span class="p">[</span><span class="s1">'style'</span><span class="p">,</span> <span class="s1">'css'</span><span class="p">,</span> <span class="s1">'sass'</span><span class="p">],</span>
+  <span class="nx">include</span><span class="err">:</span> <span class="nx">PATHS</span><span class="p">.</span><span class="nx">style</span>
+<span class="p">}</span>
+</code></pre>
+</div>
+
+<p><strong><em>Loading Stylus and YETICSS</em></strong></p>
+
+<div class="language-js highlighter-rouge"><pre class="highlight"><code><span class="kr">const</span> <span class="nx">common</span> <span class="o">=</span> <span class="p">{</span>
+  <span class="p">...</span>
+  <span class="na">module</span><span class="p">:</span> <span class="p">{</span>
+    <span class="na">loaders</span><span class="p">:</span> <span class="p">[</span>
+      <span class="p">{</span>
+        <span class="na">test</span><span class="p">:</span> <span class="sr">/</span><span class="se">\.</span><span class="sr">styl$/</span><span class="p">,</span>
+        <span class="na">loaders</span><span class="p">:</span> <span class="p">[</span><span class="s1">'style'</span><span class="p">,</span> <span class="s1">'css'</span><span class="p">,</span> <span class="s1">'stylus'</span><span class="p">],</span>
+        <span class="na">include</span><span class="p">:</span> <span class="nx">PATHS</span><span class="p">.</span><span class="nx">style</span>
+      <span class="p">}</span>
+    <span class="p">]</span>
+  <span class="p">},</span>
+  <span class="c1">// yeticss</span>
+  <span class="na">stylus</span><span class="p">:</span> <span class="p">{</span>
+    <span class="na">use</span><span class="p">:</span> <span class="p">[</span><span class="nx">require</span><span class="p">(</span><span class="s1">'yeticss'</span><span class="p">)]</span>
+  <span class="p">}</span>
+<span class="p">};</span>
+</code></pre>
+</div>
+
+<div class="language-scss highlighter-rouge"><pre class="highlight"><code><span class="k">@import</span> <span class="s1">'yeticss'</span>
+
+<span class="o">//</span><span class="ow">or</span>
+<span class="o">@</span><span class="n">import</span> <span class="s1">'yeticss/components/type'</span>
+</code></pre>
+</div>
+
+<p><strong><em>PostCSS</em></strong></p>
+
+<p><code class="highlighter-rouge">PostCSS</code> allows you to perform transformations over CSS through JavaScript plugins. You can even find plugins that provide you Sass-like features.</p>
+
+<div class="language-js highlighter-rouge"><pre class="highlight"><code><span class="kr">const</span> <span class="nx">autoprefixer</span> <span class="o">=</span> <span class="nx">require</span><span class="p">(</span><span class="s1">'autoprefixer'</span><span class="p">);</span>
+<span class="kr">const</span> <span class="nx">precss</span> <span class="o">=</span> <span class="nx">require</span><span class="p">(</span><span class="s1">'precss'</span><span class="p">);</span>
+
+<span class="nx">module</span><span class="p">.</span><span class="nx">exports</span> <span class="o">=</span> <span class="p">{</span>
+  <span class="na">module</span><span class="p">:</span> <span class="p">{</span>
+    <span class="na">loaders</span><span class="p">:</span> <span class="p">[</span>
+      <span class="p">{</span>
+        <span class="na">test</span><span class="p">:</span> <span class="sr">/</span><span class="se">\.</span><span class="sr">css$/</span><span class="p">,</span>
+        <span class="na">loaders</span><span class="p">:</span> <span class="p">[</span><span class="s1">'style'</span><span class="p">,</span> <span class="s1">'css'</span><span class="p">,</span> <span class="s1">'postcss'</span><span class="p">],</span>
+        <span class="na">include</span><span class="p">:</span> <span class="nx">PATHS</span><span class="p">.</span><span class="nx">style</span>
+      <span class="p">}</span>
+    <span class="p">]</span>
+  <span class="p">},</span>
+  <span class="c1">// PostCSS plugins go here</span>
+  <span class="na">postcss</span><span class="p">:</span> <span class="kd">function</span> <span class="p">()</span> <span class="p">{</span>
+      <span class="k">return</span> <span class="p">[</span><span class="nx">autoprefixer</span><span class="p">,</span> <span class="nx">precss</span><span class="p">];</span>
+  <span class="p">}</span>
+<span class="p">};</span>
+</code></pre>
+</div>
+
+<p><strong><em>load cssnext</em></strong></p>
+
+<div class="language-js highlighter-rouge"><pre class="highlight"><code><span class="p">{</span>
+  <span class="nl">test</span><span class="p">:</span> <span class="sr">/</span><span class="se">\.</span><span class="sr">css$/</span><span class="p">,</span>
+  <span class="nx">loaders</span><span class="err">:</span> <span class="p">[</span><span class="s1">'style'</span><span class="p">,</span> <span class="s1">'css'</span><span class="p">,</span> <span class="s1">'cssnext'</span><span class="p">],</span>
+  <span class="nx">include</span><span class="err">:</span> <span class="nx">PATHS</span><span class="p">.</span><span class="nx">style</span>
+<span class="p">}</span>
+</code></pre>
+</div>
+
+<hr />
+
+<h4 id="loading-images">Loading images</h4>
+
+<p>Webpack allows you to inline assets by using <code class="highlighter-rouge">url-loader</code>. It will output your images as BASE64 strings within your JavaScript bundles.</p>
+
+<p>This will decrease the amount of requests needed while growing the bundle size.</p>
+
+<p>Webpack allows you to control the inlining process and defer loading to <code class="highlighter-rouge">file-loader</code> that outputs image files and returns paths to them.</p>
+
+<p><strong><em>Setting Up url-loader</em></strong></p>
+
+<p>Assuming you have configured your styles correctly, Webpack will resolve any <code class="highlighter-rouge">url()</code> statements your styling might have. You can of course point to the image assets through your JavaScript code as well.</p>
+
+<div class="language-js highlighter-rouge"><pre class="highlight"><code><span class="c1">// load .jpg and .png files while inlining files below 25kB</span>
+<span class="p">{</span>
+  <span class="nl">test</span><span class="p">:</span> <span class="sr">/</span><span class="se">\.(</span><span class="sr">jpg|png</span><span class="se">)</span><span class="sr">$/</span><span class="p">,</span>
+  <span class="nx">loader</span><span class="err">:</span> <span class="s1">'url?limit=25000'</span><span class="p">,</span>
+  <span class="nx">include</span><span class="err">:</span> <span class="nx">PATHS</span><span class="p">.</span><span class="nx">images</span>
+<span class="p">}</span>
+</code></pre>
+</div>
+
+<p><strong><em>Setting Up file-loader</em></strong></p>
+
+<div class="language-js highlighter-rouge"><pre class="highlight"><code><span class="p">{</span>
+  <span class="nl">test</span><span class="p">:</span> <span class="sr">/</span><span class="se">\.(</span><span class="sr">jpg|png</span><span class="se">)</span><span class="sr">$/</span><span class="p">,</span>
+  <span class="c1">// By default file-loader returns the MD5 hash</span>
+  <span class="c1">// of the file's contents with the original extension</span>
+  <span class="nx">loader</span><span class="err">:</span> <span class="s1">'file?name=[path][name].[hash].[ext]'</span><span class="p">,</span>
+  <span class="nx">include</span><span class="err">:</span> <span class="nx">PATHS</span><span class="p">.</span><span class="nx">images</span>
+<span class="p">}</span>
+</code></pre>
+</div>
+
+<p><strong><em>Loading SVGs</em></strong></p>
+
+<div class="language-js highlighter-rouge"><pre class="highlight"><code><span class="p">{</span>
+  <span class="nl">test</span><span class="p">:</span> <span class="sr">/</span><span class="se">\.</span><span class="sr">svg$/</span><span class="p">,</span>
+  <span class="nx">loader</span><span class="err">:</span> <span class="s1">'file'</span><span class="p">,</span>
+  <span class="nx">include</span><span class="err">:</span> <span class="nx">PATHS</span><span class="p">.</span><span class="nx">images</span>
+<span class="p">}</span>
+</code></pre>
+</div>
+
+<p>The example SVG path below is relative to the CSS file:</p>
+
+<div class="language-css highlighter-rouge"><pre class="highlight"><code><span class="nc">.icon</span> <span class="p">{</span>
+   <span class="nl">background-image</span><span class="p">:</span> <span class="sx">url('../assets/icon.svg')</span><span class="p">;</span>
+<span class="p">}</span>
+</code></pre>
+</div>
+
+<p>If you want the raw SVG content, you can use the <code class="highlighter-rouge">raw-loader</code> for this purpose. This can be useful if you want to inject the SVG content to directly to JavaScript or HTML markup.</p>
+
+<p><strong><em>Compressing Images</em></strong></p>
+
+<p>In case you want to compress your images, use <code class="highlighter-rouge">image-webpack-loader</code> or <code class="highlighter-rouge">svgo-loader</code> (SVG specific). This type of loader should be applied first to the data so remember to place it as the last within loaders listing.</p>
+
+<hr />
+
+<h3 id="loading-fonts">Loading Fonts</h3>
+
+<div class="language-js highlighter-rouge"><pre class="highlight"><code><span class="p">{</span>
+  <span class="nl">test</span><span class="p">:</span> <span class="sr">/</span><span class="se">\.</span><span class="sr">woff$/</span><span class="p">,</span>
+  <span class="nx">loader</span><span class="err">:</span> <span class="s1">'url?limit=50000'</span><span class="p">,</span>
+  <span class="nx">include</span><span class="err">:</span> <span class="nx">PATHS</span><span class="p">.</span><span class="nx">fonts</span>
+<span class="p">}</span>
+</code></pre>
+</div>
+
+<p>or</p>
+
+<div class="language-js highlighter-rouge"><pre class="highlight"><code><span class="p">{</span>
+  <span class="c1">// Match woff2 in addition to patterns like .woff?v=1.1.1.</span>
+  <span class="nl">test</span><span class="p">:</span> <span class="sr">/</span><span class="se">\.</span><span class="sr">woff</span><span class="se">(</span><span class="sr">2</span><span class="se">)?(\?</span><span class="sr">v=</span><span class="se">[</span><span class="sr">0-9</span><span class="se">]\.[</span><span class="sr">0-9</span><span class="se">]\.[</span><span class="sr">0-9</span><span class="se">])?</span><span class="sr">$/</span><span class="p">,</span>
+  <span class="nx">loader</span><span class="err">:</span> <span class="s1">'url'</span><span class="p">,</span>
+  <span class="nx">query</span><span class="err">:</span> <span class="p">{</span>
+    <span class="nl">limit</span><span class="p">:</span> <span class="mi">50000</span><span class="p">,</span>
+    <span class="nx">mimetype</span><span class="err">:</span> <span class="s1">'application/font-woff'</span><span class="p">,</span>
+    <span class="nx">name</span><span class="err">:</span> <span class="s1">'./fonts/[hash].[ext]'</span>
+  <span class="p">}</span>
+<span class="p">}</span>
+</code></pre>
+</div>
+
+<p><strong><em>Supporting Multiple Formats</em></strong></p>
+
+<div class="language-js highlighter-rouge"><pre class="highlight"><code><span class="p">{</span>
+  <span class="nl">test</span><span class="p">:</span> <span class="sr">/</span><span class="se">\.</span><span class="sr">woff$/</span><span class="p">,</span>
+  <span class="c1">// Inline small woff files and output them below font/.</span>
+  <span class="c1">// Set mimetype just in case.</span>
+  <span class="nx">loader</span><span class="err">:</span> <span class="s1">'url'</span><span class="p">,</span>
+  <span class="nx">query</span><span class="err">:</span> <span class="p">{</span>
+    <span class="nl">name</span><span class="p">:</span> <span class="s1">'font/[hash].[ext]'</span><span class="p">,</span>
+    <span class="nx">limit</span><span class="err">:</span> <span class="mi">5000</span><span class="p">,</span>
+    <span class="nx">mimetype</span><span class="err">:</span> <span class="s1">'application/font-woff'</span>
+  <span class="p">},</span>
+  <span class="nx">include</span><span class="err">:</span> <span class="nx">PATHS</span><span class="p">.</span><span class="nx">fonts</span>
+<span class="p">},</span>
+<span class="p">{</span>
+  <span class="na">test</span><span class="p">:</span> <span class="sr">/</span><span class="se">\.</span><span class="sr">ttf$|</span><span class="se">\.</span><span class="sr">eot$/</span><span class="p">,</span>
+  <span class="na">loader</span><span class="p">:</span> <span class="s1">'file'</span><span class="p">,</span>
+  <span class="na">query</span><span class="p">:</span> <span class="p">{</span>
+    <span class="na">name</span><span class="p">:</span> <span class="s1">'font/[hash].[ext]'</span>
+  <span class="p">},</span>
+  <span class="na">include</span><span class="p">:</span> <span class="nx">PATHS</span><span class="p">.</span><span class="nx">fonts</span>
+<span class="p">}</span>
+</code></pre>
+</div>
+
+
+  </div>
+
+</article>
+
+      </div>
+    </div>
+
+    <footer class="site-footer">
+
+  <div class="wrapper">
+
+    <h2 class="footer-heading">Dawny Wu's blog</h2>
+
+    <div class="footer-col-wrapper">
+      <div class="footer-col footer-col-1">
+        <ul class="contact-list">
+          <li>Dawny Wu's blog</li>
+          <li><a href="mailto:nothing@gmail.com">nothing@gmail.com</a></li>
+        </ul>
+      </div>
+
+      <div class="footer-col footer-col-2">
+        <ul class="social-media-list">
+          
+          <li>
+            <a href="https://github.com/jekyll"><span class="icon icon--github"><svg viewBox="0 0 16 16"><path fill="#828282" d="M7.999,0.431c-4.285,0-7.76,3.474-7.76,7.761 c0,3.428,2.223,6.337,5.307,7.363c0.388,0.071,0.53-0.168,0.53-0.374c0-0.184-0.007-0.672-0.01-1.32 c-2.159,0.469-2.614-1.04-2.614-1.04c-0.353-0.896-0.862-1.135-0.862-1.135c-0.705-0.481,0.053-0.472,0.053-0.472 c0.779,0.055,1.189,0.8,1.189,0.8c0.692,1.186,1.816,0.843,2.258,0.645c0.071-0.502,0.271-0.843,0.493-1.037 C4.86,11.425,3.049,10.76,3.049,7.786c0-0.847,0.302-1.54,0.799-2.082C3.768,5.507,3.501,4.718,3.924,3.65 c0,0,0.652-0.209,2.134,0.796C6.677,4.273,7.34,4.187,8,4.184c0.659,0.003,1.323,0.089,1.943,0.261 c1.482-1.004,2.132-0.796,2.132-0.796c0.423,1.068,0.157,1.857,0.077,2.054c0.497,0.542,0.798,1.235,0.798,2.082 c0,2.981-1.814,3.637-3.543,3.829c0.279,0.24,0.527,0.713,0.527,1.437c0,1.037-0.01,1.874-0.01,2.129 c0,0.208,0.14,0.449,0.534,0.373c3.081-1.028,5.302-3.935,5.302-7.362C15.76,3.906,12.285,0.431,7.999,0.431z"/></svg>
+</span><span class="username">jekyll</span></a>
+
+          </li>
+          
+
+          
+          <li>
+            <a href="https://twitter.com/jekyllrb"><span class="icon icon--twitter"><svg viewBox="0 0 16 16"><path fill="#828282" d="M15.969,3.058c-0.586,0.26-1.217,0.436-1.878,0.515c0.675-0.405,1.194-1.045,1.438-1.809c-0.632,0.375-1.332,0.647-2.076,0.793c-0.596-0.636-1.446-1.033-2.387-1.033c-1.806,0-3.27,1.464-3.27,3.27 c0,0.256,0.029,0.506,0.085,0.745C5.163,5.404,2.753,4.102,1.14,2.124C0.859,2.607,0.698,3.168,0.698,3.767 c0,1.134,0.577,2.135,1.455,2.722C1.616,6.472,1.112,6.325,0.671,6.08c0,0.014,0,0.027,0,0.041c0,1.584,1.127,2.906,2.623,3.206 C3.02,9.402,2.731,9.442,2.433,9.442c-0.211,0-0.416-0.021-0.615-0.059c0.416,1.299,1.624,2.245,3.055,2.271 c-1.119,0.877-2.529,1.4-4.061,1.4c-0.264,0-0.524-0.015-0.78-0.046c1.447,0.928,3.166,1.469,5.013,1.469 c6.015,0,9.304-4.983,9.304-9.304c0-0.142-0.003-0.283-0.009-0.423C14.976,4.29,15.531,3.714,15.969,3.058z"/></svg>
+</span><span class="username">jekyllrb</span></a>
+
+          </li>
+          
+        </ul>
+      </div>
+
+      <div class="footer-col footer-col-3">
+        <p>Write an awesome description for your new site here. You can edit this line in _config.yml. It will appear in your document head meta (for Google search results) and in your feed.xml site description.
+</p>
+      </div>
+    </div>
+
+  </div>
+
+</footer>
+
+
+  </body>
+
+</html>

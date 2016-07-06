@@ -1,6 +1,6 @@
 ---
 layout: post
-title:  "Webpack"
+title:  "Webpack Egghead"
 date:   2016-07-02
 categories: webpack
 ---
@@ -117,3 +117,5 @@ import leftPad from 'imports?window=>{}exports?leftPad!./non_node_modules/leftPa
   ],
 }
 ```
+
+
