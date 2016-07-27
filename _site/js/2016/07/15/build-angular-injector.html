@@ -62,9 +62,8 @@
   </header>
 
   <div class="post-content" itemprop="articleBody">
-    <h4 id="provide">$provide</h4>
-
-<div class="language-js highlighter-rouge"><pre class="highlight"><code><span class="nx">it</span><span class="p">(</span><span class="s1">'allows injecting the $provide service to providers'</span><span class="p">,</span> <span class="kd">function</span><span class="p">()</span> <span class="p">{</span>
+    <h4>$provide</h4>
+<div class="highlight"><pre><code class="language-js" data-lang="js"><span class="nx">it</span><span class="p">(</span><span class="s1">'allows injecting the $provide service to providers'</span><span class="p">,</span> <span class="kd">function</span><span class="p">()</span> <span class="p">{</span>
   <span class="kd">var</span> <span class="nx">module</span> <span class="o">=</span> <span class="nx">angular</span><span class="p">.</span><span class="nx">module</span><span class="p">(</span><span class="s1">'myModule'</span><span class="p">,</span> <span class="p">[]);</span>
   <span class="nx">module</span><span class="p">.</span><span class="nx">provider</span><span class="p">(</span><span class="s1">'a'</span><span class="p">,</span> 
     <span class="kd">function</span> <span class="nx">AProvider</span><span class="p">(</span><span class="nx">$provide</span><span class="p">)</span> <span class="p">{</span> 
@@ -75,10 +74,7 @@
   <span class="kd">var</span> <span class="nx">injector</span> <span class="o">=</span> <span class="nx">createInjector</span><span class="p">([</span><span class="s1">'myModule'</span><span class="p">]);</span>
   <span class="nx">expect</span><span class="p">(</span><span class="nx">injector</span><span class="p">.</span><span class="nx">get</span><span class="p">(</span><span class="s1">'a'</span><span class="p">)).</span><span class="nx">toBe</span><span class="p">(</span><span class="mi">3</span><span class="p">);</span>
 <span class="p">});</span>
-</code></pre>
-</div>
-
-<div class="language-js highlighter-rouge"><pre class="highlight"><code><span class="nx">it</span><span class="p">(</span><span class="s1">'does not allow injecting the $provide service to $get'</span><span class="p">,</span> <span class="kd">function</span><span class="p">()</span> <span class="p">{</span>
+</code></pre></div><div class="highlight"><pre><code class="language-js" data-lang="js"><span class="nx">it</span><span class="p">(</span><span class="s1">'does not allow injecting the $provide service to $get'</span><span class="p">,</span> <span class="kd">function</span><span class="p">()</span> <span class="p">{</span>
   <span class="kd">var</span> <span class="nx">module</span> <span class="o">=</span> <span class="nx">angular</span><span class="p">.</span><span class="nx">module</span><span class="p">(</span><span class="s1">'myModule'</span><span class="p">,</span> <span class="p">[]);</span>
   <span class="nx">module</span><span class="p">.</span><span class="nx">provider</span><span class="p">(</span><span class="s1">'a'</span><span class="p">,</span>
     <span class="kd">function</span> <span class="nx">AProvider</span><span class="p">()</span> <span class="p">{</span> 
@@ -91,24 +87,18 @@
     <span class="nx">injector</span><span class="p">.</span><span class="nx">get</span><span class="p">(</span><span class="s1">'a'</span><span class="p">);</span>
   <span class="p">}).</span><span class="nx">toThrow</span><span class="p">();</span>
 <span class="p">});</span>
-</code></pre>
-</div>
-
-<h4 id="config-blocks">Config Blocks</h4>
-
-<div class="language-js highlighter-rouge"><pre class="highlight"><code><span class="nx">it</span><span class="p">(</span><span class="s1">'runs config blocks when the injector is created'</span><span class="p">,</span> <span class="kd">function</span><span class="p">()</span> <span class="p">{</span>
+</code></pre></div>
+<h4>Config Blocks</h4>
+<div class="highlight"><pre><code class="language-js" data-lang="js"><span class="nx">it</span><span class="p">(</span><span class="s1">'runs config blocks when the injector is created'</span><span class="p">,</span> <span class="kd">function</span><span class="p">()</span> <span class="p">{</span>
   <span class="kd">var</span> <span class="nx">module</span> <span class="o">=</span> <span class="nx">angular</span><span class="p">.</span><span class="nx">module</span><span class="p">(</span><span class="s1">'myModule'</span><span class="p">,</span> <span class="p">[]);</span>
   <span class="kd">var</span> <span class="nx">hasRun</span> <span class="o">=</span> <span class="kc">false</span><span class="p">;</span>
   <span class="nx">module</span><span class="p">.</span><span class="nx">config</span><span class="p">(</span><span class="kd">function</span><span class="p">()</span> <span class="p">{</span><span class="nx">hasRun</span> <span class="o">=</span> <span class="kc">true</span><span class="p">;</span> <span class="p">});</span>
   <span class="nx">createInjector</span><span class="p">([</span><span class="s1">'myModule'</span><span class="p">]);</span>
   <span class="nx">expect</span><span class="p">(</span><span class="nx">hasRun</span><span class="p">).</span><span class="nx">toBe</span><span class="p">(</span><span class="kc">true</span><span class="p">);</span>
 <span class="p">});</span>
-</code></pre>
-</div>
-
-<h4 id="services">Services</h4>
-
-<div class="language-js highlighter-rouge"><pre class="highlight"><code><span class="nx">it</span><span class="p">(</span><span class="s1">'allows registering a service'</span><span class="p">,</span> <span class="kd">function</span><span class="p">()</span> <span class="p">{</span>
+</code></pre></div>
+<h4>Services</h4>
+<div class="highlight"><pre><code class="language-js" data-lang="js"><span class="nx">it</span><span class="p">(</span><span class="s1">'allows registering a service'</span><span class="p">,</span> <span class="kd">function</span><span class="p">()</span> <span class="p">{</span>
   <span class="kd">var</span> <span class="nx">module</span> <span class="o">=</span> <span class="nx">angular</span><span class="p">.</span><span class="nx">module</span><span class="p">(</span><span class="s1">'myModule'</span><span class="p">,</span> <span class="p">[]);</span>
   <span class="nx">module</span><span class="p">.</span><span class="nx">service</span><span class="p">(</span><span class="s1">'aService'</span><span class="p">,</span> 
     <span class="c1">// Service是一个构造函数</span>
@@ -119,9 +109,7 @@
   <span class="kd">var</span> <span class="nx">injector</span> <span class="o">=</span> <span class="nx">createInjector</span><span class="p">([</span><span class="s1">'myModule'</span><span class="p">]);</span>
   <span class="nx">expect</span><span class="p">(</span><span class="nx">injector</span><span class="p">.</span><span class="nx">get</span><span class="p">(</span><span class="s1">'aService'</span><span class="p">).</span><span class="nx">getValue</span><span class="p">()).</span><span class="nx">toBe</span><span class="p">(</span><span class="mi">42</span><span class="p">);</span>
 <span class="p">});</span>
-</code></pre>
-</div>
-
+</code></pre></div>
   </div>
 
 </article>

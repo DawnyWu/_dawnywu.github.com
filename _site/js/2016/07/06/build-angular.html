@@ -62,34 +62,30 @@
   </header>
 
   <div class="post-content" itemprop="articleBody">
-    <h3 id="scope">Scope</h3>
+    <h3>Scope</h3>
 
 <ul>
-  <li>Sharing data between controllers and views</li>
-  <li>Sharing data between different parts of the application</li>
-  <li>Broadcasting and listening for events</li>
-  <li>Watching for changes in data</li>
+<li>Sharing data between controllers and views</li>
+<li>Sharing data between different parts of the application </li>
+<li>Broadcasting and listening for events</li>
+<li>Watching for changes in data</li>
 </ul>
 
-<p>一个<code class="highlighter-rouge">scope</code>只是一个普通的object,拥有<code class="highlighter-rouge">$watch</code>和<code class="highlighter-rouge">$digest</code>这两个函数</p>
+<p>一个<code>scope</code>只是一个普通的object,拥有<code>$watch</code>和<code>$digest</code>这两个函数</p>
 
-<p><code class="highlighter-rouge">$watch</code>接收<code class="highlighter-rouge">watcher</code>和<code class="highlighter-rouge">listener</code>函数</p>
+<p><code>$watch</code>接收<code>watcher</code>和<code>listener</code>函数</p>
 
-<p><code class="highlighter-rouge">watcher</code>函数返回监听的数据值，<code class="highlighter-rouge">angular</code>运行<code class="highlighter-rouge">$digest</code>函数，使用脏检查（对比新旧值是否有变化），若有变化运行<code class="highlighter-rouge">listener</code>函数</p>
+<p><code>watcher</code>函数返回监听的数据值，<code>angular</code>运行<code>$digest</code>函数，使用脏检查（对比新旧值是否有变化），若有变化运行<code>listener</code>函数</p>
 
-<p>那么要实现<code class="highlighter-rouge">scope.$watch(watcher, listener)</code>函数，scope要可以保存<code class="highlighter-rouge">watcher</code>和<code class="highlighter-rouge">listener</code>,以便以后<code class="highlighter-rouge">scope.$digest</code>检查，调用</p>
-
-<div class="language-js highlighter-rouge"><pre class="highlight"><code><span class="nx">Scope</span><span class="p">.</span><span class="nx">prototype</span><span class="p">.</span><span class="nx">$watch</span> <span class="o">=</span> <span class="kd">function</span><span class="p">(</span><span class="nx">watchFn</span><span class="p">,</span> <span class="nx">listenerFn</span><span class="p">)</span> <span class="p">{</span>
+<p>那么要实现<code>scope.$watch(watcher, listener)</code>函数，scope要可以保存<code>watcher</code>和<code>listener</code>,以便以后<code>scope.$digest</code>检查，调用</p>
+<div class="highlight"><pre><code class="language-js" data-lang="js"><span class="nx">Scope</span><span class="p">.</span><span class="nx">prototype</span><span class="p">.</span><span class="nx">$watch</span> <span class="o">=</span> <span class="kd">function</span><span class="p">(</span><span class="nx">watchFn</span><span class="p">,</span> <span class="nx">listenerFn</span><span class="p">)</span> <span class="p">{</span>
   <span class="kd">var</span> <span class="nx">watcher</span> <span class="o">=</span> <span class="p">{</span>
     <span class="na">watchFn</span><span class="p">:</span> <span class="nx">watchFn</span><span class="p">,</span>
     <span class="na">listenerFn</span><span class="p">:</span> <span class="nx">listenerFn</span>
   <span class="p">};</span>
   <span class="k">this</span><span class="p">.</span><span class="nx">$$watchers</span><span class="p">.</span><span class="nx">push</span><span class="p">(</span><span class="nx">watcher</span><span class="p">);</span> 
 <span class="p">};</span>
-</code></pre>
-</div>
-
-<div class="language-js highlighter-rouge"><pre class="highlight"><code><span class="nx">Scope</span><span class="p">.</span><span class="nx">prototype</span><span class="p">.</span><span class="nx">$digest</span> <span class="o">=</span> <span class="kd">function</span><span class="p">()</span> <span class="p">{</span>
+</code></pre></div><div class="highlight"><pre><code class="language-js" data-lang="js"><span class="nx">Scope</span><span class="p">.</span><span class="nx">prototype</span><span class="p">.</span><span class="nx">$digest</span> <span class="o">=</span> <span class="kd">function</span><span class="p">()</span> <span class="p">{</span>
   <span class="kd">var</span> <span class="nx">self</span> <span class="o">=</span> <span class="k">this</span><span class="p">;</span>
   <span class="kd">var</span> <span class="nx">newValue</span><span class="p">,</span> <span class="nx">oldValue</span><span class="p">;</span>
   <span class="nx">_</span><span class="p">.</span><span class="nx">forEach</span><span class="p">(</span><span class="k">this</span><span class="p">.</span><span class="nx">$$watchers</span><span class="p">,</span> <span class="kd">function</span><span class="p">(</span><span class="nx">watcher</span><span class="p">)</span> <span class="p">{</span>
@@ -101,12 +97,9 @@
     <span class="p">}</span>
   <span class="p">});</span> 
 <span class="p">};</span>
-</code></pre>
-</div>
-
-<p>之前<code class="highlighter-rouge">watch</code>返回的结果被保存在<code class="highlighter-rouge">watcher.last</code>里,那么就有个问题，第一次运行<code class="highlighter-rouge">$digest</code>的时候<code class="highlighter-rouge">watcher.last</code>是<code class="highlighter-rouge">undefined</code>啊。。。</p>
-
-<div class="language-js highlighter-rouge"><pre class="highlight"><code><span class="c1">// 所以每个watcher加了last属性</span>
+</code></pre></div>
+<p>之前<code>watch</code>返回的结果被保存在<code>watcher.last</code>里,那么就有个问题，第一次运行<code>$digest</code>的时候<code>watcher.last</code>是<code>undefined</code>啊。。。</p>
+<div class="highlight"><pre><code class="language-js" data-lang="js"><span class="c1">// 所以每个watcher加了last属性</span>
 <span class="nx">Scope</span><span class="p">.</span><span class="nx">prototype</span><span class="p">.</span><span class="nx">$watch</span> <span class="o">=</span> <span class="kd">function</span><span class="p">(</span><span class="nx">watchFn</span><span class="p">,</span> <span class="nx">listenerFn</span><span class="p">)</span> <span class="p">{</span> 
   <span class="kd">var</span> <span class="nx">watcher</span> <span class="o">=</span> <span class="p">{</span>
     <span class="na">watchFn</span><span class="p">:</span> <span class="nx">watchFn</span><span class="p">,</span>
@@ -137,12 +130,9 @@
   <span class="p">});</span>
 <span class="p">};</span>
 
-</code></pre>
-</div>
-
-<h4 id="watch">多个$watch之间有先后的情况</h4>
-
-<div class="language-js highlighter-rouge"><pre class="highlight"><code><span class="nx">it</span><span class="p">(</span><span class="s2">"triggers chained watchers in the same digest"</span><span class="p">,</span> <span class="kd">function</span><span class="p">()</span> <span class="p">{</span>
+</code></pre></div>
+<h4>多个$watch之间有先后的情况</h4>
+<div class="highlight"><pre><code class="language-js" data-lang="js"><span class="nx">it</span><span class="p">(</span><span class="s2">"triggers chained watchers in the same digest"</span><span class="p">,</span> <span class="kd">function</span><span class="p">()</span> <span class="p">{</span>
   <span class="nx">scope</span><span class="p">.</span><span class="nx">name</span> <span class="o">=</span> <span class="s1">'Jane'</span><span class="p">;</span>
   <span class="nx">scope</span><span class="p">.</span><span class="nx">$watch</span><span class="p">(</span>
     <span class="kd">function</span><span class="p">(</span><span class="nx">scope</span><span class="p">)</span> <span class="p">{</span> <span class="k">return</span> <span class="nx">scope</span><span class="p">.</span><span class="nx">nameUpper</span><span class="p">;</span> <span class="p">},</span>
@@ -162,11 +152,9 @@
       <span class="p">}</span> 
     <span class="p">}</span>
   <span class="p">);</span>
-</code></pre>
-</div>
-<p>要解决上边的问题，我们要运行多次<code class="highlighter-rouge">$digest</code>,于是我们把原来的<code class="highlighter-rouge">$digest</code>改为<code class="highlighter-rouge">$$digestOnce</code>,返回<code class="highlighter-rouge">dirty</code> boolean值。 <code class="highlighter-rouge">$digest</code>函数现在要运行多次<code class="highlighter-rouge">$$digestOnce</code></p>
-
-<div class="language-js highlighter-rouge"><pre class="highlight"><code><span class="nx">Scope</span><span class="p">.</span><span class="nx">prototype</span><span class="p">.</span><span class="nx">$$digestOnce</span> <span class="o">=</span> <span class="kd">function</span><span class="p">()</span> <span class="p">{</span>
+</code></pre></div>
+<p>要解决上边的问题，我们要运行多次<code>$digest</code>,于是我们把原来的<code>$digest</code>改为<code>$$digestOnce</code>,返回<code>dirty</code> boolean值。 <code>$digest</code>函数现在要运行多次<code>$$digestOnce</code></p>
+<div class="highlight"><pre><code class="language-js" data-lang="js"><span class="nx">Scope</span><span class="p">.</span><span class="nx">prototype</span><span class="p">.</span><span class="nx">$$digestOnce</span> <span class="o">=</span> <span class="kd">function</span><span class="p">()</span> <span class="p">{</span>
   <span class="kd">var</span> <span class="nx">self</span> <span class="o">=</span> <span class="k">this</span><span class="p">;</span>
   <span class="kd">var</span> <span class="nx">newValue</span><span class="p">,</span> <span class="nx">oldValue</span><span class="p">,</span> <span class="nx">dirty</span><span class="p">;</span> 
   <span class="nx">_</span><span class="p">.</span><span class="nx">forEach</span><span class="p">(</span><span class="k">this</span><span class="p">.</span><span class="nx">$$watchers</span><span class="p">,</span> <span class="kd">function</span><span class="p">(</span><span class="nx">watcher</span><span class="p">)</span> <span class="p">{</span>
@@ -183,23 +171,17 @@
   <span class="p">});</span>
   <span class="k">return</span> <span class="nx">dirty</span><span class="p">;</span>
 <span class="p">};</span>
-</code></pre>
-</div>
-
-<p>现在的<code class="highlighter-rouge">dirty</code></p>
-
-<div class="language-js highlighter-rouge"><pre class="highlight"><code><span class="nx">Scope</span><span class="p">.</span><span class="nx">prototype</span><span class="p">.</span><span class="nx">$digest</span> <span class="o">=</span> <span class="kd">function</span><span class="p">()</span> <span class="p">{</span> 
+</code></pre></div>
+<p>现在的<code>dirty</code></p>
+<div class="highlight"><pre><code class="language-js" data-lang="js"><span class="nx">Scope</span><span class="p">.</span><span class="nx">prototype</span><span class="p">.</span><span class="nx">$digest</span> <span class="o">=</span> <span class="kd">function</span><span class="p">()</span> <span class="p">{</span> 
   <span class="kd">var</span> <span class="nx">dirty</span><span class="p">;</span>
   <span class="k">do</span> <span class="p">{</span>
     <span class="nx">dirty</span> <span class="o">=</span> <span class="k">this</span><span class="p">.</span><span class="nx">$$digestOnce</span><span class="p">();</span> 
   <span class="p">}</span> <span class="k">while</span> <span class="p">(</span><span class="nx">dirty</span><span class="p">);</span>
 <span class="p">};</span>
-</code></pre>
-</div>
-
-<h4 id="watchwatch">多个$watch之间有互相watch的情况</h4>
-
-<div class="language-js highlighter-rouge"><pre class="highlight"><code><span class="nx">it</span><span class="p">(</span><span class="s2">"gives up on the watches after 10 iterations"</span><span class="p">,</span> <span class="kd">function</span><span class="p">()</span> <span class="p">{</span>
+</code></pre></div>
+<h4>多个$watch之间有互相watch的情况</h4>
+<div class="highlight"><pre><code class="language-js" data-lang="js"><span class="nx">it</span><span class="p">(</span><span class="s2">"gives up on the watches after 10 iterations"</span><span class="p">,</span> <span class="kd">function</span><span class="p">()</span> <span class="p">{</span>
   <span class="nx">scope</span><span class="p">.</span><span class="nx">counterA</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
   <span class="nx">scope</span><span class="p">.</span><span class="nx">counterB</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
 
@@ -216,12 +198,9 @@
       <span class="nx">scope</span><span class="p">.</span><span class="nx">counterA</span><span class="o">++</span><span class="p">;</span>
     <span class="p">}</span>
   <span class="p">);</span>
-</code></pre>
-</div>
-
-<p>这种情况会陷入死循环,所以我们要设置一个最大运行数<code class="highlighter-rouge">TTL(Time to live)</code></p>
-
-<div class="language-js highlighter-rouge"><pre class="highlight"><code><span class="nx">Scope</span><span class="p">.</span><span class="nx">prototype</span><span class="p">.</span><span class="nx">$digest</span> <span class="o">=</span> <span class="kd">function</span><span class="p">()</span> <span class="p">{</span>
+</code></pre></div>
+<p>这种情况会陷入死循环,所以我们要设置一个最大运行数<code>TTL(Time to live)</code></p>
+<div class="highlight"><pre><code class="language-js" data-lang="js"><span class="nx">Scope</span><span class="p">.</span><span class="nx">prototype</span><span class="p">.</span><span class="nx">$digest</span> <span class="o">=</span> <span class="kd">function</span><span class="p">()</span> <span class="p">{</span>
   <span class="kd">var</span> <span class="nx">ttl</span> <span class="o">=</span> <span class="mi">10</span><span class="p">;</span>
   <span class="kd">var</span> <span class="nx">dirty</span><span class="p">;</span>
   <span class="k">do</span> <span class="p">{</span>
@@ -229,23 +208,17 @@
     <span class="k">if</span> <span class="p">(</span><span class="nx">dirty</span> <span class="o">&amp;&amp;</span> <span class="o">!</span><span class="p">(</span><span class="nx">ttl</span><span class="o">--</span><span class="p">))</span> <span class="p">{</span><span class="k">throw</span> <span class="s2">"10 digest iterations reached"</span><span class="p">;</span> <span class="p">}</span>
   <span class="p">}</span> <span class="k">while</span> <span class="p">(</span><span class="nx">dirty</span><span class="p">);</span> 
 <span class="p">};</span>
-</code></pre>
-</div>
+</code></pre></div>
+<h3>优化Digest</h3>
 
-<h3 id="digest">优化Digest</h3>
+<p>一个<code>scope</code>有100个<code>watch</code>,只有一个<code>dirty</code>的<code>watch</code>,需要运行整整两遍，判断两百次新旧值是否一致</p>
 
-<p>一个<code class="highlighter-rouge">scope</code>有100个<code class="highlighter-rouge">watch</code>,只有一个<code class="highlighter-rouge">dirty</code>的<code class="highlighter-rouge">watch</code>,需要运行整整两遍，判断两百次新旧值是否一致</p>
-
-<p>我们可以优化一下，记录下最后一个<code class="highlighter-rouge">dirty</code>的<code class="highlighter-rouge">watch</code>,下一次运行的时候，发现这个<code class="highlighter-rouge">watch</code>已经不<code class="highlighter-rouge">dirty</code>了，就不在运行其他<code class="highlighter-rouge">watch</code>了</p>
-
-<div class="language-js highlighter-rouge"><pre class="highlight"><code><span class="kd">function</span> <span class="nx">Scope</span><span class="p">()</span> <span class="p">{</span> 
+<p>我们可以优化一下，记录下最后一个<code>dirty</code>的<code>watch</code>,下一次运行的时候，发现这个<code>watch</code>已经不<code>dirty</code>了，就不在运行其他<code>watch</code>了</p>
+<div class="highlight"><pre><code class="language-js" data-lang="js"><span class="kd">function</span> <span class="nx">Scope</span><span class="p">()</span> <span class="p">{</span> 
   <span class="k">this</span><span class="p">.</span><span class="nx">$$watchers</span> <span class="o">=</span> <span class="p">[];</span>
   <span class="k">this</span><span class="p">.</span><span class="nx">$$lastDirtyWatch</span> <span class="o">=</span> <span class="kc">null</span><span class="p">;</span>
 <span class="p">}</span>
-</code></pre>
-</div>
-
-<div class="language-js highlighter-rouge"><pre class="highlight"><code><span class="nx">Scope</span><span class="p">.</span><span class="nx">prototype</span><span class="p">.</span><span class="nx">$$digestOnce</span> <span class="o">=</span> <span class="kd">function</span><span class="p">()</span> <span class="p">{</span>
+</code></pre></div><div class="highlight"><pre><code class="language-js" data-lang="js"><span class="nx">Scope</span><span class="p">.</span><span class="nx">prototype</span><span class="p">.</span><span class="nx">$$digestOnce</span> <span class="o">=</span> <span class="kd">function</span><span class="p">()</span> <span class="p">{</span>
   <span class="kd">var</span> <span class="nx">self</span> <span class="o">=</span> <span class="k">this</span><span class="p">;</span>
   <span class="kd">var</span> <span class="nx">newValue</span><span class="p">,</span> <span class="nx">oldValue</span><span class="p">,</span> <span class="nx">dirty</span><span class="p">;</span> 
   <span class="nx">_</span><span class="p">.</span><span class="nx">forEach</span><span class="p">(</span><span class="k">this</span><span class="p">.</span><span class="nx">$$watchers</span><span class="p">,</span> <span class="kd">function</span><span class="p">(</span><span class="nx">watcher</span><span class="p">)</span> <span class="p">{</span>
@@ -266,20 +239,17 @@
   <span class="p">});</span>
   <span class="k">return</span> <span class="nx">dirty</span><span class="p">;</span>
 <span class="p">};</span>
-</code></pre>
-</div>
+</code></pre></div>
+<h3>Value-Based Dirty-Checking</h3>
 
-<h3 id="value-based-dirty-checking">Value-Based Dirty-Checking</h3>
+<p>目前检查新旧值是否相等是通过<code>===</code>，这个不能检查array或object中的值变化</p>
 
-<p>目前检查新旧值是否相等是通过<code class="highlighter-rouge">===</code>，这个不能检查array或object中的值变化</p>
+<p>所以当需要检查值是否相等时，我们使用<code>lodash</code>提供的<code>_.isEqual()</code></p>
 
-<p>所以当需要检查值是否相等时，我们使用<code class="highlighter-rouge">lodash</code>提供的<code class="highlighter-rouge">_.isEqual()</code></p>
-
-<p>我们保存值的方式也要改变，现在要存下<code class="highlighter-rouge">array</code>或<code class="highlighter-rouge">object</code>的<code class="highlighter-rouge">deep copy</code>,不能只存一个引用</p>
+<p>我们保存值的方式也要改变，现在要存下<code>array</code>或<code>object</code>的<code>deep copy</code>,不能只存一个引用</p>
 
 <p>由于这种检查方式会使用更多资源，angular默认不支持这种检查，需要你提供额外参数来使用这种功能</p>
-
-<div class="language-js highlighter-rouge"><pre class="highlight"><code><span class="nx">Scope</span><span class="p">.</span><span class="nx">prototype</span><span class="p">.</span><span class="nx">$$digestOnce</span> <span class="o">=</span> <span class="kd">function</span><span class="p">()</span> <span class="p">{</span>
+<div class="highlight"><pre><code class="language-js" data-lang="js"><span class="nx">Scope</span><span class="p">.</span><span class="nx">prototype</span><span class="p">.</span><span class="nx">$$digestOnce</span> <span class="o">=</span> <span class="kd">function</span><span class="p">()</span> <span class="p">{</span>
   <span class="kd">var</span> <span class="nx">self</span> <span class="o">=</span> <span class="k">this</span><span class="p">;</span>
   <span class="kd">var</span> <span class="nx">newValue</span><span class="p">,</span> <span class="nx">oldValue</span><span class="p">,</span> <span class="nx">dirty</span><span class="p">;</span> 
   <span class="nx">_</span><span class="p">.</span><span class="nx">forEach</span><span class="p">(</span><span class="k">this</span><span class="p">.</span><span class="nx">$$watchers</span><span class="p">,</span> <span class="kd">function</span><span class="p">(</span><span class="nx">watcher</span><span class="p">)</span> <span class="p">{</span>
@@ -299,16 +269,13 @@
   <span class="p">});</span>
   <span class="k">return</span> <span class="nx">dirty</span><span class="p">;</span> 
 <span class="p">};</span>
-</code></pre>
-</div>
-
+</code></pre></div>
 <p><strong><em>NaN的情况</em></strong></p>
 
-<p>由于<code class="highlighter-rouge">NaN === NaN =&gt; false</code>,这种情况要处理一下</p>
+<p>由于<code>NaN === NaN =&gt; false</code>,这种情况要处理一下</p>
 
-<p>注意<code class="highlighter-rouge">typeof NaN =&gt; "number"</code></p>
-
-<div class="language-js highlighter-rouge"><pre class="highlight"><code><span class="nx">Scope</span><span class="p">.</span><span class="nx">prototype</span><span class="p">.</span><span class="nx">$$areEqual</span> <span class="o">=</span> <span class="kd">function</span><span class="p">(</span><span class="nx">newValue</span><span class="p">,</span> <span class="nx">oldValue</span><span class="p">,</span> <span class="nx">valueEq</span><span class="p">)</span> <span class="p">{</span>
+<p>注意<code>typeof NaN =&gt; &quot;number&quot;</code></p>
+<div class="highlight"><pre><code class="language-js" data-lang="js"><span class="nx">Scope</span><span class="p">.</span><span class="nx">prototype</span><span class="p">.</span><span class="nx">$$areEqual</span> <span class="o">=</span> <span class="kd">function</span><span class="p">(</span><span class="nx">newValue</span><span class="p">,</span> <span class="nx">oldValue</span><span class="p">,</span> <span class="nx">valueEq</span><span class="p">)</span> <span class="p">{</span>
   <span class="k">if</span> <span class="p">(</span><span class="nx">valueEq</span><span class="p">)</span> <span class="p">{</span>
     <span class="k">return</span> <span class="nx">_</span><span class="p">.</span><span class="nx">isEqual</span><span class="p">(</span><span class="nx">newValue</span><span class="p">,</span> <span class="nx">oldValue</span><span class="p">);</span> 
   <span class="p">}</span> <span class="k">else</span> <span class="p">{</span>
@@ -319,9 +286,7 @@
            <span class="nb">isNaN</span><span class="p">(</span><span class="nx">newValue</span><span class="p">)</span> <span class="o">&amp;&amp;</span> <span class="nb">isNaN</span><span class="p">(</span><span class="nx">oldValue</span><span class="p">));</span>
   <span class="p">}</span>
 <span class="p">};</span>
-</code></pre>
-</div>
-
+</code></pre></div>
   </div>
 
 </article>

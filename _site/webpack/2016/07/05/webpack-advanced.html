@@ -64,11 +64,10 @@
   <div class="post-content" itemprop="articleBody">
     <p><strong><em>CommonsChunkPlugin</em></strong></p>
 
-<p>You can specify the <code class="highlighter-rouge">minChunk</code> option in here as well. This option says, if any module is used X or more times, then take it out and pull it into the common chunk. The name must match with the key in the entry object.</p>
+<p>You can specify the <code>minChunk</code> option in here as well. This option says, if any module is used X or more times, then take it out and pull it into the common chunk. The name must match with the key in the entry object.</p>
 
-<p>Now the next time you run WebPack, you’ll have another outputed chunk that contains jQuery as well as any module that you have used 3 or more times.</p>
-
-<div class="language-js highlighter-rouge"><pre class="highlight"><code><span class="kd">var</span> <span class="nx">CommonsPlugin</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">require</span><span class="p">(</span><span class="s2">"webpack/lib/optimize/CommonsChunkPlugin"</span><span class="p">)</span>
+<p>Now the next time you run WebPack, you&#39;ll have another outputed chunk that contains jQuery as well as any module that you have used 3 or more times.</p>
+<div class="highlight"><pre><code class="language-js" data-lang="js"><span class="kd">var</span> <span class="nx">CommonsPlugin</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">require</span><span class="p">(</span><span class="s2">"webpack/lib/optimize/CommonsChunkPlugin"</span><span class="p">)</span>
 
 <span class="c1">// ...</span>
 
@@ -83,24 +82,18 @@
     <span class="p">});</span>
   <span class="p">]</span>
 <span class="p">};</span>
-</code></pre>
-</div>
-
+</code></pre></div>
 <p><strong><em>require.ensure</em></strong></p>
-
-<div class="language-js highlighter-rouge"><pre class="highlight"><code><span class="nx">require</span><span class="p">.</span><span class="nx">ensure</span><span class="p">([</span><span class="s2">"./below_the_fold"</span><span class="p">],</span>
+<div class="highlight"><pre><code class="language-js" data-lang="js"><span class="nx">require</span><span class="p">.</span><span class="nx">ensure</span><span class="p">([</span><span class="s2">"./below_the_fold"</span><span class="p">],</span>
   <span class="kd">function</span><span class="p">(</span><span class="nx">require</span><span class="p">)</span> <span class="p">{</span>
   <span class="c1">// Now require it "sync"</span>
   <span class="nx">require</span><span class="p">(</span><span class="s2">"./below_the_fold"</span><span class="p">);</span>
   <span class="p">},</span>
   <span class="s2">"below_the_fold"</span><span class="p">);</span>
   <span class="c1">// 3rd optional argument to name the "chunk" that get's output...</span>
-</code></pre>
-</div>
-
+</code></pre></div>
 <p>load on demand</p>
-
-<div class="language-js highlighter-rouge"><pre class="highlight"><code><span class="kd">let</span> <span class="nx">map</span><span class="p">;</span>  
+<div class="highlight"><pre><code class="language-js" data-lang="js"><span class="kd">let</span> <span class="nx">map</span><span class="p">;</span>  
 <span class="nx">$mapButton</span><span class="p">.</span><span class="nx">on</span><span class="p">(</span><span class="s2">"click"</span><span class="p">,</span> <span class="kd">function</span><span class="p">()</span> <span class="p">{</span>
   <span class="k">if</span> <span class="p">(</span><span class="o">!</span><span class="nx">mapLoaded</span><span class="p">)</span> <span class="p">{</span>
     <span class="nx">require</span><span class="p">.</span><span class="nx">ensure</span><span class="p">([</span>
@@ -120,63 +113,52 @@
     <span class="p">},</span> <span class="s2">"map"</span><span class="p">);</span>
   <span class="p">}</span>
 <span class="p">});</span>
-</code></pre>
-</div>
+</code></pre></div>
 <p><strong><em>require.context</em></strong></p>
 
 <p><a href="https://webpack.github.io/docs/context.html">https://webpack.github.io/docs/context.html</a></p>
 
 <p>A context is created if your request contains expressions</p>
 
-<p><code class="highlighter-rouge">require("./template/" + name + ".jade");</code></p>
+<p><code>require(&quot;./template/&quot; + name + &quot;.jade&quot;);</code></p>
 
 <p>webpack parses the require statement and extracts some information:</p>
 
 <ul>
-  <li>Directory: <code class="highlighter-rouge">./template</code></li>
-  <li>Regular expression: <code class="highlighter-rouge">/^.*\.jade$/</code></li>
+<li>Directory: <code>./template</code></li>
+<li>Regular expression: <code>/^.*\.jade$/</code></li>
 </ul>
 
-<p>It contains references to all modules in that directory that can be required with a request matching the regular expression.</p>
-
-<div class="language-js highlighter-rouge"><pre class="highlight"><code><span class="p">{</span>
+<p>It contains references to all modules in that directory that can be required with a request matching the regular expression. </p>
+<div class="highlight"><pre><code class="language-js" data-lang="js"><span class="p">{</span>
     <span class="s2">"./table.jade"</span><span class="err">:</span> <span class="mi">22</span><span class="p">,</span>
     <span class="s2">"./table-row.jade"</span><span class="err">:</span> <span class="mi">23</span><span class="p">,</span>
     <span class="s2">"./directory/folder.jade"</span><span class="err">:</span> <span class="mi">24</span>
 <span class="p">}</span>
-</code></pre>
-</div>
-
+</code></pre></div>
 <p>You can create your own context with the require.context function.</p>
-
-<div class="language-js highlighter-rouge"><pre class="highlight"><code><span class="nx">require</span><span class="p">.</span><span class="nx">context</span><span class="p">(</span>
+<div class="highlight"><pre><code class="language-js" data-lang="js"><span class="nx">require</span><span class="p">.</span><span class="nx">context</span><span class="p">(</span>
   <span class="nx">directory</span><span class="p">,</span> 
   <span class="nx">useSubdirectories</span> <span class="o">=</span> <span class="kc">false</span><span class="p">,</span> 
   <span class="nx">regExp</span> <span class="o">=</span> <span class="sr">/^</span><span class="se">\.\/</span><span class="sr">/</span>
 <span class="p">)</span>
-</code></pre>
-</div>
-
+</code></pre></div>
 <p>examples:</p>
-
-<div class="language-js highlighter-rouge"><pre class="highlight"><code><span class="nx">require</span><span class="p">.</span><span class="nx">context</span><span class="p">(</span><span class="s2">"./test"</span><span class="p">,</span> <span class="kc">false</span><span class="p">,</span> <span class="sr">/Test$/</span><span class="p">)</span>
+<div class="highlight"><pre><code class="language-js" data-lang="js"><span class="nx">require</span><span class="p">.</span><span class="nx">context</span><span class="p">(</span><span class="s2">"./test"</span><span class="p">,</span> <span class="kc">false</span><span class="p">,</span> <span class="sr">/Test$/</span><span class="p">)</span>
 <span class="c1">// a context with all files from the test directory that can be</span>
 <span class="c1">// required with a request endings with "Test"</span>
 
 <span class="nx">require</span><span class="p">.</span><span class="nx">context</span><span class="p">(</span><span class="s2">".."</span><span class="p">,</span> <span class="kc">true</span><span class="p">,</span> <span class="sr">/^grunt-</span><span class="se">[^\/]</span><span class="sr">+</span><span class="se">\/</span><span class="sr">tasks/</span><span class="p">[</span><span class="o">^</span><span class="err">\</span><span class="o">/</span><span class="p">]</span><span class="o">+</span><span class="nx">$</span><span class="o">/</span><span class="p">)</span>
 <span class="c1">// all grunt task that are in a modules directory of the parent folder</span>
-</code></pre>
-</div>
-
+</code></pre></div>
 <p>A context module exports a (require) function that takes one argument: the request.</p>
 
 <ul>
-  <li>property <code class="highlighter-rouge">resolve</code> which is a <code class="highlighter-rouge">function</code> and returns the module id of the parsed request.</li>
-  <li>property <code class="highlighter-rouge">keys</code> which is a <code class="highlighter-rouge">function</code> that returns all possible requests that the context module can handle.</li>
-  <li>property <code class="highlighter-rouge">id</code> which is the module id of the context module.</li>
+<li>property <code>resolve</code> which is a <code>function</code> and returns the module id of the parsed request.</li>
+<li>property <code>keys</code> which is a <code>function</code> that returns all possible requests that the context module can handle.</li>
+<li>property <code>id</code> which is the module id of the context module.</li>
 </ul>
-
-<div class="language-js highlighter-rouge"><pre class="highlight"><code><span class="kd">var</span> <span class="nx">req</span> <span class="o">=</span> <span class="nx">require</span><span class="p">.</span><span class="nx">context</span><span class="p">(</span><span class="s2">"./templates"</span><span class="p">,</span> <span class="kc">true</span><span class="p">,</span> <span class="sr">/^</span><span class="se">\.\/</span><span class="sr">.*</span><span class="se">\.</span><span class="sr">jade$/</span><span class="p">);</span>
+<div class="highlight"><pre><code class="language-js" data-lang="js"><span class="kd">var</span> <span class="nx">req</span> <span class="o">=</span> <span class="nx">require</span><span class="p">.</span><span class="nx">context</span><span class="p">(</span><span class="s2">"./templates"</span><span class="p">,</span> <span class="kc">true</span><span class="p">,</span> <span class="sr">/^</span><span class="se">\.\/</span><span class="sr">.*</span><span class="se">\.</span><span class="sr">jade$/</span><span class="p">);</span>
 
 <span class="kd">var</span> <span class="nx">tableTemplate</span> <span class="o">=</span> <span class="nx">req</span><span class="p">(</span><span class="s2">"./table.jade"</span><span class="p">);</span>
 <span class="c1">// tableTemplate === require("./templates/table.jade");</span>
@@ -189,19 +171,14 @@
 
 <span class="nx">req</span><span class="p">.</span><span class="nx">id</span><span class="p">;</span>
 <span class="c1">// is i. e. 42</span>
-</code></pre>
-</div>
-
-<div class="language-js highlighter-rouge"><pre class="highlight"><code><span class="kd">function</span> <span class="nx">requireAll</span><span class="p">(</span><span class="nx">requireContext</span><span class="p">)</span> <span class="p">{</span>
+</code></pre></div><div class="highlight"><pre><code class="language-js" data-lang="js"><span class="kd">function</span> <span class="nx">requireAll</span><span class="p">(</span><span class="nx">requireContext</span><span class="p">)</span> <span class="p">{</span>
   <span class="k">return</span> <span class="nx">requireContext</span><span class="p">.</span><span class="nx">keys</span><span class="p">().</span><span class="nx">map</span><span class="p">(</span><span class="nx">requireContext</span><span class="p">);</span>
 <span class="p">}</span>
 <span class="c1">// requires and returns all modules that match</span>
 
 <span class="kd">var</span> <span class="nx">modules</span> <span class="o">=</span> <span class="nx">requireAll</span><span class="p">(</span><span class="nx">require</span><span class="p">.</span><span class="nx">context</span><span class="p">(</span><span class="s2">"./spec"</span><span class="p">,</span> <span class="kc">true</span><span class="p">,</span> <span class="sr">/^</span><span class="se">\.\/</span><span class="sr">.*</span><span class="se">\.</span><span class="sr">js$/</span><span class="p">));</span>
 <span class="c1">// is an array containing all the matching modules</span>
-</code></pre>
-</div>
-
+</code></pre></div>
 <p>If the module source contains a require that cannot be statically analyzed, the context is the current directory.</p>
 
   </div>

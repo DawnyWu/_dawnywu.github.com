@@ -7,7 +7,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
 
   <title>Parser Jison</title>
-  <meta name="description" content="In the formal grammatical rules for a language, each kind of syntactic unit or grouping is named by a symbol.">
+  <meta name="description" content="In the formal grammatical rules for a language, each kind of syntactic unit or grouping is named by a symbol. ">
 
   <link rel="stylesheet" href="/css/main.css">
   <link rel="canonical" href="http://yourdomain.com/js/2016/07/15/Parser-Jison.html">
@@ -62,26 +62,21 @@
   </header>
 
   <div class="post-content" itemprop="articleBody">
-    <p>In the formal grammatical rules for a language, each kind of syntactic unit or grouping is named by a <code class="highlighter-rouge">symbol</code>.</p>
+    <p>In the formal grammatical rules for a language, each kind of syntactic unit or grouping is named by a <code>symbol</code>. </p>
 
 <ul>
-  <li>
-    <p>Those which are built by grouping smaller constructs according to grammatical rules are called <code class="highlighter-rouge">nonterminal symbols</code>;We call a piece corresponding to a single nonterminal symbol a <code class="highlighter-rouge">grouping</code>.</p>
-  </li>
-  <li>
-    <p>those which can’t be subdivided are called <code class="highlighter-rouge">terminal symbols</code> or <code class="highlighter-rouge">token types</code>. We call a piece of input corresponding to a single terminal symbol a <code class="highlighter-rouge">token</code></p>
-  </li>
+<li><p>Those which are built by grouping smaller constructs according to grammatical rules are called <code>nonterminal symbols</code>;We call a piece corresponding to a single nonterminal symbol a <code>grouping</code>.</p></li>
+<li><p>those which can&#39;t be subdivided are called <code>terminal symbols</code> or <code>token types</code>. We call a piece of input corresponding to a single terminal symbol a <code>token</code></p></li>
 </ul>
 
 <p>We can use the C language as an example of what symbols, terminal and nonterminal, mean.</p>
 
-<h4 id="in-c">In C</h4>
+<h4>In C</h4>
 
-<p>The <code class="highlighter-rouge">tokens</code> of C are identifiers, constants (numeric and string), and the various keywords, arithmetic operators and punctuation marks.</p>
+<p>The <code>tokens</code> of C are identifiers, constants (numeric and string), and the various keywords, arithmetic operators and punctuation marks.</p>
 
-<p>So the <code class="highlighter-rouge">terminal symbols</code> of a grammar for C include identifier, number, string, plus one symbol for each keyword, operator or punctuation mark: if, return, const, static, int, char, plus-sign, open-brace, close-brace, comma and many more. (These tokens can be subdivided into characters, but that is a matter of lexicography, not grammar.)</p>
-
-<div class="language-c highlighter-rouge"><pre class="highlight"><code><span class="kt">int</span>             <span class="cm">/* keyword `int' */</span>
+<p>So the <code>terminal symbols</code> of a grammar for C include identifier, number, string, plus one symbol for each keyword, operator or punctuation mark: if, return, const, static, int, char, plus-sign, open-brace, close-brace, comma and many more. (These tokens can be subdivided into characters, but that is a matter of lexicography, not grammar.)</p>
+<div class="highlight"><pre><code class="language-c" data-lang="c"><span class="kt">int</span>             <span class="cm">/* keyword `int' */</span>
 <span class="n">square</span> <span class="p">(</span><span class="n">x</span><span class="p">)</span>      <span class="cm">/* identifier, open-paren, */</span>
                 <span class="cm">/* identifier, close-paren */</span>
      <span class="kt">int</span> <span class="n">x</span><span class="p">;</span>     <span class="cm">/* keyword `int', identifier, semicolon */</span>
@@ -89,19 +84,17 @@
   <span class="k">return</span> <span class="n">x</span> <span class="o">*</span> <span class="n">x</span><span class="p">;</span> <span class="cm">/* keyword `return', identifier, */</span>
                 <span class="cm">/* asterisk, identifier, semicolon */</span>
 <span class="p">}</span>               <span class="cm">/* close-brace */</span>
-</code></pre>
-</div>
+</code></pre></div>
+<p>The example above is a function definition; it contains one <code>declaration</code>, and one <code>statement</code>. In the statement, each <code>x</code> is an expression and so is <code>x * x</code>.</p>
 
-<p>The example above is a function definition; it contains one <code class="highlighter-rouge">declaration</code>, and one <code class="highlighter-rouge">statement</code>. In the statement, each <code class="highlighter-rouge">x</code> is an expression and so is <code class="highlighter-rouge">x * x</code>.</p>
+<p>The syntactic groupings of C include the expression, the statement, the declaration, and the function definition. These are represented in the grammar of C by nonterminal symbols <code>expression</code>, <code>statement</code>, <code>declaration</code> and <code>function definition</code>.</p>
 
-<p>The syntactic groupings of C include the expression, the statement, the declaration, and the function definition. These are represented in the grammar of C by nonterminal symbols <code class="highlighter-rouge">expression</code>, <code class="highlighter-rouge">statement</code>, <code class="highlighter-rouge">declaration</code> and <code class="highlighter-rouge">function definition</code>.</p>
+<h4>Bison</h4>
 
-<h4 id="bison">Bison</h4>
 <p><a href="http://dinosaur.compilertools.net/bison/bison_5.html">http://dinosaur.compilertools.net/bison/bison_5.html</a></p>
 
 <p><strong><em>rpcalc</em></strong></p>
-
-<div class="language-c highlighter-rouge"><pre class="highlight"><code><span class="cm">/* Reverse polish notation calculator. */</span>
+<div class="highlight"><pre><code class="language-c" data-lang="c"><span class="cm">/* Reverse polish notation calculator. */</span>
 
 <span class="o">%</span><span class="p">{</span>
 <span class="cp">#define YYSTYPE double
@@ -131,12 +124,9 @@
 <span class="p">;</span>
 <span class="o">%%</span>
 
-</code></pre>
-</div>
-
+</code></pre></div>
 <p><strong><em>calc</em></strong></p>
-
-<div class="language-c highlighter-rouge"><pre class="highlight"><code><span class="cm">/* Infix notation calculator--calc */</span>
+<div class="highlight"><pre><code class="language-c" data-lang="c"><span class="cm">/* Infix notation calculator--calc */</span>
 
 <span class="o">%</span><span class="p">{</span>
 <span class="cp">#define YYSTYPE double
@@ -170,12 +160,9 @@
         <span class="o">|</span> <span class="sc">'('</span> <span class="n">exp</span> <span class="sc">')'</span>        <span class="p">{</span> <span class="err">$$</span> <span class="o">=</span> <span class="err">$</span><span class="mi">2</span><span class="p">;</span>         <span class="p">}</span>
 <span class="p">;</span>
 <span class="o">%%</span>
-</code></pre>
-</div>
-
+</code></pre></div>
 <p><strong><em>mfcalc</em></strong></p>
-
-<div class="language-c highlighter-rouge"><pre class="highlight"><code><span class="o">%</span><span class="p">{</span>
+<div class="highlight"><pre><code class="language-c" data-lang="c"><span class="o">%</span><span class="p">{</span>
 <span class="cp">#include &lt;math.h&gt;  </span><span class="cm">/* For math functions, cos(), sin(), etc. */</span><span class="cp">
 #include "calc.h"  </span><span class="cm">/* Contains definition of `symrec'        */</span><span class="cp">
 </span><span class="o">%</span><span class="p">}</span>
@@ -197,9 +184,7 @@
 <span class="cm">/* Grammar follows */</span>
 
 <span class="o">%%</span>
-</code></pre>
-</div>
-
+</code></pre></div>
   </div>
 
 </article>

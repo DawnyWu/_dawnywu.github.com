@@ -62,9 +62,8 @@
   </header>
 
   <div class="post-content" itemprop="articleBody">
-    <h4 id="eval">$eval</h4>
-
-<div class="language-js highlighter-rouge"><pre class="highlight"><code><span class="c1">// spec</span>
+    <h4>$eval</h4>
+<div class="highlight"><pre><code class="language-js" data-lang="js"><span class="c1">// spec</span>
 <span class="kd">var</span> <span class="nx">result</span> <span class="o">=</span> <span class="nx">scope</span><span class="p">.</span><span class="nx">$eval</span><span class="p">(</span><span class="kd">function</span><span class="p">(</span><span class="nx">scope</span><span class="p">)</span> <span class="p">{</span>
   <span class="k">return</span> <span class="nx">scope</span><span class="p">.</span><span class="nx">aValue</span><span class="p">;</span>
 <span class="p">});</span>
@@ -77,51 +76,39 @@
 <span class="nx">Scope</span><span class="p">.</span><span class="nx">prototype</span><span class="p">.</span><span class="nx">$eval</span> <span class="o">=</span> <span class="kd">function</span><span class="p">(</span><span class="nx">expr</span><span class="p">,</span> <span class="nx">locals</span><span class="p">)</span> <span class="p">{</span> 
   <span class="k">return</span> <span class="nx">expr</span><span class="p">(</span><span class="k">this</span><span class="p">,</span> <span class="nx">locals</span><span class="p">);</span>
 <span class="p">};</span>
-</code></pre>
-</div>
-
-<h4 id="apply">$apply</h4>
-
-<div class="language-js highlighter-rouge"><pre class="highlight"><code><span class="nx">Scope</span><span class="p">.</span><span class="nx">prototype</span><span class="p">.</span><span class="nx">$apply</span> <span class="o">=</span> <span class="kd">function</span><span class="p">(</span><span class="nx">expr</span><span class="p">)</span> <span class="p">{</span> 
+</code></pre></div>
+<h4>$apply</h4>
+<div class="highlight"><pre><code class="language-js" data-lang="js"><span class="nx">Scope</span><span class="p">.</span><span class="nx">prototype</span><span class="p">.</span><span class="nx">$apply</span> <span class="o">=</span> <span class="kd">function</span><span class="p">(</span><span class="nx">expr</span><span class="p">)</span> <span class="p">{</span> 
   <span class="k">try</span> <span class="p">{</span>
     <span class="k">return</span> <span class="k">this</span><span class="p">.</span><span class="nx">$eval</span><span class="p">(</span><span class="nx">expr</span><span class="p">);</span> 
   <span class="p">}</span> <span class="k">finally</span> <span class="p">{</span>
     <span class="k">this</span><span class="p">.</span><span class="nx">$digest</span><span class="p">();</span> 
   <span class="p">}</span>
 <span class="p">};</span>
-</code></pre>
-</div>
+</code></pre></div>
+<h4>$evalAsync - Deferred Execution</h4>
 
-<h4 id="evalasync---deferred-execution">$evalAsync - Deferred Execution</h4>
+<p>angular中异步的两种常用方法<code>$timeout</code>和<code>$evalAsync</code></p>
 
-<p>angular中异步的两种常用方法<code class="highlighter-rouge">$timeout</code>和<code class="highlighter-rouge">$evalAsync</code></p>
+<p>The reason why <code>$evalAsync</code> is often preferrable to a <code>$timeout with zero delay</code> has to do with the browser event loop. </p>
 
-<p>The reason why <code class="highlighter-rouge">$evalAsync</code> is often preferrable to a <code class="highlighter-rouge">$timeout with zero delay</code> has to do with the browser event loop.</p>
+<p>This difference between <code>$timeout</code> and <code>$evalAsync</code> is especially significant when you want to prevent unnecessary rendering: Why let the browser render DOM changes that are going to be immediately overridden anyway?</p>
 
-<p>This difference between <code class="highlighter-rouge">$timeout</code> and <code class="highlighter-rouge">$evalAsync</code> is especially significant when you want to prevent unnecessary rendering: Why let the browser render DOM changes that are going to be immediately overridden anyway?</p>
-
-<p><code class="highlighter-rouge">$evalAsync</code>会让函数延迟执行，但是会在<code class="highlighter-rouge">$digest</code>之前</p>
+<p><code>$evalAsync</code>会让函数延迟执行，但是会在<code>$digest</code>之前</p>
 
 <p>我们需要一个地方存放延迟执行的这些函数：</p>
-
-<div class="language-js highlighter-rouge"><pre class="highlight"><code><span class="kd">function</span> <span class="nx">Scope</span><span class="p">()</span> <span class="p">{</span> 
+<div class="highlight"><pre><code class="language-js" data-lang="js"><span class="kd">function</span> <span class="nx">Scope</span><span class="p">()</span> <span class="p">{</span> 
   <span class="k">this</span><span class="p">.</span><span class="nx">$$watchers</span> <span class="o">=</span> <span class="p">[];</span>
   <span class="k">this</span><span class="p">.</span><span class="nx">$$lastDirtyWatch</span> <span class="o">=</span> <span class="kc">null</span><span class="p">;</span>
   <span class="c1">//要开始了</span>
   <span class="k">this</span><span class="p">.</span><span class="nx">$$asyncQueue</span> <span class="o">=</span> <span class="p">[];</span>
 <span class="p">}</span>
-</code></pre>
-</div>
-
-<div class="language-js highlighter-rouge"><pre class="highlight"><code><span class="nx">Scope</span><span class="p">.</span><span class="nx">prototype</span><span class="p">.</span><span class="nx">$evalAsync</span> <span class="o">=</span> <span class="kd">function</span><span class="p">(</span><span class="nx">expr</span><span class="p">)</span> <span class="p">{</span>
+</code></pre></div><div class="highlight"><pre><code class="language-js" data-lang="js"><span class="nx">Scope</span><span class="p">.</span><span class="nx">prototype</span><span class="p">.</span><span class="nx">$evalAsync</span> <span class="o">=</span> <span class="kd">function</span><span class="p">(</span><span class="nx">expr</span><span class="p">)</span> <span class="p">{</span>
   <span class="k">this</span><span class="p">.</span><span class="nx">$$asyncQueue</span><span class="p">.</span><span class="nx">push</span><span class="p">({</span><span class="na">scope</span><span class="p">:</span> <span class="k">this</span><span class="p">,</span> <span class="na">expression</span><span class="p">:</span> <span class="nx">expr</span><span class="p">});</span>
 <span class="p">};</span>
-</code></pre>
-</div>
-
-<p>修改<code class="highlighter-rouge">digest</code></p>
-
-<div class="language-js highlighter-rouge"><pre class="highlight"><code><span class="nx">Scope</span><span class="p">.</span><span class="nx">prototype</span><span class="p">.</span><span class="nx">$digest</span> <span class="o">=</span> <span class="kd">function</span><span class="p">()</span> <span class="p">{</span>
+</code></pre></div>
+<p>修改<code>digest</code></p>
+<div class="highlight"><pre><code class="language-js" data-lang="js"><span class="nx">Scope</span><span class="p">.</span><span class="nx">prototype</span><span class="p">.</span><span class="nx">$digest</span> <span class="o">=</span> <span class="kd">function</span><span class="p">()</span> <span class="p">{</span>
   <span class="kd">var</span> <span class="nx">ttl</span> <span class="o">=</span> <span class="mi">10</span><span class="p">;</span>
   <span class="kd">var</span> <span class="nx">dirty</span><span class="p">;</span>
   <span class="k">this</span><span class="p">.</span><span class="nx">$$lastDirtyWatch</span> <span class="o">=</span> <span class="kc">null</span><span class="p">;</span>
@@ -137,19 +124,17 @@
     <span class="p">}</span>
   <span class="p">}</span> <span class="k">while</span> <span class="p">(</span><span class="nx">dirty</span><span class="p">);</span> 
 <span class="p">};</span>
-</code></pre>
-</div>
-
-<h4 id="scheduling-evalasync-from-watch-functions">Scheduling $evalAsync from Watch Functions</h4>
+</code></pre></div>
+<h4>Scheduling $evalAsync from Watch Functions</h4>
 
 <p>这个还要再看看</p>
 
-<h4 id="coalescing-apply-invocations---applyasync">Coalescing $apply Invocations - $applyAsync</h4>
+<h4>Coalescing $apply Invocations - $applyAsync</h4>
 
-<h4 id="watching-several-changes-with-one-listener">Watching Several Changes With One Listener:</h4>
+<h4>Watching Several Changes With One Listener:</h4>
+
 <p>$watchGroup</p>
-
-<div class="language-js highlighter-rouge"><pre class="highlight"><code><span class="c1">// spec</span>
+<div class="highlight"><pre><code class="language-js" data-lang="js"><span class="c1">// spec</span>
 <span class="nx">scope</span><span class="p">.</span><span class="nx">$watchGroup</span><span class="p">([</span>
   <span class="kd">function</span><span class="p">(</span><span class="nx">scope</span><span class="p">)</span> <span class="p">{</span> <span class="k">return</span> <span class="nx">scope</span><span class="p">.</span><span class="nx">aValue</span><span class="p">;</span> <span class="p">},</span>
   <span class="kd">function</span><span class="p">(</span><span class="nx">scope</span><span class="p">)</span> <span class="p">{</span> <span class="k">return</span> <span class="nx">scope</span><span class="p">.</span><span class="nx">anotherValue</span><span class="p">;</span> <span class="p">}</span>
@@ -166,10 +151,7 @@
     <span class="nx">self</span><span class="p">.</span><span class="nx">$watch</span><span class="p">(</span><span class="nx">watchFn</span><span class="p">,</span> <span class="nx">listenerFn</span><span class="p">);</span>
   <span class="p">});</span>
 <span class="p">};</span>
-</code></pre>
-</div>
-
-
+</code></pre></div>
   </div>
 
 </article>

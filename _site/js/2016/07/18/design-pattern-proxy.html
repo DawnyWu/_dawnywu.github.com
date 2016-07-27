@@ -6,8 +6,8 @@
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
   <meta name="viewport" content="width=device-width, initial-scale=1">
 
-  <title>Design Patterns-</title>
-  <meta name="description" content="var proxy = { ids: [],delay: 50,timeout: null,callback: null,context: null,makeRequest: function (id, callback, context) {// add to the queue this.ids.push(i...">
+  <title>Design Patterns-Proxy</title>
+  <meta name="description" content="Proxy">
 
   <link rel="stylesheet" href="/css/main.css">
   <link rel="canonical" href="http://yourdomain.com/js/2016/07/18/design-pattern-proxy.html">
@@ -57,42 +57,55 @@
         <article class="post" itemscope itemtype="http://schema.org/BlogPosting">
 
   <header class="post-header">
-    <h1 class="post-title" itemprop="name headline">Design Patterns-</h1>
+    <h1 class="post-title" itemprop="name headline">Design Patterns-Proxy</h1>
     <p class="post-meta"><time datetime="2016-07-18T00:00:00+08:00" itemprop="datePublished">Jul 18, 2016</time></p>
   </header>
 
   <div class="post-content" itemprop="articleBody">
-    <div class="language-js highlighter-rouge"><pre class="highlight"><code><span class="kd">var</span> <span class="nx">proxy</span> <span class="o">=</span> <span class="p">{</span> <span class="na">ids</span><span class="p">:</span> <span class="p">[],</span>
-<span class="na">delay</span><span class="p">:</span> <span class="mi">50</span><span class="p">,</span>
-<span class="na">timeout</span><span class="p">:</span> <span class="kc">null</span><span class="p">,</span>
-<span class="na">callback</span><span class="p">:</span> <span class="kc">null</span><span class="p">,</span>
-<span class="na">context</span><span class="p">:</span> <span class="kc">null</span><span class="p">,</span>
-<span class="na">makeRequest</span><span class="p">:</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">id</span><span class="p">,</span> <span class="nx">callback</span><span class="p">,</span> <span class="nx">context</span><span class="p">)</span> <span class="p">{</span>
-<span class="c1">// add to the queue this.ids.push(id);</span>
-<span class="k">this</span><span class="p">.</span><span class="nx">callback</span> <span class="o">=</span> <span class="nx">callback</span><span class="p">;</span> <span class="k">this</span><span class="p">.</span><span class="nx">context</span> <span class="o">=</span> <span class="nx">context</span><span class="p">;</span>
-<span class="c1">// set up timeout</span>
-<span class="k">if</span> <span class="p">(</span><span class="o">!</span><span class="k">this</span><span class="p">.</span><span class="nx">timeout</span><span class="p">)</span> <span class="p">{</span>
-<span class="k">this</span><span class="p">.</span><span class="nx">timeout</span> <span class="o">=</span> <span class="nx">setTimeout</span><span class="p">(</span><span class="kd">function</span> <span class="p">()</span> <span class="p">{</span> <span class="nx">proxy</span><span class="p">.</span><span class="nx">flush</span><span class="p">();</span>
-<span class="p">},</span> <span class="k">this</span><span class="p">.</span><span class="nx">delay</span><span class="p">);</span>
-<span class="err">￼￼</span><span class="nx">Proxy</span> <span class="o">|</span> <span class="mi">165</span>
-<span class="p">}</span> <span class="p">},</span>
-<span class="na">flush</span><span class="p">:</span> <span class="kd">function</span> <span class="p">()</span> <span class="p">{</span>
-<span class="nx">http</span><span class="p">.</span><span class="nx">makeRequest</span><span class="p">(</span><span class="k">this</span><span class="p">.</span><span class="nx">ids</span><span class="p">,</span> <span class="s2">"proxy.handler"</span><span class="p">);</span>
-<span class="c1">// clear timeout and queue this.timeout = null; this.ids = [];</span>
-<span class="p">},</span>
-<span class="na">handler</span><span class="p">:</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">data</span><span class="p">)</span> <span class="p">{</span>
-<span class="kd">var</span> <span class="nx">i</span><span class="p">,</span> <span class="nx">max</span><span class="p">;</span>
-<span class="c1">// single video</span>
-<span class="k">if</span> <span class="p">(</span><span class="nb">parseInt</span><span class="p">(</span><span class="nx">data</span><span class="p">.</span><span class="nx">query</span><span class="p">.</span><span class="nx">count</span><span class="p">,</span> <span class="mi">10</span><span class="p">)</span> <span class="o">===</span> <span class="mi">1</span><span class="p">)</span> <span class="p">{</span>
-<span class="nx">proxy</span><span class="p">.</span><span class="nx">callback</span><span class="p">.</span><span class="nx">call</span><span class="p">(</span><span class="nx">proxy</span><span class="p">.</span><span class="nx">context</span><span class="p">,</span> <span class="nx">data</span><span class="p">.</span><span class="nx">query</span><span class="p">.</span><span class="nx">results</span><span class="p">.</span><span class="nx">Video</span><span class="p">);</span>
-<span class="k">return</span><span class="p">;</span> <span class="p">}</span>
-<span class="c1">// multiple videos</span>
-<span class="k">for</span> <span class="p">(</span><span class="nx">i</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span> <span class="nx">max</span> <span class="o">=</span> <span class="nx">data</span><span class="p">.</span><span class="nx">query</span><span class="p">.</span><span class="nx">results</span><span class="p">.</span><span class="nx">Video</span><span class="p">.</span><span class="nx">length</span><span class="p">;</span> <span class="nx">i</span> <span class="o">&lt;</span> <span class="nx">max</span><span class="p">;</span> <span class="nx">i</span> <span class="o">+=</span> <span class="mi">1</span><span class="p">)</span> <span class="p">{</span>
-<span class="nx">proxy</span><span class="p">.</span><span class="nx">callback</span><span class="p">.</span><span class="nx">call</span><span class="p">(</span><span class="nx">proxy</span><span class="p">.</span><span class="nx">context</span><span class="p">,</span> <span class="nx">data</span><span class="p">.</span><span class="nx">query</span><span class="p">.</span><span class="nx">results</span><span class="p">.</span><span class="nx">Video</span><span class="p">[</span><span class="nx">i</span><span class="p">]);</span> <span class="p">}</span>
-<span class="p">}</span> <span class="p">};</span>
-</code></pre>
-</div>
+    <h3>Proxy</h3>
 
+<p>使用proxy代理发送http请求，使得发送时间相近的请求可以合并为一个请求</p>
+
+<p>proxy还可以做cache</p>
+<div class="highlight"><pre><code class="language-js" data-lang="js"><span class="kd">var</span> <span class="nx">proxy</span> <span class="o">=</span> <span class="p">{</span> 
+  <span class="na">ids</span><span class="p">:</span> <span class="p">[],</span>
+  <span class="na">delay</span><span class="p">:</span> <span class="mi">50</span><span class="p">,</span>
+  <span class="na">timeout</span><span class="p">:</span> <span class="kc">null</span><span class="p">,</span>
+  <span class="na">callback</span><span class="p">:</span> <span class="kc">null</span><span class="p">,</span>
+  <span class="na">context</span><span class="p">:</span> <span class="kc">null</span><span class="p">,</span>
+  <span class="c1">// 并不立即发送请求</span>
+  <span class="na">makeRequest</span><span class="p">:</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">id</span><span class="p">,</span> <span class="nx">callback</span><span class="p">,</span> <span class="nx">context</span><span class="p">)</span> <span class="p">{</span>
+    <span class="c1">// add to the queue</span>
+    <span class="k">this</span><span class="p">.</span><span class="nx">ids</span><span class="p">.</span><span class="nx">push</span><span class="p">(</span><span class="nx">id</span><span class="p">);</span>
+    <span class="k">this</span><span class="p">.</span><span class="nx">callback</span> <span class="o">=</span> <span class="nx">callback</span><span class="p">;</span>
+    <span class="k">this</span><span class="p">.</span><span class="nx">context</span> <span class="o">=</span> <span class="nx">context</span><span class="p">;</span>
+    <span class="c1">// set up timeout</span>
+    <span class="k">if</span> <span class="p">(</span><span class="o">!</span><span class="k">this</span><span class="p">.</span><span class="nx">timeout</span><span class="p">)</span> <span class="p">{</span>
+      <span class="k">this</span><span class="p">.</span><span class="nx">timeout</span> <span class="o">=</span> <span class="nx">setTimeout</span><span class="p">(</span> <span class="kd">function</span><span class="p">(){</span><span class="nx">proxy</span><span class="p">.</span><span class="nx">flush</span><span class="p">();},</span>
+                                 <span class="k">this</span><span class="p">.</span><span class="nx">delay</span>
+                                <span class="p">);</span>
+    <span class="p">}</span> 
+  <span class="p">},</span>
+  <span class="na">flush</span><span class="p">:</span> <span class="kd">function</span> <span class="p">()</span> <span class="p">{</span>
+    <span class="nx">http</span><span class="p">.</span><span class="nx">makeRequest</span><span class="p">(</span><span class="k">this</span><span class="p">.</span><span class="nx">ids</span><span class="p">,</span> <span class="s2">"proxy.handler"</span><span class="p">);</span>
+    <span class="c1">// clear timeout and queue</span>
+    <span class="k">this</span><span class="p">.</span><span class="nx">timeout</span> <span class="o">=</span> <span class="kc">null</span><span class="p">;</span> 
+    <span class="k">this</span><span class="p">.</span><span class="nx">ids</span> <span class="o">=</span> <span class="p">[];</span>
+  <span class="p">},</span>
+  <span class="na">handler</span><span class="p">:</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">data</span><span class="p">)</span> <span class="p">{</span>
+    <span class="kd">var</span> <span class="nx">i</span><span class="p">,</span> <span class="nx">max</span><span class="p">;</span>
+    <span class="c1">// single video</span>
+    <span class="k">if</span> <span class="p">(</span><span class="nb">parseInt</span><span class="p">(</span><span class="nx">data</span><span class="p">.</span><span class="nx">query</span><span class="p">.</span><span class="nx">count</span><span class="p">,</span> <span class="mi">10</span><span class="p">)</span> <span class="o">===</span> <span class="mi">1</span><span class="p">)</span> <span class="p">{</span>
+      <span class="nx">proxy</span><span class="p">.</span><span class="nx">callback</span><span class="p">.</span><span class="nx">call</span><span class="p">(</span><span class="nx">proxy</span><span class="p">.</span><span class="nx">context</span><span class="p">,</span> <span class="nx">data</span><span class="p">.</span><span class="nx">query</span><span class="p">.</span><span class="nx">results</span><span class="p">.</span><span class="nx">Video</span><span class="p">);</span>
+      <span class="k">return</span><span class="p">;</span> 
+    <span class="p">}</span>
+    <span class="c1">// multiple videos</span>
+    <span class="k">for</span> <span class="p">(</span><span class="nx">i</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span> <span class="nx">max</span> <span class="o">=</span> <span class="nx">data</span><span class="p">.</span><span class="nx">query</span><span class="p">.</span><span class="nx">results</span><span class="p">.</span><span class="nx">Video</span><span class="p">.</span><span class="nx">length</span><span class="p">;</span> <span class="nx">i</span> <span class="o">&lt;</span> <span class="nx">max</span><span class="p">;</span> <span class="nx">i</span> <span class="o">+=</span> <span class="mi">1</span><span class="p">)</span> <span class="p">{</span>
+      <span class="nx">proxy</span><span class="p">.</span><span class="nx">callback</span><span class="p">.</span><span class="nx">call</span><span class="p">(</span><span class="nx">proxy</span><span class="p">.</span><span class="nx">context</span><span class="p">,</span> <span class="nx">data</span><span class="p">.</span><span class="nx">query</span><span class="p">.</span><span class="nx">results</span><span class="p">.</span><span class="nx">Video</span><span class="p">[</span><span class="nx">i</span><span class="p">]);</span> 
+    <span class="p">}</span>
+  <span class="p">}</span> 
+<span class="p">};</span>
+</code></pre></div>
   </div>
 
 </article>

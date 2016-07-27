@@ -1,0 +1,32 @@
+---
+layout: post
+title:  "Build Promise"
+date:   2016-07-21
+categories: js
+---
+
+```js
+function doSomething() {
+  return new Promise(function(resolve) {
+    var value = 42;
+    resolve(value);
+  });
+}
+```
+
+```js
+function Promise(fn) {
+  var callback = null;
+  this.then = function(cb) {
+    callback = cb;
+  };
+
+  function resolve(value) {
+    callback(value);
+  }
+  // fn是一个接收resolve fn的函数
+  fn(resolve);
+}
+```
+
+new Promise().then(callback)

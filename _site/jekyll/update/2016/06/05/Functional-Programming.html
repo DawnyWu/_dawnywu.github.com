@@ -62,47 +62,44 @@
   </header>
 
   <div class="post-content" itemprop="articleBody">
-    <h2 id="section">函数式编程中的错误处理</h2>
+    <h2>函数式编程中的错误处理</h2>
 
-<h3 id="lifting">什么是lifting?</h3>
+<h3>什么是lifting?</h3>
 
-<p><code class="highlighter-rouge">var zoltar = compose(map(console.log), map(fortune), getAge(moment()));</code></p>
+<p><code>var zoltar = compose(map(console.log), map(fortune), getAge(moment()));</code></p>
 
 <p>At the time of calling, a function can be surrounded by map, which transforms it from a non-functory function to a functory one, in informal terms. We call this process lifting.</p>
 
-<h3 id="side-effect">Side Effect</h3>
+<h3>Side Effect</h3>
+
 <p>Any interaction with the world outside of a function is a side effect</p>
 
 <p>包括但不限于以下：</p>
 
 <ul>
-  <li>changing the file system</li>
-  <li>inserting a record into a database</li>
-  <li>making an http call</li>
-  <li>mutations</li>
-  <li>printing to the screen / logging</li>
-  <li>obtaining user input</li>
-  <li>querying the DOM</li>
-  <li>accessing system state</li>
+<li>changing the file system</li>
+<li>inserting a record into a database</li>
+<li>making an http call</li>
+<li>mutations</li>
+<li>printing to the screen / logging</li>
+<li>obtaining user input</li>
+<li>querying the DOM</li>
+<li>accessing system state</li>
 </ul>
 
-<h3 id="impure-function-to-pure-function">Impure function to pure function</h3>
+<h3>Impure function to pure function</h3>
 
 <figure class="highlight"><pre><code class="language-javascript" data-lang="javascript"><span class="kd">var</span> <span class="nx">pureHttpCall</span> <span class="o">=</span> <span class="nx">memoize</span><span class="p">(</span><span class="kd">function</span><span class="p">(</span><span class="nx">url</span><span class="p">,</span> <span class="nx">params</span><span class="p">)</span> <span class="p">{</span>
   <span class="k">return</span> <span class="kd">function</span><span class="p">()</span> <span class="p">{</span>
     <span class="k">return</span> <span class="nx">$</span><span class="p">.</span><span class="nx">getJSON</span><span class="p">(</span><span class="nx">url</span><span class="p">,</span> <span class="nx">params</span><span class="p">);</span>
   <span class="p">};</span>
 <span class="p">});</span></code></pre></figure>
-
-<div class="language-javascript highlighter-rouge"><pre class="highlight"><code><span class="kd">var</span> <span class="nx">getFromStorage</span> <span class="o">=</span> <span class="kd">function</span><span class="p">(</span><span class="nx">key</span><span class="p">)</span> <span class="p">{</span>
+<div class="highlight"><pre><code class="language-javascript" data-lang="javascript"><span class="kd">var</span> <span class="nx">getFromStorage</span> <span class="o">=</span> <span class="kd">function</span><span class="p">(</span><span class="nx">key</span><span class="p">)</span> <span class="p">{</span>
   <span class="k">return</span> <span class="kd">function</span><span class="p">()</span> <span class="p">{</span>
     <span class="k">return</span> <span class="nx">localStorage</span><span class="p">[</span><span class="nx">key</span><span class="p">];</span>
   <span class="p">};</span>
 <span class="p">};</span>
-</code></pre>
-</div>
-
-
+</code></pre></div>
   </div>
 
 </article>

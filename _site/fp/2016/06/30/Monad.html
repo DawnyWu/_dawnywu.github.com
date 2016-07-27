@@ -66,35 +66,27 @@
 
 <p>Monads are pointed functors that can flatten</p>
 
-<p>Any functor which defines a join method, has an of method, and obeys a few laws is a monad.</p>
+<p>Any functor which defines a join method, has an of method, and obeys a few laws is a monad. </p>
 
 <p><strong><em>join</em></strong></p>
-
-<div class="language-javascript highlighter-rouge"><pre class="highlight"><code><span class="c1">// 本质就是去掉一层Container</span>
+<div class="highlight"><pre><code class="language-javascript" data-lang="javascript"><span class="c1">// 本质就是去掉一层Container</span>
 <span class="nx">Maybe</span><span class="p">.</span><span class="nx">prototype</span><span class="p">.</span><span class="nx">join</span> <span class="o">=</span> <span class="kd">function</span><span class="p">()</span> <span class="p">{</span>
   <span class="k">return</span> <span class="k">this</span><span class="p">.</span><span class="nx">isNothing</span><span class="p">()</span> <span class="p">?</span> <span class="nx">Maybe</span><span class="p">.</span><span class="nx">of</span><span class="p">(</span><span class="kc">null</span><span class="p">)</span> <span class="p">:</span> <span class="k">this</span><span class="p">.</span><span class="nx">__value</span><span class="p">;</span>
 <span class="p">}</span>
-</code></pre>
-</div>
-
-<div class="language-javascript highlighter-rouge"><pre class="highlight"><code><span class="nx">IO</span><span class="p">.</span><span class="nx">prototype</span><span class="p">.</span><span class="nx">join</span> <span class="o">=</span> <span class="kd">function</span><span class="p">()</span> <span class="p">{</span>
+</code></pre></div><div class="highlight"><pre><code class="language-javascript" data-lang="javascript"><span class="nx">IO</span><span class="p">.</span><span class="nx">prototype</span><span class="p">.</span><span class="nx">join</span> <span class="o">=</span> <span class="kd">function</span><span class="p">()</span> <span class="p">{</span>
   <span class="kd">var</span> <span class="nx">thiz</span> <span class="o">=</span> <span class="k">this</span><span class="p">;</span>
   <span class="k">return</span> <span class="k">new</span> <span class="nx">IO</span><span class="p">(</span><span class="kd">function</span><span class="p">()</span> <span class="p">{</span>
     <span class="k">return</span> <span class="nx">thiz</span><span class="p">.</span><span class="nx">unsafePerformIO</span><span class="p">().</span><span class="nx">unsafePerformIO</span><span class="p">();</span>
   <span class="p">});</span>
 <span class="p">};</span>
-</code></pre>
-</div>
-
+</code></pre></div>
 <p><strong><em>chain</em></strong></p>
 
-<p>called »= (pronounced bind) or flatMap</p>
-
-<div class="language-javascript highlighter-rouge"><pre class="highlight"><code><span class="kd">var</span> <span class="nx">chain</span> <span class="o">=</span> <span class="nx">curry</span><span class="p">(</span><span class="kd">function</span><span class="p">(</span><span class="nx">f</span><span class="p">,</span> <span class="nx">m</span><span class="p">){</span>
+<p>called &gt;&gt;= (pronounced bind) or flatMap </p>
+<div class="highlight"><pre><code class="language-javascript" data-lang="javascript"><span class="kd">var</span> <span class="nx">chain</span> <span class="o">=</span> <span class="nx">curry</span><span class="p">(</span><span class="kd">function</span><span class="p">(</span><span class="nx">f</span><span class="p">,</span> <span class="nx">m</span><span class="p">){</span>
   <span class="k">return</span> <span class="nx">m</span><span class="p">.</span><span class="nx">map</span><span class="p">(</span><span class="nx">f</span><span class="p">).</span><span class="nx">join</span><span class="p">();</span> <span class="c1">// or compose(join, map(f))(m)</span>
 <span class="p">});</span>
-</code></pre>
-</div>
+</code></pre></div>
 <p>map(f)后join</p>
 
 <p>f是一个会添加一层Container的函数</p>

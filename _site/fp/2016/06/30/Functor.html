@@ -7,7 +7,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
 
   <title>Functor</title>
-  <meta name="description" content="IO```javascriptvar IO = function(f) {  this.__value = f;};">
+  <meta name="description" content="IOvar IO = function(f) {  this.__value = f;};">
 
   <link rel="stylesheet" href="/css/main.css">
   <link rel="canonical" href="http://yourdomain.com/fp/2016/06/30/Functor.html">
@@ -62,8 +62,8 @@
   </header>
 
   <div class="post-content" itemprop="articleBody">
-    <h3 id="io">IO</h3>
-<div class="language-javascript highlighter-rouge"><pre class="highlight"><code><span class="kd">var</span> <span class="nx">IO</span> <span class="o">=</span> <span class="kd">function</span><span class="p">(</span><span class="nx">f</span><span class="p">)</span> <span class="p">{</span>
+    <h3>IO</h3>
+<div class="highlight"><pre><code class="language-javascript" data-lang="javascript"><span class="kd">var</span> <span class="nx">IO</span> <span class="o">=</span> <span class="kd">function</span><span class="p">(</span><span class="nx">f</span><span class="p">)</span> <span class="p">{</span>
   <span class="k">this</span><span class="p">.</span><span class="nx">__value</span> <span class="o">=</span> <span class="nx">f</span><span class="p">;</span>
 <span class="p">};</span>
 
@@ -76,13 +76,13 @@
 <span class="nx">IO</span><span class="p">.</span><span class="nx">prototype</span><span class="p">.</span><span class="nx">map</span> <span class="o">=</span> <span class="kd">function</span><span class="p">(</span><span class="nx">f</span><span class="p">)</span> <span class="p">{</span>
   <span class="k">return</span> <span class="k">new</span> <span class="nx">IO</span><span class="p">(</span><span class="nx">_</span><span class="p">.</span><span class="nx">compose</span><span class="p">(</span><span class="nx">f</span><span class="p">,</span> <span class="k">this</span><span class="p">.</span><span class="nx">__value</span><span class="p">));</span>
 <span class="p">};</span>
-</code></pre>
-</div>
+</code></pre></div>
 <p>返回包裹着结果的函数，使得其无副作用</p>
 
 <p>.value方法就好像炸弹的拉环</p>
 
-<h3 id="async">Async</h3>
+<h3>Async</h3>
+
 <p>JQuery 中的 Promise is not pure.</p>
 
 <p>promise中的.then可以想成.map</p>

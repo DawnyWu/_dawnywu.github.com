@@ -62,19 +62,15 @@
   </header>
 
   <div class="post-content" itemprop="articleBody">
-    <h4 id="parse-number">Parse Number</h4>
-
-<div class="language-js highlighter-rouge"><pre class="highlight"><code><span class="c1">// number 42 to token</span>
+    <h4>Parse Number</h4>
+<div class="highlight"><pre><code class="language-js" data-lang="js"><span class="c1">// number 42 to token</span>
 <span class="p">{</span>
   <span class="nl">text</span><span class="p">:</span> <span class="s1">'42'</span><span class="p">,</span>
   <span class="nx">value</span><span class="err">:</span> <span class="mi">42</span>
 <span class="p">}</span>
-</code></pre>
-</div>
-
+</code></pre></div>
 <p>Lex的基本结构，遍历每个character，创建token</p>
-
-<div class="language-js highlighter-rouge"><pre class="highlight"><code><span class="nx">Lexer</span><span class="p">.</span><span class="nx">prototype</span><span class="p">.</span><span class="nx">lex</span> <span class="o">=</span> <span class="kd">function</span><span class="p">(</span><span class="nx">text</span><span class="p">)</span> <span class="p">{</span>
+<div class="highlight"><pre><code class="language-js" data-lang="js"><span class="nx">Lexer</span><span class="p">.</span><span class="nx">prototype</span><span class="p">.</span><span class="nx">lex</span> <span class="o">=</span> <span class="kd">function</span><span class="p">(</span><span class="nx">text</span><span class="p">)</span> <span class="p">{</span>
   <span class="k">this</span><span class="p">.</span><span class="nx">text</span> <span class="o">=</span> <span class="nx">text</span><span class="p">;</span>
   <span class="k">this</span><span class="p">.</span><span class="nx">index</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
   <span class="k">this</span><span class="p">.</span><span class="nx">ch</span> <span class="o">=</span> <span class="kc">undefined</span><span class="p">;</span>
@@ -114,26 +110,20 @@
     <span class="na">value</span><span class="p">:</span> <span class="nb">Number</span><span class="p">(</span><span class="nx">number</span><span class="p">)</span>
   <span class="p">});</span>
 <span class="p">};</span>
-</code></pre>
-</div>
+</code></pre></div>
+<p>创建AST <code>{type: AST.Literal, value: 42}</code></p>
 
-<p>创建AST <code class="highlighter-rouge"><span class="p">{</span><span class="err">type:</span><span class="w"> </span><span class="err">AST.Literal,</span><span class="w"> </span><span class="err">value:</span><span class="w"> </span><span class="err">42</span><span class="p">}</span></code></p>
-
-<p>Every AST has a root node of type <code class="highlighter-rouge">AST.Program</code>. That root node has an attribute called <code class="highlighter-rouge">body</code> that holds the contents of the expression.</p>
+<p>Every AST has a root node of type <code>AST.Program</code>. That root node has an attribute called <code>body</code> that holds the contents of the expression. </p>
 
 <p>所以最终应当是这样的</p>
-
-<div class="language-js highlighter-rouge"><pre class="highlight"><code><span class="p">{</span>
+<div class="highlight"><pre><code class="language-js" data-lang="js"><span class="p">{</span>
   <span class="nl">type</span><span class="p">:</span> <span class="nx">AST</span><span class="p">.</span><span class="nx">Program</span><span class="p">,</span>
   <span class="nx">body</span><span class="err">:</span> <span class="p">{</span>
     <span class="nl">type</span><span class="p">:</span> <span class="nx">AST</span><span class="p">.</span><span class="nx">Literal</span><span class="p">,</span>
     <span class="nx">value</span><span class="err">:</span> <span class="mi">42</span>
   <span class="p">}</span>
 <span class="p">}</span>
-</code></pre>
-</div>
-
-<div class="language-js highlighter-rouge"><pre class="highlight"><code><span class="nx">AST</span><span class="p">.</span><span class="nx">prototype</span><span class="p">.</span><span class="nx">ast</span> <span class="o">=</span> <span class="kd">function</span><span class="p">(</span><span class="nx">text</span><span class="p">)</span> <span class="p">{</span>
+</code></pre></div><div class="highlight"><pre><code class="language-js" data-lang="js"><span class="nx">AST</span><span class="p">.</span><span class="nx">prototype</span><span class="p">.</span><span class="nx">ast</span> <span class="o">=</span> <span class="kd">function</span><span class="p">(</span><span class="nx">text</span><span class="p">)</span> <span class="p">{</span>
   <span class="k">this</span><span class="p">.</span><span class="nx">tokens</span> <span class="o">=</span> <span class="k">this</span><span class="p">.</span><span class="nx">lexer</span><span class="p">.</span><span class="nx">lex</span><span class="p">(</span><span class="nx">text</span><span class="p">);</span>
   <span class="k">return</span> <span class="k">this</span><span class="p">.</span><span class="nx">program</span><span class="p">();</span>
 <span class="p">};</span>
@@ -144,23 +134,18 @@
 <span class="nx">AST</span><span class="p">.</span><span class="nx">prototype</span><span class="p">.</span><span class="nx">constant</span> <span class="o">=</span> <span class="kd">function</span><span class="p">()</span> <span class="p">{</span>
   <span class="k">return</span> <span class="p">{</span><span class="na">type</span><span class="p">:</span> <span class="nx">AST</span><span class="p">.</span><span class="nx">Literal</span><span class="p">,</span> <span class="na">value</span><span class="p">:</span> <span class="k">this</span><span class="p">.</span><span class="nx">tokens</span><span class="p">[</span><span class="mi">0</span><span class="p">].</span><span class="nx">value</span><span class="p">};</span>
 <span class="p">};</span>
-</code></pre>
-</div>
-
+</code></pre></div>
 <p>ASTCompiler根据AST来创建函数</p>
-
-<div class="language-js highlighter-rouge"><pre class="highlight"><code><span class="nx">ASTCompiler</span><span class="p">.</span><span class="nx">prototype</span><span class="p">.</span><span class="nx">compile</span> <span class="o">=</span> <span class="kd">function</span><span class="p">(</span><span class="nx">text</span><span class="p">)</span> <span class="p">{</span>
+<div class="highlight"><pre><code class="language-js" data-lang="js"><span class="nx">ASTCompiler</span><span class="p">.</span><span class="nx">prototype</span><span class="p">.</span><span class="nx">compile</span> <span class="o">=</span> <span class="kd">function</span><span class="p">(</span><span class="nx">text</span><span class="p">)</span> <span class="p">{</span>
   <span class="kd">var</span> <span class="nx">ast</span> <span class="o">=</span> <span class="k">this</span><span class="p">.</span><span class="nx">astBuilder</span><span class="p">.</span><span class="nx">ast</span><span class="p">(</span><span class="nx">text</span><span class="p">);</span> 
   <span class="c1">// recurse生成一些东西存在state中</span>
   <span class="k">this</span><span class="p">.</span><span class="nx">state</span> <span class="o">=</span> <span class="p">{</span><span class="na">body</span><span class="p">:</span> <span class="p">[]};</span>
   <span class="k">this</span><span class="p">.</span><span class="nx">recurse</span><span class="p">(</span><span class="nx">ast</span><span class="p">);</span>
   <span class="k">return</span> <span class="k">new</span> <span class="nb">Function</span><span class="p">(</span><span class="k">this</span><span class="p">.</span><span class="nx">state</span><span class="p">.</span><span class="nx">body</span><span class="p">.</span><span class="nx">join</span><span class="p">(</span><span class="s1">''</span><span class="p">));</span>
 <span class="p">};</span>
-</code></pre>
-</div>
-<p><code class="highlighter-rouge">recurse</code> is a <code class="highlighter-rouge">recursive method</code> that we will invoke for each node in the tree.Since each node has a type, and different types of nodes require different kind of processing</p>
-
-<div class="language-js highlighter-rouge"><pre class="highlight"><code><span class="nx">ASTCompiler</span><span class="p">.</span><span class="nx">prototype</span><span class="p">.</span><span class="nx">recurse</span> <span class="o">=</span> <span class="kd">function</span><span class="p">(</span><span class="nx">ast</span><span class="p">)</span> <span class="p">{</span>
+</code></pre></div>
+<p><code>recurse</code> is a <code>recursive method</code> that we will invoke for each node in the tree.Since each node has a type, and different types of nodes require different kind of processing</p>
+<div class="highlight"><pre><code class="language-js" data-lang="js"><span class="nx">ASTCompiler</span><span class="p">.</span><span class="nx">prototype</span><span class="p">.</span><span class="nx">recurse</span> <span class="o">=</span> <span class="kd">function</span><span class="p">(</span><span class="nx">ast</span><span class="p">)</span> <span class="p">{</span>
   <span class="k">switch</span> <span class="p">(</span><span class="nx">ast</span><span class="p">.</span><span class="nx">type</span><span class="p">)</span> <span class="p">{</span>
     <span class="k">case</span> <span class="nx">AST</span><span class="p">.</span><span class="nx">Program</span><span class="err">:</span>
     <span class="c1">// Literal类型只需要返回值就可以了</span>
@@ -168,21 +153,15 @@
       <span class="k">return</span> <span class="nx">ast</span><span class="p">.</span><span class="nx">value</span><span class="p">;</span>
   <span class="p">}</span>
 <span class="p">};</span>
-</code></pre>
-</div>
-
-<div class="language-js highlighter-rouge"><pre class="highlight"><code><span class="c1">// Program类型返回 return 语句 和 ast.body 中的内容</span>
+</code></pre></div><div class="highlight"><pre><code class="language-js" data-lang="js"><span class="c1">// Program类型返回 return 语句 和 ast.body 中的内容</span>
 <span class="k">case</span> <span class="nx">AST</span><span class="p">.</span><span class="nx">Program</span><span class="err">:</span>
   <span class="k">this</span><span class="p">.</span><span class="nx">state</span><span class="p">.</span><span class="nx">body</span><span class="p">.</span><span class="nx">push</span><span class="p">(</span><span class="s1">'return '</span><span class="p">,</span> <span class="k">this</span><span class="p">.</span><span class="nx">recurse</span><span class="p">(</span><span class="nx">ast</span><span class="p">.</span><span class="nx">body</span><span class="p">),</span> <span class="s1">';'</span><span class="p">);</span> 
   <span class="k">break</span><span class="p">;</span>
-</code></pre>
-</div>
+</code></pre></div>
+<h4>Parsing Floating Point Numbers</h4>
 
-<h4 id="parsing-floating-point-numbers">Parsing Floating Point Numbers</h4>
-
-<p>现在要允许浮点数<code class="highlighter-rouge">4.2</code></p>
-
-<div class="language-js highlighter-rouge"><pre class="highlight"><code><span class="nx">Lexer</span><span class="p">.</span><span class="nx">prototype</span><span class="p">.</span><span class="nx">readNumber</span> <span class="o">=</span> <span class="kd">function</span><span class="p">()</span> <span class="p">{</span>
+<p>现在要允许浮点数<code>4.2</code></p>
+<div class="highlight"><pre><code class="language-js" data-lang="js"><span class="nx">Lexer</span><span class="p">.</span><span class="nx">prototype</span><span class="p">.</span><span class="nx">readNumber</span> <span class="o">=</span> <span class="kd">function</span><span class="p">()</span> <span class="p">{</span>
   <span class="kd">var</span> <span class="nx">number</span> <span class="o">=</span> <span class="s1">''</span><span class="p">;</span>
   <span class="k">while</span> <span class="p">(</span><span class="k">this</span><span class="p">.</span><span class="nx">index</span> <span class="o">&lt;</span> <span class="k">this</span><span class="p">.</span><span class="nx">text</span><span class="p">.</span><span class="nx">length</span><span class="p">)</span> <span class="p">{</span>
     <span class="kd">var</span> <span class="nx">ch</span> <span class="o">=</span> <span class="k">this</span><span class="p">.</span><span class="nx">text</span><span class="p">.</span><span class="nx">charAt</span><span class="p">(</span><span class="k">this</span><span class="p">.</span><span class="nx">index</span><span class="p">);</span>
@@ -194,12 +173,9 @@
     <span class="p">}</span>
     <span class="k">this</span><span class="p">.</span><span class="nx">index</span><span class="o">++</span><span class="p">;</span> 
   <span class="p">}</span>
-</code></pre>
-</div>
-
-<h4 id="string">String</h4>
-
-<div class="language-js highlighter-rouge"><pre class="highlight"><code><span class="c1">// 单引号和双引号</span>
+</code></pre></div>
+<h4>String</h4>
+<div class="highlight"><pre><code class="language-js" data-lang="js"><span class="c1">// 单引号和双引号</span>
 <span class="p">}</span> <span class="k">else</span> <span class="k">if</span> <span class="p">(</span><span class="k">this</span><span class="p">.</span><span class="nx">ch</span> <span class="o">===</span> <span class="s1">'\''</span> <span class="o">||</span> <span class="k">this</span><span class="p">.</span><span class="nx">ch</span> <span class="o">===</span> <span class="s1">'"'</span><span class="p">)</span> <span class="p">{</span>
   <span class="k">this</span><span class="p">.</span><span class="nx">readString</span><span class="p">();</span>
 
@@ -224,10 +200,7 @@
   <span class="p">}</span>
   <span class="k">throw</span> <span class="s1">'Unmatched quote'</span><span class="p">;</span> 
 <span class="p">};</span>
-</code></pre>
-</div>
-
-
+</code></pre></div>
   </div>
 
 </article>

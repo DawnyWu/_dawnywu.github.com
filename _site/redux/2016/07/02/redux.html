@@ -65,8 +65,7 @@
     <p><strong><em>Simplify the arrow function</em></strong></p>
 
 <p>如果arrow function只是返回一个object,那么可以用如下写法</p>
-
-<div class="language-js highlighter-rouge"><pre class="highlight"><code><span class="c1">// 原来</span>
+<div class="highlight"><pre><code class="language-js" data-lang="js"><span class="c1">// 原来</span>
 <span class="kr">export</span> <span class="kr">const</span> <span class="nx">addTodo</span> <span class="o">=</span> <span class="p">(</span><span class="nx">text</span><span class="p">)</span> <span class="o">=&gt;</span> <span class="p">{</span>
   <span class="k">return</span> <span class="p">{</span>
   <span class="na">type</span><span class="p">:</span> <span class="s1">'ADD_TODO'</span><span class="p">,</span>
@@ -79,18 +78,14 @@
   <span class="na">id</span><span class="p">:</span> <span class="p">(</span><span class="nx">nextTodoId</span><span class="o">++</span><span class="p">).</span><span class="nx">toString</span><span class="p">(),</span>
   <span class="nx">text</span><span class="p">,</span>
 <span class="p">});</span>
-</code></pre>
-</div>
+</code></pre></div>
 <p>如果是object里有函数，那么还可以这样写</p>
-
-<div class="highlighter-rouge"><pre class="highlight"><code>const mapDispatchToProps = (dispatch) =&gt; ({
+<div class="highlight"><pre><code class="language-" data-lang="">const mapDispatchToProps = (dispatch) =&gt; ({
   onTodoClick(id) {
     dispatch(toggleTodo(id));
   },
 });
-</code></pre>
-</div>
-
+</code></pre></div>
   </div>
 
 </article>

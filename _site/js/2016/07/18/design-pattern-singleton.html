@@ -62,13 +62,12 @@
   </header>
 
   <div class="post-content" itemprop="articleBody">
-    <h3 id="singleton">Singleton</h3>
+    <h3>Singleton</h3>
 
-<h4 id="singleton-instance">方法一：把singleton instance写在构造函数对象上</h4>
+<h4>方法一：把singleton instance写在构造函数对象上</h4>
 
 <p>缺点： 别人可以修改Universe.instanced对象</p>
-
-<div class="language-js highlighter-rouge"><pre class="highlight"><code><span class="kd">function</span> <span class="nx">Universe</span><span class="p">()</span> <span class="p">{</span>
+<div class="highlight"><pre><code class="language-js" data-lang="js"><span class="kd">function</span> <span class="nx">Universe</span><span class="p">()</span> <span class="p">{</span>
   <span class="c1">// do we have an existing instance?</span>
   <span class="k">if</span> <span class="p">(</span><span class="k">typeof</span> <span class="nx">Universe</span><span class="p">.</span><span class="nx">instance</span> <span class="o">===</span> <span class="s2">"object"</span><span class="p">)</span> <span class="p">{</span>
     <span class="k">return</span> <span class="nx">Universe</span><span class="p">.</span><span class="nx">instance</span><span class="p">;</span> 
@@ -84,14 +83,11 @@
 <span class="kd">var</span> <span class="nx">uni</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">Universe</span><span class="p">();</span>
 <span class="kd">var</span> <span class="nx">uni2</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">Universe</span><span class="p">();</span>
 <span class="nx">uni</span> <span class="o">===</span> <span class="nx">uni2</span><span class="p">;</span> <span class="c1">// true</span>
-</code></pre>
-</div>
-
-<h4 id="closure">方法二：用closure</h4>
+</code></pre></div>
+<h4>方法二：用closure</h4>
 
 <p>缺点：由于使用了Self-Defining函数，之前函数的property就被覆盖掉了</p>
-
-<div class="language-js highlighter-rouge"><pre class="highlight"><code><span class="kd">function</span> <span class="nx">Universe</span><span class="p">()</span> <span class="p">{</span>
+<div class="highlight"><pre><code class="language-js" data-lang="js"><span class="kd">function</span> <span class="nx">Universe</span><span class="p">()</span> <span class="p">{</span>
   <span class="c1">// the cached instance</span>
   <span class="kd">var</span> <span class="nx">instance</span> <span class="o">=</span> <span class="k">this</span><span class="p">;</span>
   <span class="c1">// proceed as normal </span>
@@ -100,12 +96,9 @@
   <span class="nx">Universe</span> <span class="o">=</span> <span class="kd">function</span> <span class="p">()</span> <span class="p">{</span>
     <span class="k">return</span> <span class="nx">instance</span><span class="p">;</span> <span class="p">};</span>
   <span class="p">}</span>
-</code></pre>
-</div>
-
+</code></pre></div>
 <p>缺点示例：</p>
-
-<div class="language-js highlighter-rouge"><pre class="highlight"><code><span class="c1">// adding to the prototype </span>
+<div class="highlight"><pre><code class="language-js" data-lang="js"><span class="c1">// adding to the prototype </span>
 <span class="nx">Universe</span><span class="p">.</span><span class="nx">prototype</span><span class="p">.</span><span class="nx">nothing</span> <span class="o">=</span> <span class="kc">true</span><span class="p">;</span>
 <span class="kd">var</span> <span class="nx">uni</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">Universe</span><span class="p">();</span>
 
@@ -126,12 +119,9 @@
 <span class="c1">// but that's odd:</span>
 <span class="nx">uni</span><span class="p">.</span><span class="nx">constructor</span> <span class="o">===</span> <span class="nx">Universe</span><span class="p">;</span> <span class="c1">// false</span>
 <span class="c1">// 是因为已经不是同一个对象了，uni指向旧的对象</span>
-</code></pre>
-</div>
-
-<p>如果想要<code class="highlighter-rouge">uni.constructor === Universe</code>是<code class="highlighter-rouge">true</code>的话, 需要让第一次生成的instance的constructor指向<code class="highlighter-rouge">redefined</code>的Universe</p>
-
-<div class="language-js highlighter-rouge"><pre class="highlight"><code><span class="kd">function</span> <span class="nx">Universe</span><span class="p">()</span> <span class="p">{</span>
+</code></pre></div>
+<p>如果想要<code>uni.constructor === Universe</code>是<code>true</code>的话, 需要让第一次生成的instance的constructor指向<code>redefined</code>的Universe</p>
+<div class="highlight"><pre><code class="language-js" data-lang="js"><span class="kd">function</span> <span class="nx">Universe</span><span class="p">()</span> <span class="p">{</span>
   <span class="c1">// the cached instance</span>
   <span class="kd">var</span> <span class="nx">instance</span><span class="p">;</span>
   <span class="c1">// rewrite the constructor</span>
@@ -148,12 +138,9 @@
   <span class="nx">instance</span><span class="p">.</span><span class="nx">start_time</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span> <span class="nx">instance</span><span class="p">.</span><span class="nx">bang</span> <span class="o">=</span> <span class="s2">"Big"</span><span class="p">;</span>
   <span class="k">return</span> <span class="nx">instance</span><span class="p">;</span> 
 <span class="p">}</span>
-</code></pre>
-</div>
-
+</code></pre></div>
 <p>下边代码也可以解决刚才的问题，他根本没用 Self-Defining Functions</p>
-
-<div class="language-js highlighter-rouge"><pre class="highlight"><code><span class="kd">var</span> <span class="nx">Universe</span><span class="p">;</span> 
+<div class="highlight"><pre><code class="language-js" data-lang="js"><span class="kd">var</span> <span class="nx">Universe</span><span class="p">;</span> 
 <span class="p">(</span><span class="kd">function</span> <span class="p">()</span> <span class="p">{</span>
   <span class="kd">var</span> <span class="nx">instance</span><span class="p">;</span>
   <span class="nx">Universe</span> <span class="o">=</span> <span class="kd">function</span> <span class="nx">Universe</span><span class="p">()</span> <span class="p">{</span>
@@ -165,14 +152,11 @@
     <span class="k">this</span><span class="p">.</span><span class="nx">start_time</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span> <span class="k">this</span><span class="p">.</span><span class="nx">bang</span> <span class="o">=</span> <span class="s2">"Big"</span><span class="p">;</span>
   <span class="p">};</span> 
 <span class="p">}());</span>
-</code></pre>
-</div>
-
-<hr />
+</code></pre></div>
+<hr>
 
 <p><strong><em>必要知识 Self-Defining Functions</em></strong></p>
-
-<div class="language-js highlighter-rouge"><pre class="highlight"><code><span class="kd">var</span> <span class="nx">scareMe</span> <span class="o">=</span> <span class="kd">function</span> <span class="p">()</span> <span class="p">{</span>
+<div class="highlight"><pre><code class="language-js" data-lang="js"><span class="kd">var</span> <span class="nx">scareMe</span> <span class="o">=</span> <span class="kd">function</span> <span class="p">()</span> <span class="p">{</span>
   <span class="nx">alert</span><span class="p">(</span><span class="s2">"Boo!"</span><span class="p">);</span>
   <span class="nx">scareMe</span> <span class="o">=</span> <span class="kd">function</span> <span class="p">()</span> <span class="p">{</span>
     <span class="nx">alert</span><span class="p">(</span><span class="s2">"Double boo!"</span><span class="p">);</span> 
@@ -180,14 +164,11 @@
 <span class="p">};</span>
 <span class="c1">// using the self-defining function scareMe(); // Boo!</span>
 <span class="nx">scareMe</span><span class="p">();</span> <span class="c1">// Double boo!</span>
-</code></pre>
-</div>
-
+</code></pre></div>
 <p>要注意，重新定义的函数会覆盖掉之前函数的property</p>
 
 <p>把函数复制给一个变量，或作为一个object的value后，多次运行函数。虽然函数会覆盖掉，但是变量或key仍会指向旧的函数，</p>
-
-<div class="language-js highlighter-rouge"><pre class="highlight"><code><span class="c1">// 1. adding a new property</span>
+<div class="highlight"><pre><code class="language-js" data-lang="js"><span class="c1">// 1. adding a new property</span>
 <span class="nx">scareMe</span><span class="p">.</span><span class="nx">property</span> <span class="o">=</span> <span class="s2">"properly"</span><span class="p">;</span>
 <span class="c1">// 2. assigning to a different name</span>
 <span class="kd">var</span> <span class="nx">prank</span> <span class="o">=</span> <span class="nx">scareMe</span><span class="p">;</span>
@@ -207,10 +188,7 @@
 <span class="nx">scareMe</span><span class="p">();</span> <span class="c1">// Double boo!</span>
 <span class="nx">scareMe</span><span class="p">();</span> <span class="c1">// Double boo! </span>
 <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="nx">scareMe</span><span class="p">.</span><span class="nx">property</span><span class="p">);</span> <span class="c1">// undefined</span>
-</code></pre>
-</div>
-
-
+</code></pre></div>
   </div>
 
 </article>

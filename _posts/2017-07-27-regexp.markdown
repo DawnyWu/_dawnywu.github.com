@@ -1,0 +1,7 @@
+---
+layout: post
+title:  "Build my own angular: regexp"
+date:   2016-07-25
+categories: js
+---
+

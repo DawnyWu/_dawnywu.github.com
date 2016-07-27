@@ -6,8 +6,8 @@
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
   <meta name="viewport" content="width=device-width, initial-scale=1">
 
-  <title>Design Patterns-Singleton</title>
-  <meta name="description" content="Singleton">
+  <title>Design Patterns-Observer</title>
+  <meta name="description" content="Observer">
 
   <link rel="stylesheet" href="/css/main.css">
   <link rel="canonical" href="http://yourdomain.com/js/2016/07/18/design-pattern.html">
@@ -57,156 +57,106 @@
         <article class="post" itemscope itemtype="http://schema.org/BlogPosting">
 
   <header class="post-header">
-    <h1 class="post-title" itemprop="name headline">Design Patterns-Singleton</h1>
+    <h1 class="post-title" itemprop="name headline">Design Patterns-Observer</h1>
     <p class="post-meta"><time datetime="2016-07-18T00:00:00+08:00" itemprop="datePublished">Jul 18, 2016</time></p>
   </header>
 
   <div class="post-content" itemprop="articleBody">
-    <h3 id="singleton">Singleton</h3>
+    <h3 id="observer">Observer</h3>
 
-<h4 id="singleton-instance">方法一：把singleton instance写在构造函数对象上</h4>
+<h4 id="example-1-magazine-subscriptions">Example #1: Magazine Subscriptions</h4>
 
-<p>缺点： 别人可以修改Universe.instanced对象</p>
+<p>you have a <code class="highlighter-rouge">publisher paper</code>, which publishes <code class="highlighter-rouge">a daily newspaper</code> and <code class="highlighter-rouge">a monthly magazine</code>.</p>
 
-<div class="language-js highlighter-rouge"><pre class="highlight"><code><span class="kd">function</span> <span class="nx">Universe</span><span class="p">()</span> <span class="p">{</span>
-  <span class="c1">// do we have an existing instance?</span>
-  <span class="k">if</span> <span class="p">(</span><span class="k">typeof</span> <span class="nx">Universe</span><span class="p">.</span><span class="nx">instance</span> <span class="o">===</span> <span class="s2">"object"</span><span class="p">)</span> <span class="p">{</span>
-    <span class="k">return</span> <span class="nx">Universe</span><span class="p">.</span><span class="nx">instance</span><span class="p">;</span> 
-  <span class="p">}</span>
-  <span class="c1">// proceed as normal </span>
-  <span class="k">this</span><span class="p">.</span><span class="nx">start_time</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span> <span class="k">this</span><span class="p">.</span><span class="nx">bang</span> <span class="o">=</span> <span class="s2">"Big"</span><span class="p">;</span>
-  <span class="c1">// cache </span>
-  <span class="nx">Universe</span><span class="p">.</span><span class="nx">instance</span> <span class="o">=</span> <span class="k">this</span><span class="p">;</span>
-  <span class="c1">// implicit return:</span>
-  <span class="c1">// return this; </span>
-<span class="p">}</span>
-<span class="c1">// testing</span>
-<span class="kd">var</span> <span class="nx">uni</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">Universe</span><span class="p">();</span>
-<span class="kd">var</span> <span class="nx">uni2</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">Universe</span><span class="p">();</span>
-<span class="nx">uni</span> <span class="o">===</span> <span class="nx">uni2</span><span class="p">;</span> <span class="c1">// true</span>
-</code></pre>
-</div>
+<p><code class="highlighter-rouge">a publisher object</code> needs to have these members:</p>
 
-<h4 id="closure">方法二：用closure</h4>
+<ul>
+  <li><code class="highlighter-rouge">subscribers</code>
+An array</li>
+  <li><code class="highlighter-rouge">subscribe()</code>
+Add to the array of subscribers</li>
+  <li><code class="highlighter-rouge">unsubscribe()</code>
+Remove from the subscribers array</li>
+  <li><code class="highlighter-rouge">publish()</code>
+Loop though subscribers and call the methods they provided when they signed up</li>
+</ul>
 
-<p>缺点：由于使用了Self-Defining函数，之前函数的property就被覆盖掉了</p>
-
-<div class="language-js highlighter-rouge"><pre class="highlight"><code><span class="kd">function</span> <span class="nx">Universe</span><span class="p">()</span> <span class="p">{</span>
-  <span class="c1">// the cached instance</span>
-  <span class="kd">var</span> <span class="nx">instance</span> <span class="o">=</span> <span class="k">this</span><span class="p">;</span>
-  <span class="c1">// proceed as normal </span>
-  <span class="k">this</span><span class="p">.</span><span class="nx">start_time</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span> <span class="k">this</span><span class="p">.</span><span class="nx">bang</span> <span class="o">=</span> <span class="s2">"Big"</span><span class="p">;</span>
-  <span class="c1">// rewrite the constructor</span>
-  <span class="nx">Universe</span> <span class="o">=</span> <span class="kd">function</span> <span class="p">()</span> <span class="p">{</span>
-    <span class="k">return</span> <span class="nx">instance</span><span class="p">;</span> <span class="p">};</span>
-  <span class="p">}</span>
-</code></pre>
-</div>
-
-<p>缺点示例：</p>
-
-<div class="language-js highlighter-rouge"><pre class="highlight"><code><span class="c1">// adding to the prototype </span>
-<span class="nx">Universe</span><span class="p">.</span><span class="nx">prototype</span><span class="p">.</span><span class="nx">nothing</span> <span class="o">=</span> <span class="kc">true</span><span class="p">;</span>
-<span class="kd">var</span> <span class="nx">uni</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">Universe</span><span class="p">();</span>
-
-<span class="nx">Universe</span><span class="p">.</span><span class="nx">prototype</span><span class="p">.</span><span class="nx">everything</span> <span class="o">=</span> <span class="kc">true</span><span class="p">;</span>
-<span class="kd">var</span> <span class="nx">uni2</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">Universe</span><span class="p">();</span>
-<span class="c1">// 由于是singleton, un1 === un2,都有nothing，但是没有everything的</span>
-
-<span class="c1">//Test</span>
-<span class="nx">uni</span><span class="p">.</span><span class="nx">nothing</span><span class="p">;</span> <span class="c1">// true </span>
-<span class="nx">uni2</span><span class="p">.</span><span class="nx">nothing</span><span class="p">;</span> <span class="c1">// true </span>
-<span class="nx">uni</span><span class="p">.</span><span class="nx">everything</span><span class="p">;</span> <span class="c1">// undefined </span>
-<span class="nx">uni2</span><span class="p">.</span><span class="nx">everything</span><span class="p">;</span> <span class="c1">// undefined</span>
-
-<span class="c1">// that sounds right: </span>
-<span class="nx">uni</span><span class="p">.</span><span class="nx">constructor</span><span class="p">.</span><span class="nx">name</span><span class="p">;</span> <span class="c1">// "Universe"</span>
-<span class="c1">// constructor名字没有变的原因是新旧函数都叫Universe</span>
-
-<span class="c1">// but that's odd:</span>
-<span class="nx">uni</span><span class="p">.</span><span class="nx">constructor</span> <span class="o">===</span> <span class="nx">Universe</span><span class="p">;</span> <span class="c1">// false</span>
-<span class="c1">// 是因为已经不是同一个对象了，uni指向旧的对象</span>
-</code></pre>
-</div>
-
-<p>如果想要<code class="highlighter-rouge">uni.constructor === Universe</code>是<code class="highlighter-rouge">true</code>的话, 需要让第一次生成的instance的constructor指向<code class="highlighter-rouge">redefined</code>的Universe</p>
-
-<div class="language-js highlighter-rouge"><pre class="highlight"><code><span class="kd">function</span> <span class="nx">Universe</span><span class="p">()</span> <span class="p">{</span>
-  <span class="c1">// the cached instance</span>
-  <span class="kd">var</span> <span class="nx">instance</span><span class="p">;</span>
-  <span class="c1">// rewrite the constructor</span>
-  <span class="nx">Universe</span> <span class="o">=</span> <span class="kd">function</span> <span class="nx">Universe</span><span class="p">()</span> <span class="p">{</span>
-               <span class="k">return</span> <span class="nx">instance</span><span class="p">;</span> 
-             <span class="p">};</span>
-  <span class="c1">// carry over the prototype properties</span>
-  <span class="nx">Universe</span><span class="p">.</span><span class="nx">prototype</span> <span class="o">=</span> <span class="k">this</span><span class="p">;</span>
-  <span class="c1">// the instance</span>
-  <span class="nx">instance</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">Universe</span><span class="p">();</span>
-  <span class="c1">// reset the constructor pointer</span>
-  <span class="nx">instance</span><span class="p">.</span><span class="nx">constructor</span> <span class="o">=</span> <span class="nx">Universe</span><span class="p">;</span>
-  <span class="c1">// all the functionality </span>
-  <span class="nx">instance</span><span class="p">.</span><span class="nx">start_time</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span> <span class="nx">instance</span><span class="p">.</span><span class="nx">bang</span> <span class="o">=</span> <span class="s2">"Big"</span><span class="p">;</span>
-  <span class="k">return</span> <span class="nx">instance</span><span class="p">;</span> 
-<span class="p">}</span>
-</code></pre>
-</div>
-
-<p>下边代码也可以解决刚才的问题，他根本没用 Self-Defining Functions</p>
-
-<div class="language-js highlighter-rouge"><pre class="highlight"><code><span class="kd">var</span> <span class="nx">Universe</span><span class="p">;</span> 
-<span class="p">(</span><span class="kd">function</span> <span class="p">()</span> <span class="p">{</span>
-  <span class="kd">var</span> <span class="nx">instance</span><span class="p">;</span>
-  <span class="nx">Universe</span> <span class="o">=</span> <span class="kd">function</span> <span class="nx">Universe</span><span class="p">()</span> <span class="p">{</span>
-    <span class="k">if</span> <span class="p">(</span><span class="nx">instance</span><span class="p">)</span> <span class="p">{</span>
-      <span class="k">return</span> <span class="nx">instance</span><span class="p">;</span>
+<div class="language-js highlighter-rouge"><pre class="highlight"><code><span class="kd">var</span> <span class="nx">publisher</span> <span class="o">=</span> <span class="p">{</span> 
+  <span class="na">subscribers</span><span class="p">:</span> <span class="p">{</span>
+    <span class="na">any</span><span class="p">:</span> <span class="p">[],</span> <span class="c1">// event type: subscribers </span>
+  <span class="c1">//type1: [fun1, fun2],</span>
+  <span class="c1">//type2: [fun1, fun2]</span>
+  <span class="p">},</span>
+  <span class="na">subscribe</span><span class="p">:</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">fn</span><span class="p">,</span> <span class="nx">type</span><span class="p">)</span> <span class="p">{</span>
+    <span class="nx">type</span> <span class="o">=</span> <span class="nx">type</span> <span class="o">||</span> <span class="s1">'any'</span><span class="p">;</span>
+    <span class="k">if</span> <span class="p">(</span><span class="k">typeof</span> <span class="k">this</span><span class="p">.</span><span class="nx">subscribers</span><span class="p">[</span><span class="nx">type</span><span class="p">]</span> <span class="o">===</span> <span class="s2">"undefined"</span><span class="p">)</span> <span class="p">{</span>
+      <span class="k">this</span><span class="p">.</span><span class="nx">subscribers</span><span class="p">[</span><span class="nx">type</span><span class="p">]</span> <span class="o">=</span> <span class="p">[];</span> 
     <span class="p">}</span>
-    <span class="nx">instance</span> <span class="o">=</span> <span class="k">this</span><span class="p">;</span>
-    <span class="c1">// all the functionality </span>
-    <span class="k">this</span><span class="p">.</span><span class="nx">start_time</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span> <span class="k">this</span><span class="p">.</span><span class="nx">bang</span> <span class="o">=</span> <span class="s2">"Big"</span><span class="p">;</span>
-  <span class="p">};</span> 
-<span class="p">}());</span>
-</code></pre>
-</div>
-
-<hr />
-
-<p><strong><em>必要知识 Self-Defining Functions</em></strong></p>
-
-<div class="language-js highlighter-rouge"><pre class="highlight"><code><span class="kd">var</span> <span class="nx">scareMe</span> <span class="o">=</span> <span class="kd">function</span> <span class="p">()</span> <span class="p">{</span>
-  <span class="nx">alert</span><span class="p">(</span><span class="s2">"Boo!"</span><span class="p">);</span>
-  <span class="nx">scareMe</span> <span class="o">=</span> <span class="kd">function</span> <span class="p">()</span> <span class="p">{</span>
-    <span class="nx">alert</span><span class="p">(</span><span class="s2">"Double boo!"</span><span class="p">);</span> 
-  <span class="p">};</span>
+    <span class="k">this</span><span class="p">.</span><span class="nx">subscribers</span><span class="p">[</span><span class="nx">type</span><span class="p">].</span><span class="nx">push</span><span class="p">(</span><span class="nx">fn</span><span class="p">);</span> 
+  <span class="p">},</span>
+  <span class="na">unsubscribe</span><span class="p">:</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">fn</span><span class="p">,</span> <span class="nx">type</span><span class="p">)</span> <span class="p">{</span>
+    <span class="k">this</span><span class="p">.</span><span class="nx">visitSubscribers</span><span class="p">(</span><span class="s1">'unsubscribe'</span><span class="p">,</span> <span class="nx">fn</span><span class="p">,</span> <span class="nx">type</span><span class="p">);</span> 
+  <span class="p">},</span>
+  <span class="na">publish</span><span class="p">:</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">publication</span><span class="p">,</span> <span class="nx">type</span><span class="p">)</span> <span class="p">{</span>
+    <span class="k">this</span><span class="p">.</span><span class="nx">visitSubscribers</span><span class="p">(</span><span class="s1">'publish'</span><span class="p">,</span> <span class="nx">publication</span><span class="p">,</span> <span class="nx">type</span><span class="p">);</span> 
+  <span class="p">},</span>
+  <span class="na">visitSubscribers</span><span class="p">:</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">action</span><span class="p">,</span> <span class="nx">arg</span><span class="p">,</span> <span class="nx">type</span><span class="p">)</span> <span class="p">{</span>
+    <span class="kd">var</span> <span class="nx">pubtype</span> <span class="o">=</span> <span class="nx">type</span> <span class="o">||</span> <span class="s1">'any'</span><span class="p">,</span>
+        <span class="nx">subscribers</span> <span class="o">=</span> <span class="k">this</span><span class="p">.</span><span class="nx">subscribers</span><span class="p">[</span><span class="nx">pubtype</span><span class="p">],</span> 
+        <span class="nx">i</span><span class="p">,</span>
+        <span class="nx">max</span> <span class="o">=</span> <span class="nx">subscribers</span><span class="p">.</span><span class="nx">length</span><span class="p">;</span>
+        
+    <span class="k">for</span> <span class="p">(</span><span class="nx">i</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span> <span class="nx">i</span> <span class="o">&lt;</span> <span class="nx">max</span><span class="p">;</span> <span class="nx">i</span> <span class="o">+=</span> <span class="mi">1</span><span class="p">)</span> <span class="p">{</span>
+      <span class="k">if</span> <span class="p">(</span><span class="nx">action</span> <span class="o">===</span> <span class="s1">'publish'</span><span class="p">)</span> <span class="p">{</span>
+        <span class="nx">subscribers</span><span class="p">[</span><span class="nx">i</span><span class="p">](</span><span class="nx">arg</span><span class="p">);</span>
+      <span class="p">}</span> <span class="k">else</span> <span class="p">{</span>
+        <span class="c1">// unsubscribe</span>
+        <span class="k">if</span> <span class="p">(</span><span class="nx">subscribers</span><span class="p">[</span><span class="nx">i</span><span class="p">]</span> <span class="o">===</span> <span class="nx">arg</span><span class="p">)</span> <span class="p">{</span>
+          <span class="nx">subscribers</span><span class="p">.</span><span class="nx">splice</span><span class="p">(</span><span class="nx">i</span><span class="p">,</span> <span class="mi">1</span><span class="p">);</span> 
+        <span class="p">}</span>
+      <span class="p">}</span> 
+    <span class="p">}</span>
+  <span class="p">}</span> 
 <span class="p">};</span>
-<span class="c1">// using the self-defining function scareMe(); // Boo!</span>
-<span class="nx">scareMe</span><span class="p">();</span> <span class="c1">// Double boo!</span>
-</code></pre>
-</div>
 
-<p>要注意，重新定义的函数会覆盖掉之前函数的property</p>
+<span class="kd">var</span> <span class="nx">paper</span> <span class="o">=</span> <span class="p">{</span>
+  <span class="na">daily</span><span class="p">:</span> <span class="kd">function</span> <span class="p">()</span> <span class="p">{</span>
+    <span class="k">this</span><span class="p">.</span><span class="nx">publish</span><span class="p">(</span><span class="s2">"big news today"</span><span class="p">);</span> 
+  <span class="p">},</span>
+  <span class="na">monthly</span><span class="p">:</span> <span class="kd">function</span> <span class="p">()</span> <span class="p">{</span>
+    <span class="k">this</span><span class="p">.</span><span class="nx">publish</span><span class="p">(</span><span class="s2">"interesting analysis"</span><span class="p">,</span> <span class="s2">"monthly"</span><span class="p">);</span>
+  <span class="p">}</span>
+<span class="p">};</span>
 
-<p>把函数复制给一个变量，或作为一个object的value后，多次运行函数。虽然函数会覆盖掉，但是变量或key仍会指向旧的函数，</p>
+<span class="kd">function</span> <span class="nx">makePublisher</span><span class="p">(</span><span class="nx">o</span><span class="p">)</span> <span class="p">{</span>
+  <span class="kd">var</span> <span class="nx">i</span><span class="p">;</span>
+  <span class="k">for</span> <span class="p">(</span><span class="nx">i</span> <span class="k">in</span> <span class="nx">publisher</span><span class="p">)</span> <span class="p">{</span>
+    <span class="k">if</span> <span class="p">(</span><span class="nx">publisher</span><span class="p">.</span><span class="nx">hasOwnProperty</span><span class="p">(</span><span class="nx">i</span><span class="p">)</span> <span class="o">&amp;&amp;</span> <span class="k">typeof</span> <span class="nx">publisher</span><span class="p">[</span><span class="nx">i</span><span class="p">]</span> <span class="o">===</span> <span class="s2">"function"</span><span class="p">)</span> <span class="p">{</span>
+      <span class="nx">o</span><span class="p">[</span><span class="nx">i</span><span class="p">]</span> <span class="o">=</span> <span class="nx">publisher</span><span class="p">[</span><span class="nx">i</span><span class="p">];</span> 
+    <span class="p">}</span>
+  <span class="p">}</span>
+  <span class="nx">o</span><span class="p">.</span><span class="nx">subscribers</span> <span class="o">=</span> <span class="p">{</span><span class="na">any</span><span class="p">:</span> <span class="p">[]};</span> 
+<span class="p">}</span>
 
-<div class="language-js highlighter-rouge"><pre class="highlight"><code><span class="c1">// 1. adding a new property</span>
-<span class="nx">scareMe</span><span class="p">.</span><span class="nx">property</span> <span class="o">=</span> <span class="s2">"properly"</span><span class="p">;</span>
-<span class="c1">// 2. assigning to a different name</span>
-<span class="kd">var</span> <span class="nx">prank</span> <span class="o">=</span> <span class="nx">scareMe</span><span class="p">;</span>
-<span class="c1">// 3. using as a method </span>
-<span class="kd">var</span> <span class="nx">spooky</span> <span class="o">=</span> <span class="p">{</span>
-      <span class="na">boo</span><span class="p">:</span> <span class="nx">scareMe</span> 
-    <span class="p">};</span>
-<span class="c1">// calling with a new name</span>
-<span class="nx">prank</span><span class="p">();</span> <span class="c1">// "Boo!"</span>
-<span class="nx">prank</span><span class="p">();</span> <span class="c1">// "Boo!" </span>
-<span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="nx">prank</span><span class="p">.</span><span class="nx">property</span><span class="p">);</span> <span class="c1">// "properly"</span>
-<span class="c1">// calling as a method</span>
-<span class="nx">spooky</span><span class="p">.</span><span class="nx">boo</span><span class="p">();</span> <span class="c1">// "Boo!"</span>
-<span class="nx">spooky</span><span class="p">.</span><span class="nx">boo</span><span class="p">();</span> <span class="c1">// "Boo!"</span>
-<span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="nx">spooky</span><span class="p">.</span><span class="nx">boo</span><span class="p">.</span><span class="nx">property</span><span class="p">);</span> <span class="c1">// "properly"</span>
-<span class="c1">// using the self-defined function </span>
-<span class="nx">scareMe</span><span class="p">();</span> <span class="c1">// Double boo!</span>
-<span class="nx">scareMe</span><span class="p">();</span> <span class="c1">// Double boo! </span>
-<span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="nx">scareMe</span><span class="p">.</span><span class="nx">property</span><span class="p">);</span> <span class="c1">// undefined</span>
+<span class="nx">makePublisher</span><span class="p">(</span><span class="nx">paper</span><span class="p">);</span>
+
+<span class="kd">var</span> <span class="nx">joe</span> <span class="o">=</span> <span class="p">{</span>
+  <span class="na">drinkCoffee</span><span class="p">:</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">paper</span><span class="p">)</span> <span class="p">{</span>
+    <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="s1">'Just read '</span> <span class="o">+</span> <span class="nx">paper</span><span class="p">);</span> 
+  <span class="p">},</span>
+  <span class="na">sundayPreNap</span><span class="p">:</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">monthly</span><span class="p">)</span> <span class="p">{</span>
+    <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="s1">'About to fall asleep reading this '</span> <span class="o">+</span> <span class="nx">monthly</span><span class="p">);</span> 
+  <span class="p">}</span>
+<span class="p">};</span>
+
+<span class="nx">paper</span><span class="p">.</span><span class="nx">subscribe</span><span class="p">(</span><span class="nx">joe</span><span class="p">.</span><span class="nx">drinkCoffee</span><span class="p">);</span>
+<span class="nx">paper</span><span class="p">.</span><span class="nx">subscribe</span><span class="p">(</span><span class="nx">joe</span><span class="p">.</span><span class="nx">sundayPreNap</span><span class="p">,</span> <span class="s1">'monthly'</span><span class="p">);</span>
+
+<span class="nx">paper</span><span class="p">.</span><span class="nx">daily</span><span class="p">();</span>
+<span class="nx">paper</span><span class="p">.</span><span class="nx">daily</span><span class="p">();</span>
+<span class="nx">paper</span><span class="p">.</span><span class="nx">daily</span><span class="p">();</span>
+<span class="nx">paper</span><span class="p">.</span><span class="nx">monthly</span><span class="p">();</span>
+
 </code></pre>
 </div>
 

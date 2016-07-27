@@ -1,0 +1,430 @@
+<!DOCTYPE html>
+<html>
+
+  <head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  <title>Design Patterns-Object Creation</title>
+  <meta name="description" content="object private member">
+
+  <link rel="stylesheet" href="/css/main.css">
+  <link rel="canonical" href="http://yourdomain.com/js/2016/07/19/design_pattern_object.html">
+  <link rel="alternate" type="application/rss+xml" title="Dawny Wu's blog" href="http://yourdomain.com/feed.xml">
+</head>
+
+
+  <body>
+
+    <header class="site-header">
+
+  <div class="wrapper">
+
+    <a class="site-title" href="/">Dawny Wu's blog</a>
+
+    <nav class="site-nav">
+      <a href="#" class="menu-icon">
+        <svg viewBox="0 0 18 15">
+          <path fill="#424242" d="M18,1.484c0,0.82-0.665,1.484-1.484,1.484H1.484C0.665,2.969,0,2.304,0,1.484l0,0C0,0.665,0.665,0,1.484,0 h15.031C17.335,0,18,0.665,18,1.484L18,1.484z"/>
+          <path fill="#424242" d="M18,7.516C18,8.335,17.335,9,16.516,9H1.484C0.665,9,0,8.335,0,7.516l0,0c0-0.82,0.665-1.484,1.484-1.484 h15.031C17.335,6.031,18,6.696,18,7.516L18,7.516z"/>
+          <path fill="#424242" d="M18,13.516C18,14.335,17.335,15,16.516,15H1.484C0.665,15,0,14.335,0,13.516l0,0 c0-0.82,0.665-1.484,1.484-1.484h15.031C17.335,12.031,18,12.696,18,13.516L18,13.516z"/>
+        </svg>
+      </a>
+
+      <div class="trigger">
+        
+          
+          <a class="page-link" href="/about/">About</a>
+          
+        
+          
+        
+          
+        
+          
+        
+      </div>
+    </nav>
+
+  </div>
+
+</header>
+
+
+    <div class="page-content">
+      <div class="wrapper">
+        <article class="post" itemscope itemtype="http://schema.org/BlogPosting">
+
+  <header class="post-header">
+    <h1 class="post-title" itemprop="name headline">Design Patterns-Object Creation</h1>
+    <p class="post-meta"><time datetime="2016-07-19T00:00:00+08:00" itemprop="datePublished">Jul 19, 2016</time></p>
+  </header>
+
+  <div class="post-content" itemprop="articleBody">
+    <h3>object private member</h3>
+<div class="highlight"><pre><code class="language-js" data-lang="js"><span class="kd">function</span> <span class="nx">Gadget</span><span class="p">()</span> <span class="p">{</span>
+  <span class="c1">// private member</span>
+  <span class="kd">var</span> <span class="nx">name</span> <span class="o">=</span> <span class="s1">'iPod'</span><span class="p">;</span>
+  <span class="c1">// public function </span>
+  <span class="k">this</span><span class="p">.</span><span class="nx">getName</span> <span class="o">=</span> <span class="kd">function</span> <span class="p">()</span> <span class="p">{</span>
+    <span class="k">return</span> <span class="nx">name</span><span class="p">;</span> 
+  <span class="p">};</span>
+<span class="p">}</span>
+
+<span class="kd">var</span> <span class="nx">toy</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">Gadget</span><span class="p">();</span>
+<span class="c1">// `name` is undefined, it's private </span>
+<span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="nx">toy</span><span class="p">.</span><span class="nx">name</span><span class="p">);</span> <span class="c1">// undefined</span>
+</code></pre></div>
+<p>上边的<code>getName</code>可以叫做<code>Privileged Methods</code>, because it has “special” access to the private property name.</p>
+
+<h3>private member 失败的情况</h3>
+<div class="highlight"><pre><code class="language-js" data-lang="js"><span class="kd">function</span> <span class="nx">Gadget</span><span class="p">()</span> <span class="p">{</span> 
+  <span class="c1">// private member </span>
+  <span class="kd">var</span> <span class="nx">specs</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="na">screen_width</span><span class="p">:</span> <span class="mi">320</span><span class="p">,</span> <span class="na">screen_height</span><span class="p">:</span> <span class="mi">480</span><span class="p">,</span> <span class="na">color</span><span class="p">:</span> <span class="s2">"white"</span>
+  <span class="p">};</span>
+  <span class="c1">// public function </span>
+  <span class="k">this</span><span class="p">.</span><span class="nx">getSpecs</span> <span class="o">=</span> <span class="kd">function</span> <span class="p">()</span> <span class="p">{</span>
+    <span class="k">return</span> <span class="nx">specs</span><span class="p">;</span> 
+  <span class="p">};</span>
+<span class="p">}</span>
+</code></pre></div>
+<p><code>private member</code>是<code>object</code>, <code>getSpecs</code>返回<code>private member</code>的索引，从而可以修改<code>private member</code>...</p>
+<div class="highlight"><pre><code class="language-js" data-lang="js"><span class="kd">var</span> <span class="nx">toy</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">Gadget</span><span class="p">(),</span> 
+<span class="nx">specs</span> <span class="o">=</span> <span class="nx">toy</span><span class="p">.</span><span class="nx">getSpecs</span><span class="p">();</span>
+
+<span class="nx">specs</span><span class="p">.</span><span class="nx">color</span> <span class="o">=</span> <span class="s2">"black"</span><span class="p">;</span> 
+<span class="nx">specs</span><span class="p">.</span><span class="nx">price</span> <span class="o">=</span> <span class="s2">"free"</span><span class="p">;</span>
+<span class="nx">console</span><span class="p">.</span><span class="nx">dir</span><span class="p">(</span><span class="nx">toy</span><span class="p">.</span><span class="nx">getSpecs</span><span class="p">());</span>
+</code></pre></div>
+<p>The <code>solution</code> to this unexpected behavior is to be careful not to pass references to objects and arrays you want to keep private</p>
+
+<p>比如不返回原对象的索引，而是按需要返回其中的几个属性<code>getDimension</code>，或返回shallowCopy,deepCopy</p>
+
+<h3>Object Literals 如何创建 private member</h3>
+<div class="highlight"><pre><code class="language-js" data-lang="js"><span class="kd">var</span> <span class="nx">myobj</span><span class="p">;</span> <span class="c1">// this will be the object </span>
+<span class="p">(</span><span class="kd">function</span> <span class="p">()</span> <span class="p">{</span>
+  <span class="c1">// private members</span>
+  <span class="kd">var</span> <span class="nx">name</span> <span class="o">=</span> <span class="s2">"my, oh my"</span><span class="p">;</span>
+  <span class="c1">// implement the public part </span>
+  <span class="c1">// note -- no `var`</span>
+  <span class="nx">myobj</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="c1">// privileged method </span>
+    <span class="na">getName</span><span class="p">:</span> <span class="kd">function</span> <span class="p">()</span> <span class="p">{</span>
+      <span class="k">return</span> <span class="nx">name</span><span class="p">;</span> 
+    <span class="p">}</span>
+  <span class="p">};</span> 
+<span class="p">}());</span>
+<span class="nx">myobj</span><span class="p">.</span><span class="nx">getName</span><span class="p">();</span> <span class="c1">// "my, oh my"</span>
+</code></pre></div><div class="highlight"><pre><code class="language-js" data-lang="js"><span class="kd">var</span> <span class="nx">myobj</span> <span class="o">=</span> <span class="p">(</span><span class="kd">function</span> <span class="p">()</span> <span class="p">{</span> 
+  <span class="c1">// private members</span>
+  <span class="kd">var</span> <span class="nx">name</span> <span class="o">=</span> <span class="s2">"my, oh my"</span><span class="p">;</span>
+  <span class="c1">// implement the public part </span>
+  <span class="k">return</span> <span class="p">{</span>
+    <span class="na">getName</span><span class="p">:</span> <span class="kd">function</span> <span class="p">()</span> <span class="p">{</span>
+      <span class="k">return</span> <span class="nx">name</span><span class="p">;</span> 
+    <span class="p">}</span>
+  <span class="p">};</span> 
+<span class="p">}());</span>
+<span class="nx">myobj</span><span class="p">.</span><span class="nx">getName</span><span class="p">();</span> <span class="c1">// "my, oh my"</span>
+</code></pre></div>
+<h3>创建private member缺点及解决</h3>
+
+<p>比如下边这种，每一次new都会重新生成var name=&quot;ipad&quot;</p>
+<div class="highlight"><pre><code class="language-js" data-lang="js"><span class="kd">function</span> <span class="nx">Gadget</span><span class="p">()</span> <span class="p">{</span>
+  <span class="c1">// private member</span>
+  <span class="kd">var</span> <span class="nx">name</span> <span class="o">=</span> <span class="s1">'iPod'</span><span class="p">;</span>
+  <span class="c1">// public function </span>
+  <span class="k">this</span><span class="p">.</span><span class="nx">getName</span> <span class="o">=</span> <span class="kd">function</span> <span class="p">()</span> <span class="p">{</span>
+    <span class="k">return</span> <span class="nx">name</span><span class="p">;</span> 
+  <span class="p">};</span>
+<span class="p">}</span>
+</code></pre></div><div class="highlight"><pre><code class="language-js" data-lang="js"><span class="kd">function</span> <span class="nx">Gadget</span><span class="p">()</span> <span class="p">{</span>
+  <span class="c1">// private member</span>
+  <span class="kd">var</span> <span class="nx">name</span> <span class="o">=</span> <span class="s1">'iPod'</span><span class="p">;</span>
+  <span class="c1">// public function </span>
+  <span class="k">this</span><span class="p">.</span><span class="nx">getName</span> <span class="o">=</span> <span class="kd">function</span> <span class="p">()</span> <span class="p">{</span>
+    <span class="k">return</span> <span class="nx">name</span><span class="p">;</span> 
+  <span class="p">};</span>
+<span class="p">}</span>
+
+<span class="nx">Gadget</span><span class="p">.</span><span class="nx">prototype</span> <span class="o">=</span> <span class="p">(</span><span class="kd">function</span> <span class="p">()</span> <span class="p">{</span> 
+  <span class="c1">// private member</span>
+  <span class="kd">var</span> <span class="nx">browser</span> <span class="o">=</span> <span class="s2">"Mobile Webkit"</span><span class="p">;</span> 
+  <span class="c1">// public prototype members </span>
+  <span class="k">return</span> <span class="p">{</span>
+    <span class="na">getBrowser</span><span class="p">:</span> <span class="kd">function</span> <span class="p">()</span> <span class="p">{</span>
+      <span class="k">return</span> <span class="nx">browser</span><span class="p">;</span> 
+    <span class="p">}</span>
+  <span class="p">};</span> 
+<span class="p">}());</span>
+
+</code></pre></div>
+<h3>Revealing Private Functions As Public Methods</h3>
+
+<p>让<code>Private Function</code>表现得像<code>Public Methods</code>, 在一些情况下也是有用的</p>
+<div class="highlight"><pre><code class="language-js" data-lang="js"><span class="kd">var</span> <span class="nx">myarray</span><span class="p">;</span>
+<span class="p">(</span><span class="kd">function</span> <span class="p">()</span> <span class="p">{</span>
+  <span class="kd">var</span> <span class="nx">astr</span> <span class="o">=</span> <span class="s2">"[object Array]"</span><span class="p">,</span>
+      <span class="nx">toString</span> <span class="o">=</span> <span class="nb">Object</span><span class="p">.</span><span class="nx">prototype</span><span class="p">.</span><span class="nx">toString</span><span class="p">;</span>
+
+  <span class="kd">function</span> <span class="nx">isArray</span><span class="p">(</span><span class="nx">a</span><span class="p">)</span> <span class="p">{</span>
+    <span class="k">return</span> <span class="nx">toString</span><span class="p">.</span><span class="nx">call</span><span class="p">(</span><span class="nx">a</span><span class="p">)</span> <span class="o">===</span> <span class="nx">astr</span><span class="p">;</span> 
+  <span class="p">}</span>
+
+  <span class="kd">function</span> <span class="nx">indexOf</span><span class="p">(</span><span class="nx">haystack</span><span class="p">,</span> <span class="nx">needle</span><span class="p">)</span> <span class="p">{</span> 
+    <span class="kd">var</span> <span class="nx">i</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span>
+        <span class="nx">max</span> <span class="o">=</span> <span class="nx">haystack</span><span class="p">.</span><span class="nx">length</span><span class="p">;</span> 
+    <span class="k">for</span> <span class="p">(;</span> <span class="nx">i</span> <span class="o">&lt;</span> <span class="nx">max</span><span class="p">;</span> <span class="nx">i</span> <span class="o">+=</span> <span class="mi">1</span><span class="p">)</span> <span class="p">{</span>
+      <span class="k">if</span> <span class="p">(</span><span class="nx">haystack</span><span class="p">[</span><span class="nx">i</span><span class="p">]</span> <span class="o">===</span> <span class="nx">needle</span><span class="p">)</span> <span class="p">{</span>
+        <span class="k">return</span> <span class="nx">i</span><span class="p">;</span> 
+      <span class="p">}</span>
+    <span class="p">}</span>
+    <span class="k">return</span> <span class="err">−</span><span class="mi">1</span><span class="p">;</span> 
+  <span class="p">}</span>
+
+  <span class="nx">myarray</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="na">isArray</span><span class="p">:</span> <span class="nx">isArray</span><span class="p">,</span> 
+    <span class="na">indexOf</span><span class="p">:</span> <span class="nx">indexOf</span><span class="p">,</span> 
+    <span class="na">inArray</span><span class="p">:</span> <span class="nx">indexOf</span>
+  <span class="p">};</span>
+<span class="p">}());</span>
+</code></pre></div>
+<p>如果有人把<code>indexOf</code>设为<code>null</code>,对<code>inArray</code>方法毫无影响</p>
+
+<h3>Declaring Dependencies</h3>
+<div class="highlight"><pre><code class="language-js" data-lang="js"><span class="kd">var</span> <span class="nx">myFunction</span> <span class="o">=</span> <span class="kd">function</span> <span class="p">()</span> <span class="p">{</span> 
+  <span class="c1">// dependencies</span>
+  <span class="kd">var</span> <span class="nx">event</span> <span class="o">=</span> <span class="nx">YAHOO</span><span class="p">.</span><span class="nx">util</span><span class="p">.</span><span class="nx">Event</span><span class="p">,</span> 
+      <span class="nx">dom</span> <span class="o">=</span> <span class="nx">YAHOO</span><span class="p">.</span><span class="nx">util</span><span class="p">.</span><span class="nx">Dom</span><span class="p">;</span>
+
+  <span class="c1">// use event and dom variables</span>
+  <span class="c1">// for the rest of the function... </span>
+<span class="p">};</span>
+</code></pre></div>
+<h3>Module Pattern</h3>
+<div class="highlight"><pre><code class="language-js" data-lang="js"><span class="nx">MYAPP</span><span class="p">.</span><span class="nx">namespace</span><span class="p">(</span><span class="s1">'MYAPP.utilities.array'</span><span class="p">);</span> 
+<span class="nx">MYAPP</span><span class="p">.</span><span class="nx">utilities</span><span class="p">.</span><span class="nx">array</span> <span class="o">=</span> <span class="p">(</span><span class="kd">function</span> <span class="p">()</span> <span class="p">{</span>
+  <span class="c1">// dependencies</span>
+  <span class="kd">var</span> <span class="nx">uobj</span> <span class="o">=</span> <span class="nx">MYAPP</span><span class="p">.</span><span class="nx">utilities</span><span class="p">.</span><span class="nx">object</span><span class="p">,</span>
+      <span class="nx">ulang</span> <span class="o">=</span> <span class="nx">MYAPP</span><span class="p">.</span><span class="nx">utilities</span><span class="p">.</span><span class="nx">lang</span><span class="p">,</span>
+
+      <span class="c1">// private properties </span>
+      <span class="nx">array_string</span> <span class="o">=</span> <span class="s2">"[object Array]"</span><span class="p">,</span> 
+      <span class="nx">ops</span> <span class="o">=</span> <span class="nb">Object</span><span class="p">.</span><span class="nx">prototype</span><span class="p">.</span><span class="nx">toString</span><span class="p">;</span>
+
+      <span class="c1">// private methods </span>
+      <span class="c1">// ...</span>
+
+      <span class="c1">// end var</span>
+
+  <span class="c1">// optionally one-time init procedures </span>
+  <span class="c1">// ...</span>
+
+  <span class="c1">// public API </span>
+  <span class="k">return</span> <span class="p">{</span>
+    <span class="na">inArray</span><span class="p">:</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">needle</span><span class="p">,</span> <span class="nx">haystack</span><span class="p">)</span> <span class="p">{</span>
+      <span class="k">for</span> <span class="p">(</span><span class="kd">var</span> <span class="nx">i</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span> <span class="nx">max</span> <span class="o">=</span> <span class="nx">haystack</span><span class="p">.</span><span class="nx">length</span><span class="p">;</span> <span class="nx">i</span> <span class="o">&lt;</span> <span class="nx">max</span><span class="p">;</span> <span class="nx">i</span> <span class="o">+=</span> <span class="mi">1</span><span class="p">)</span> <span class="p">{</span>
+      <span class="k">if</span> <span class="p">(</span><span class="nx">haystack</span><span class="p">[</span><span class="nx">i</span><span class="p">]</span> <span class="o">===</span> <span class="nx">needle</span><span class="p">)</span> <span class="p">{</span>
+      <span class="k">return</span> <span class="kc">true</span><span class="p">;</span> <span class="p">}</span>
+      <span class="p">}</span> 
+    <span class="p">},</span>
+    <span class="na">isArray</span><span class="p">:</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">a</span><span class="p">)</span> <span class="p">{</span>
+      <span class="k">return</span> <span class="nx">ops</span><span class="p">.</span><span class="nx">call</span><span class="p">(</span><span class="nx">a</span><span class="p">)</span> <span class="o">===</span> <span class="nx">array_string</span><span class="p">;</span> 
+    <span class="p">}</span>
+    <span class="c1">// ... more methods and properties </span>
+  <span class="p">};</span>
+<span class="p">}());</span>
+</code></pre></div>
+<h4>Revealing Module Pattern</h4>
+<div class="highlight"><pre><code class="language-js" data-lang="js"><span class="nx">MYAPP</span><span class="p">.</span><span class="nx">utilities</span><span class="p">.</span><span class="nx">array</span> <span class="o">=</span> <span class="p">(</span><span class="kd">function</span> <span class="p">()</span> <span class="p">{</span>
+  <span class="c1">// private properties</span>
+  <span class="kd">var</span> <span class="nx">array_string</span> <span class="o">=</span> <span class="s2">"[object Array]"</span><span class="p">,</span>
+  <span class="nx">ops</span> <span class="o">=</span> <span class="nb">Object</span><span class="p">.</span><span class="nx">prototype</span><span class="p">.</span><span class="nx">toString</span><span class="p">,</span>
+  <span class="c1">// private methods</span>
+  <span class="nx">inArray</span> <span class="o">=</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">haystack</span><span class="p">,</span> <span class="nx">needle</span><span class="p">)</span> <span class="p">{</span>
+    <span class="k">for</span> <span class="p">(</span><span class="kd">var</span> <span class="nx">i</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span> <span class="nx">max</span> <span class="o">=</span> <span class="nx">haystack</span><span class="p">.</span><span class="nx">length</span><span class="p">;</span> <span class="nx">i</span> <span class="o">&lt;</span> <span class="nx">max</span><span class="p">;</span> <span class="nx">i</span> <span class="o">+=</span> <span class="mi">1</span><span class="p">)</span> <span class="p">{</span> 
+      <span class="k">if</span> <span class="p">(</span><span class="nx">haystack</span><span class="p">[</span><span class="nx">i</span><span class="p">]</span> <span class="o">===</span> <span class="nx">needle</span><span class="p">)</span> <span class="p">{</span>
+        <span class="k">return</span> <span class="nx">i</span><span class="p">;</span> 
+      <span class="p">}</span>
+    <span class="p">}</span>
+    <span class="k">return</span> <span class="err">−</span><span class="mi">1</span><span class="p">;</span> 
+  <span class="p">},</span>
+  <span class="nx">isArray</span> <span class="o">=</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">a</span><span class="p">)</span> <span class="p">{</span>
+    <span class="k">return</span> <span class="nx">ops</span><span class="p">.</span><span class="nx">call</span><span class="p">(</span><span class="nx">a</span><span class="p">)</span> <span class="o">===</span> <span class="nx">array_string</span><span class="p">;</span> 
+  <span class="p">};</span>
+  <span class="c1">// end var</span>
+  <span class="c1">// revealing public API</span>
+  <span class="k">return</span> <span class="p">{</span>
+    <span class="na">isArray</span><span class="p">:</span> <span class="nx">isArray</span><span class="p">,</span>
+    <span class="na">indexOf</span><span class="p">:</span> <span class="nx">inArray</span> 
+  <span class="p">};</span>
+<span class="p">}());</span>
+</code></pre></div>
+<h4>Importing Globals into a Module</h4>
+<div class="highlight"><pre><code class="language-js" data-lang="js"><span class="nx">MYAPP</span><span class="p">.</span><span class="nx">utilities</span><span class="p">.</span><span class="nx">module</span> <span class="o">=</span> <span class="p">(</span><span class="kd">function</span> <span class="p">(</span><span class="nx">app</span><span class="p">,</span> <span class="nx">global</span><span class="p">)</span> <span class="p">{</span>
+  <span class="c1">// references to the global object</span>
+  <span class="c1">// and to the global app namespace object </span>
+  <span class="c1">// are now localized</span>
+<span class="p">}(</span><span class="nx">MYAPP</span><span class="p">,</span> <span class="k">this</span><span class="p">));</span>
+</code></pre></div>
+<h3>Static Members</h3>
+
+<h4>Private Static Members</h4>
+
+<ul>
+<li>Shared by all the objects created with the same constructor function</li>
+<li>Not accessible outside the constructor</li>
+</ul>
+<div class="highlight"><pre><code class="language-js" data-lang="js"><span class="kd">var</span> <span class="nx">Gadget</span> <span class="o">=</span> <span class="p">(</span><span class="kd">function</span> <span class="p">()</span> <span class="p">{</span>
+  <span class="c1">// static variable/property </span>
+  <span class="c1">// private counter </span>
+  <span class="kd">var</span> <span class="nx">counter</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
+  <span class="c1">// returning the new implementation </span>
+  <span class="c1">// of the constructor</span>
+  <span class="k">return</span> <span class="kd">function</span> <span class="p">()</span> <span class="p">{</span>
+    <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="nx">counter</span> <span class="o">+=</span> <span class="mi">1</span><span class="p">);</span> 
+  <span class="p">};</span>
+<span class="p">}());</span> <span class="c1">// execute immediately</span>
+
+<span class="kd">var</span> <span class="nx">g1</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">Gadget</span><span class="p">();</span> <span class="c1">// logs 1 </span>
+<span class="kd">var</span> <span class="nx">g2</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">Gadget</span><span class="p">();</span> <span class="c1">// logs 2 </span>
+<span class="kd">var</span> <span class="nx">g3</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">Gadget</span><span class="p">();</span> <span class="c1">// logs 3</span>
+</code></pre></div>
+<p>好像可以用来做instance的id,我们来做一个previlege method</p>
+<div class="highlight"><pre><code class="language-js" data-lang="js"><span class="c1">// constructor</span>
+<span class="kd">var</span> <span class="nx">Gadget</span> <span class="o">=</span> <span class="p">(</span><span class="kd">function</span> <span class="p">()</span> <span class="p">{</span>
+  <span class="c1">// static variable/property </span>
+  <span class="kd">var</span> <span class="nx">counter</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span>
+      <span class="nx">NewGadget</span><span class="p">;</span>
+  <span class="c1">// this will become the</span>
+  <span class="c1">// new constructor implementation </span>
+  <span class="nx">NewGadget</span> <span class="o">=</span> <span class="kd">function</span> <span class="p">()</span> <span class="p">{</span>
+    <span class="nx">counter</span> <span class="o">+=</span> <span class="mi">1</span><span class="p">;</span> 
+  <span class="p">};</span>
+  <span class="c1">// a privileged method </span>
+  <span class="nx">NewGadget</span><span class="p">.</span><span class="nx">prototype</span><span class="p">.</span><span class="nx">getLastId</span> <span class="o">=</span> <span class="kd">function</span> <span class="p">()</span> <span class="p">{</span>
+    <span class="k">return</span> <span class="nx">counter</span><span class="p">;</span> 
+  <span class="p">};</span>
+  <span class="c1">// overwrite the constructor </span>
+  <span class="k">return</span> <span class="nx">NewGadget</span><span class="p">;</span>
+<span class="p">}());</span> <span class="c1">// execute immediately</span>
+
+<span class="kd">var</span> <span class="nx">iphone</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">Gadget</span><span class="p">();</span> 
+<span class="nx">iphone</span><span class="p">.</span><span class="nx">getLastId</span><span class="p">();</span> <span class="c1">// 1 </span>
+<span class="kd">var</span> <span class="nx">ipod</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">Gadget</span><span class="p">();</span> 
+<span class="nx">ipod</span><span class="p">.</span><span class="nx">getLastId</span><span class="p">();</span> <span class="c1">// 2 </span>
+<span class="kd">var</span> <span class="nx">ipad</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">Gadget</span><span class="p">();</span> 
+<span class="nx">ipad</span><span class="p">.</span><span class="nx">getLastId</span><span class="p">();</span> <span class="c1">// 3</span>
+</code></pre></div>
+<h3>Object Constants</h3>
+<div class="highlight"><pre><code class="language-js" data-lang="js"><span class="c1">// constructor</span>
+<span class="kd">var</span> <span class="nx">Widget</span> <span class="o">=</span> <span class="kd">function</span> <span class="p">()</span> <span class="p">{</span>
+  <span class="c1">// implementation... </span>
+<span class="p">};</span>
+<span class="c1">// constants </span>
+<span class="nx">Widget</span><span class="p">.</span><span class="nx">MAX_HEIGHT</span> <span class="o">=</span> <span class="mi">320</span><span class="p">;</span> 
+<span class="nx">Widget</span><span class="p">.</span><span class="nx">MAX_WIDTH</span> <span class="o">=</span> <span class="mi">480</span><span class="p">;</span>
+</code></pre></div>
+<p>我们需要MAX_HEIGHT不可变</p>
+
+<p>you can create a private property and provide a getter method, but no setter. This is probably overkill in many cases when you can get by with a simple convention, but it is still an option.</p>
+
+<p>The following example is an implementation of a general-purpose constant object</p>
+<div class="highlight"><pre><code class="language-js" data-lang="js"><span class="kd">var</span> <span class="nx">constant</span> <span class="o">=</span> <span class="p">(</span><span class="kd">function</span> <span class="p">()</span> <span class="p">{</span>
+  <span class="kd">var</span> <span class="nx">constants</span> <span class="o">=</span> <span class="p">{},</span>
+      <span class="nx">ownProp</span> <span class="o">=</span> <span class="nb">Object</span><span class="p">.</span><span class="nx">prototype</span><span class="p">.</span><span class="nx">hasOwnProperty</span><span class="p">,</span> 
+      <span class="nx">allowed</span> <span class="o">=</span> <span class="p">{</span>
+        <span class="na">string</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span> <span class="na">number</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span> <span class="na">boolean</span><span class="p">:</span> <span class="mi">1</span>
+      <span class="p">},</span>
+  <span class="nx">prefix</span> <span class="o">=</span> <span class="p">(</span><span class="nb">Math</span><span class="p">.</span><span class="nx">random</span><span class="p">()</span> <span class="o">+</span> <span class="s2">"_"</span><span class="p">).</span><span class="nx">slice</span><span class="p">(</span><span class="mi">2</span><span class="p">);</span> 
+  <span class="k">return</span> <span class="p">{</span>
+    <span class="na">set</span><span class="p">:</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">name</span><span class="p">,</span> <span class="nx">value</span><span class="p">)</span> <span class="p">{</span> 
+      <span class="k">if</span> <span class="p">(</span><span class="k">this</span><span class="p">.</span><span class="nx">isDefined</span><span class="p">(</span><span class="nx">name</span><span class="p">))</span> <span class="p">{</span>
+        <span class="k">return</span> <span class="kc">false</span><span class="p">;</span> 
+      <span class="p">}</span>
+      <span class="k">if</span> <span class="p">(</span><span class="o">!</span><span class="nx">ownProp</span><span class="p">.</span><span class="nx">call</span><span class="p">(</span><span class="nx">allowed</span><span class="p">,</span> <span class="k">typeof</span> <span class="nx">value</span><span class="p">))</span> <span class="p">{</span>
+        <span class="k">return</span> <span class="kc">false</span><span class="p">;</span> 
+      <span class="p">}</span>
+      <span class="nx">constants</span><span class="p">[</span><span class="nx">prefix</span> <span class="o">+</span> <span class="nx">name</span><span class="p">]</span> <span class="o">=</span> <span class="nx">value</span><span class="p">;</span>
+      <span class="k">return</span> <span class="kc">true</span><span class="p">;</span>
+    <span class="p">},</span>
+    <span class="na">isDefined</span><span class="p">:</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">name</span><span class="p">)</span> <span class="p">{</span>
+      <span class="k">return</span> <span class="nx">ownProp</span><span class="p">.</span><span class="nx">call</span><span class="p">(</span><span class="nx">constants</span><span class="p">,</span> <span class="nx">prefix</span> <span class="o">+</span> <span class="nx">name</span><span class="p">);</span> 
+    <span class="p">},</span>
+    <span class="na">get</span><span class="p">:</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">name</span><span class="p">)</span> <span class="p">{</span>
+      <span class="k">if</span> <span class="p">(</span><span class="k">this</span><span class="p">.</span><span class="nx">isDefined</span><span class="p">(</span><span class="nx">name</span><span class="p">))</span> <span class="p">{</span>
+        <span class="k">return</span> <span class="nx">constants</span><span class="p">[</span><span class="nx">prefix</span> <span class="o">+</span> <span class="nx">name</span><span class="p">];</span> 
+      <span class="p">}</span>
+      <span class="k">return</span> <span class="kc">null</span><span class="p">;</span> 
+    <span class="p">}</span>
+  <span class="p">};</span> 
+<span class="p">}());</span>
+
+<span class="c1">// check if defined </span>
+<span class="nx">constant</span><span class="p">.</span><span class="nx">isDefined</span><span class="p">(</span><span class="s2">"maxwidth"</span><span class="p">);</span> <span class="c1">// false</span>
+<span class="c1">// define</span>
+<span class="nx">constant</span><span class="p">.</span><span class="nx">set</span><span class="p">(</span><span class="s2">"maxwidth"</span><span class="p">,</span> <span class="mi">480</span><span class="p">);</span> <span class="c1">// true</span>
+<span class="c1">// check again </span>
+<span class="nx">constant</span><span class="p">.</span><span class="nx">isDefined</span><span class="p">(</span><span class="s2">"maxwidth"</span><span class="p">);</span> <span class="c1">// true</span>
+<span class="c1">// attempt to redefine </span>
+<span class="nx">constant</span><span class="p">.</span><span class="nx">set</span><span class="p">(</span><span class="s2">"maxwidth"</span><span class="p">,</span> <span class="mi">320</span><span class="p">);</span> <span class="c1">// false</span>
+<span class="c1">// is the value still intact? </span>
+<span class="nx">constant</span><span class="p">.</span><span class="nx">get</span><span class="p">(</span><span class="s2">"maxwidth"</span><span class="p">);</span> <span class="c1">// 480</span>
+</code></pre></div>
+  </div>
+
+</article>
+
+      </div>
+    </div>
+
+    <footer class="site-footer">
+
+  <div class="wrapper">
+
+    <h2 class="footer-heading">Dawny Wu's blog</h2>
+
+    <div class="footer-col-wrapper">
+      <div class="footer-col footer-col-1">
+        <ul class="contact-list">
+          <li>Dawny Wu's blog</li>
+          <li><a href="mailto:nothing@gmail.com">nothing@gmail.com</a></li>
+        </ul>
+      </div>
+
+      <div class="footer-col footer-col-2">
+        <ul class="social-media-list">
+          
+          <li>
+            <a href="https://github.com/jekyll"><span class="icon icon--github"><svg viewBox="0 0 16 16"><path fill="#828282" d="M7.999,0.431c-4.285,0-7.76,3.474-7.76,7.761 c0,3.428,2.223,6.337,5.307,7.363c0.388,0.071,0.53-0.168,0.53-0.374c0-0.184-0.007-0.672-0.01-1.32 c-2.159,0.469-2.614-1.04-2.614-1.04c-0.353-0.896-0.862-1.135-0.862-1.135c-0.705-0.481,0.053-0.472,0.053-0.472 c0.779,0.055,1.189,0.8,1.189,0.8c0.692,1.186,1.816,0.843,2.258,0.645c0.071-0.502,0.271-0.843,0.493-1.037 C4.86,11.425,3.049,10.76,3.049,7.786c0-0.847,0.302-1.54,0.799-2.082C3.768,5.507,3.501,4.718,3.924,3.65 c0,0,0.652-0.209,2.134,0.796C6.677,4.273,7.34,4.187,8,4.184c0.659,0.003,1.323,0.089,1.943,0.261 c1.482-1.004,2.132-0.796,2.132-0.796c0.423,1.068,0.157,1.857,0.077,2.054c0.497,0.542,0.798,1.235,0.798,2.082 c0,2.981-1.814,3.637-3.543,3.829c0.279,0.24,0.527,0.713,0.527,1.437c0,1.037-0.01,1.874-0.01,2.129 c0,0.208,0.14,0.449,0.534,0.373c3.081-1.028,5.302-3.935,5.302-7.362C15.76,3.906,12.285,0.431,7.999,0.431z"/></svg>
+</span><span class="username">jekyll</span></a>
+
+          </li>
+          
+
+          
+          <li>
+            <a href="https://twitter.com/jekyllrb"><span class="icon icon--twitter"><svg viewBox="0 0 16 16"><path fill="#828282" d="M15.969,3.058c-0.586,0.26-1.217,0.436-1.878,0.515c0.675-0.405,1.194-1.045,1.438-1.809c-0.632,0.375-1.332,0.647-2.076,0.793c-0.596-0.636-1.446-1.033-2.387-1.033c-1.806,0-3.27,1.464-3.27,3.27 c0,0.256,0.029,0.506,0.085,0.745C5.163,5.404,2.753,4.102,1.14,2.124C0.859,2.607,0.698,3.168,0.698,3.767 c0,1.134,0.577,2.135,1.455,2.722C1.616,6.472,1.112,6.325,0.671,6.08c0,0.014,0,0.027,0,0.041c0,1.584,1.127,2.906,2.623,3.206 C3.02,9.402,2.731,9.442,2.433,9.442c-0.211,0-0.416-0.021-0.615-0.059c0.416,1.299,1.624,2.245,3.055,2.271 c-1.119,0.877-2.529,1.4-4.061,1.4c-0.264,0-0.524-0.015-0.78-0.046c1.447,0.928,3.166,1.469,5.013,1.469 c6.015,0,9.304-4.983,9.304-9.304c0-0.142-0.003-0.283-0.009-0.423C14.976,4.29,15.531,3.714,15.969,3.058z"/></svg>
+</span><span class="username">jekyllrb</span></a>
+
+          </li>
+          
+        </ul>
+      </div>
+
+      <div class="footer-col footer-col-3">
+        <p>Write an awesome description for your new site here. You can edit this line in _config.yml. It will appear in your document head meta (for Google search results) and in your feed.xml site description.
+</p>
+      </div>
+    </div>
+
+  </div>
+
+</footer>
+
+
+  </body>
+
+</html>
