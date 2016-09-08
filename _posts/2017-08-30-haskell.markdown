@@ -1,0 +1,37 @@
+---
+layout: post
+title:  "Haskell"
+date:   2016-08-30
+categories: fp
+---
+
+#### 类型没有看懂
+
+```haskell
+compareWithHundred :: (Num a, Ord a) => a -> Ordering  
+compareWithHundred = compare 100  
+```
+
+
+
+#### elem 为什么要加反引号？
+
+```haskell
+(`elem` ['A'..'Z']) 
+```
+
+#### 这两种为什么一样的。。。。
+
+```haskell
+addThree :: (Num a) => a -> a -> a -> a  
+addThree x y z = x + y + z  
+
+addThree :: (Num a) => a -> a -> a -> a  
+addThree = \x -> \y -> \z -> x + y + z  
+```
+
+### Type and Typeclass
+
+value constructors are just functions that take the fields as parameters and return a value of some type (like Shape) as a result. 
+
+type constructors can take types as parameters to produce new types. 

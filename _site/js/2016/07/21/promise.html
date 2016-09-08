@@ -7,7 +7,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
 
   <title>Build Promise</title>
-  <meta name="description" content="function doSomething() {  return new Promise(function(resolve) {    var value = 42;    resolve(value);  });}">
+  <meta name="description" content="我们想doSomething之后执行一个函数,有下边两种写法">
 
   <link rel="stylesheet" href="/css/main.css">
   <link rel="canonical" href="http://yourdomain.com/js/2016/07/21/promise.html">
@@ -62,13 +62,56 @@
   </header>
 
   <div class="post-content" itemprop="articleBody">
-    <div class="highlight"><pre><code class="language-js" data-lang="js"><span class="kd">function</span> <span class="nx">doSomething</span><span class="p">()</span> <span class="p">{</span>
+    <p>我们想<code>doSomething</code>之后执行一个函数,有下边两种写法</p>
+
+<p><code>doSomthing</code>之后运行回调函数，这回调函数是参数，所以想怎样就怎样，要注意一点的是，<code>value</code>这个值是<code>doSomething</code>函数内部传递的，你再外部只能接受</p>
+<div class="highlight"><pre><code class="language-js" data-lang="js"><span class="nx">doSomething</span><span class="p">(</span><span class="kd">function</span><span class="p">(</span><span class="nx">value</span><span class="p">)</span> <span class="p">{</span>
+  <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="s1">'Got a value:'</span> <span class="o">+</span> <span class="nx">value</span><span class="p">);</span>
+<span class="p">});</span>
+</code></pre></div>
+<p>我们细细这函数是如何定义的呢？内部构造是怎么样的</p>
+<div class="highlight"><pre><code class="language-js" data-lang="js"><span class="kd">function</span> <span class="nx">doSomething</span><span class="p">(</span><span class="nx">callback</span><span class="p">){</span>
+  <span class="c1">// ...</span>
+  <span class="c1">// 搞啊搞</span>
+  <span class="c1">// 搞出个值传给callback,外部可改不了的哦，只能接受</span>
+  <span class="kd">var</span> <span class="nx">value</span> <span class="o">=</span> <span class="mi">44</span>
+  <span class="nx">callback</span><span class="p">(</span><span class="nx">value</span><span class="p">)</span>
+<span class="p">}</span>
+</code></pre></div>
+<p><code>doSomething</code>也能是这样的,<code>.then</code>里边写之前的回调函数</p>
+<div class="highlight"><pre><code class="language-js" data-lang="js"><span class="nx">doSomething</span><span class="p">().</span><span class="nx">then</span><span class="p">(</span><span class="kd">function</span><span class="p">(</span><span class="nx">value</span><span class="p">)</span> <span class="p">{</span>
+  <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="s1">'Got a value:'</span> <span class="o">+</span> <span class="nx">value</span><span class="p">);</span>
+<span class="p">});</span>
+</code></pre></div>
+<p>我们猜猜他是怎么实现的呢？</p>
+<div class="highlight"><pre><code class="language-js" data-lang="js"><span class="kd">function</span> <span class="nx">doSomething</span><span class="p">(){</span>
+  <span class="c1">// ...</span>
+  <span class="c1">// 搞啊搞</span>
+  <span class="kd">var</span> <span class="nx">value</span> <span class="o">=</span> <span class="mi">44</span>
+  <span class="k">return</span> <span class="p">{</span>
+    <span class="na">then</span><span class="p">:</span> <span class="nx">callback</span><span class="p">(</span><span class="nx">value</span><span class="p">)</span>
+  <span class="p">}</span>
+<span class="p">}</span>
+</code></pre></div>
+<p>下边是Promise使用时的例子，我们以它为spec</p>
+<div class="highlight"><pre><code class="language-js" data-lang="js"><span class="kd">function</span> <span class="nx">doSomething</span><span class="p">()</span> <span class="p">{</span>
   <span class="k">return</span> <span class="k">new</span> <span class="nx">Promise</span><span class="p">(</span><span class="kd">function</span><span class="p">(</span><span class="nx">resolve</span><span class="p">)</span> <span class="p">{</span>
     <span class="kd">var</span> <span class="nx">value</span> <span class="o">=</span> <span class="mi">42</span><span class="p">;</span>
     <span class="nx">resolve</span><span class="p">(</span><span class="nx">value</span><span class="p">);</span>
   <span class="p">});</span>
 <span class="p">}</span>
-</code></pre></div><div class="highlight"><pre><code class="language-js" data-lang="js"><span class="kd">function</span> <span class="nx">Promise</span><span class="p">(</span><span class="nx">fn</span><span class="p">)</span> <span class="p">{</span>
+</code></pre></div>
+<p>我们可以推测<code>new Promise</code>返回一个object, 里边有 <code>{then: callback}</code></p>
+
+<p>那我们简单实现<code>Promise</code></p>
+<div class="highlight"><pre><code class="language-js" data-lang="js"><span class="kd">function</span> <span class="nx">Promise</span><span class="p">(</span><span class="nx">fn</span><span class="p">){</span>
+  <span class="k">this</span><span class="p">.</span><span class="nx">then</span> <span class="o">=</span> <span class="kd">function</span><span class="p">(</span><span class="nx">callback</span><span class="p">){</span>
+    <span class="nx">callback</span><span class="p">()</span>
+  <span class="p">}</span>
+<span class="p">}</span>
+</code></pre></div>
+<p>原blog里是这么实现的</p>
+<div class="highlight"><pre><code class="language-js" data-lang="js"><span class="kd">function</span> <span class="nx">Promise</span><span class="p">(</span><span class="nx">fn</span><span class="p">)</span> <span class="p">{</span>
   <span class="kd">var</span> <span class="nx">callback</span> <span class="o">=</span> <span class="kc">null</span><span class="p">;</span>
   <span class="k">this</span><span class="p">.</span><span class="nx">then</span> <span class="o">=</span> <span class="kd">function</span><span class="p">(</span><span class="nx">cb</span><span class="p">)</span> <span class="p">{</span>
     <span class="nx">callback</span> <span class="o">=</span> <span class="nx">cb</span><span class="p">;</span>
@@ -77,11 +120,105 @@
   <span class="kd">function</span> <span class="nx">resolve</span><span class="p">(</span><span class="nx">value</span><span class="p">)</span> <span class="p">{</span>
     <span class="nx">callback</span><span class="p">(</span><span class="nx">value</span><span class="p">);</span>
   <span class="p">}</span>
-  <span class="c1">// fn是一个接收resolve fn的函数</span>
+
   <span class="nx">fn</span><span class="p">(</span><span class="nx">resolve</span><span class="p">);</span>
 <span class="p">}</span>
 </code></pre></div>
-<p>new Promise().then(callback)</p>
+<p>问题来了，这个resolve究竟是什么呢？说明我们有一个事情一直没有想通，回调函数的参数并不是他自己可以控制，改变的，而是函数本身内部传给他的。这就说明resolve这个函数是Promise内部有的。我们快改写一下。。。</p>
+<div class="highlight"><pre><code class="language-js" data-lang="js"><span class="kd">function</span> <span class="nx">Promise</span><span class="p">(</span><span class="nx">fn</span><span class="p">){</span>
+  <span class="k">this</span><span class="p">.</span><span class="nx">then</span> <span class="o">=</span> <span class="kd">function</span><span class="p">(</span><span class="nx">callback</span><span class="p">){</span>
+    <span class="nx">callback</span><span class="p">()</span>
+  <span class="p">}</span>
+
+  <span class="kd">function</span> <span class="nx">resolve</span><span class="p">(){}</span>
+
+
+<span class="p">}</span>
+</code></pre></div><div class="highlight"><pre><code class="language-js" data-lang="js"><span class="kd">function</span> <span class="nx">Promise</span><span class="p">(</span><span class="nx">fn</span><span class="p">)</span> <span class="p">{</span>
+  <span class="kd">var</span> <span class="nx">state</span> <span class="o">=</span> <span class="s1">'pending'</span><span class="p">;</span>
+  <span class="kd">var</span> <span class="nx">value</span><span class="p">;</span>
+  <span class="kd">var</span> <span class="nx">deferred</span><span class="p">;</span>
+
+  <span class="kd">function</span> <span class="nx">resolve</span><span class="p">(</span><span class="nx">newValue</span><span class="p">)</span> <span class="p">{</span>
+    <span class="nx">value</span> <span class="o">=</span> <span class="nx">newValue</span><span class="p">;</span>
+    <span class="nx">state</span> <span class="o">=</span> <span class="s1">'resolved'</span><span class="p">;</span>
+
+    <span class="k">if</span><span class="p">(</span><span class="nx">deferred</span><span class="p">)</span> <span class="p">{</span>
+      <span class="nx">handle</span><span class="p">(</span><span class="nx">deferred</span><span class="p">);</span>
+    <span class="p">}</span>
+  <span class="p">}</span>
+
+  <span class="kd">function</span> <span class="nx">handle</span><span class="p">(</span><span class="nx">onResolved</span><span class="p">)</span> <span class="p">{</span>
+    <span class="k">if</span><span class="p">(</span><span class="nx">state</span> <span class="o">===</span> <span class="s1">'pending'</span><span class="p">)</span> <span class="p">{</span>
+      <span class="nx">deferred</span> <span class="o">=</span> <span class="nx">onResolved</span><span class="p">;</span>
+      <span class="k">return</span><span class="p">;</span>
+    <span class="p">}</span>
+
+    <span class="nx">onResolved</span><span class="p">(</span><span class="nx">value</span><span class="p">);</span>
+  <span class="p">}</span>
+
+  <span class="k">this</span><span class="p">.</span><span class="nx">then</span> <span class="o">=</span> <span class="kd">function</span><span class="p">(</span><span class="nx">onResolved</span><span class="p">)</span> <span class="p">{</span>
+    <span class="nx">handle</span><span class="p">(</span><span class="nx">onResolved</span><span class="p">);</span>
+  <span class="p">};</span>
+
+  <span class="nx">fn</span><span class="p">(</span><span class="nx">resolve</span><span class="p">);</span>
+<span class="p">}</span>
+</code></pre></div>
+<p>Promise是一个构造函数，他还需要传入一个函数是为什么呢？如果传入的仅仅是resolved, rejected会怎么样呢？</p>
+<div class="highlight"><pre><code class="language-js" data-lang="js"><span class="kd">function</span> <span class="nx">readJSON</span><span class="p">(</span><span class="nx">filename</span><span class="p">){</span>
+  <span class="k">return</span> <span class="k">new</span> <span class="nx">Promise</span><span class="p">(</span><span class="kd">function</span> <span class="p">(</span><span class="nx">fulfill</span><span class="p">,</span> <span class="nx">reject</span><span class="p">){</span>
+    <span class="nx">readFile</span><span class="p">(</span><span class="nx">filename</span><span class="p">,</span> <span class="s1">'utf8'</span><span class="p">).</span><span class="nx">done</span><span class="p">(</span><span class="kd">function</span> <span class="p">(</span><span class="nx">res</span><span class="p">){</span>
+      <span class="k">try</span> <span class="p">{</span>
+        <span class="nx">fulfill</span><span class="p">(</span><span class="nx">JSON</span><span class="p">.</span><span class="nx">parse</span><span class="p">(</span><span class="nx">res</span><span class="p">));</span>
+      <span class="p">}</span> <span class="k">catch</span> <span class="p">(</span><span class="nx">ex</span><span class="p">)</span> <span class="p">{</span>
+        <span class="nx">reject</span><span class="p">(</span><span class="nx">ex</span><span class="p">);</span>
+      <span class="p">}</span>
+    <span class="p">},</span> <span class="nx">reject</span><span class="p">);</span>
+  <span class="p">});</span>
+<span class="p">}</span>
+</code></pre></div><div class="highlight"><pre><code class="language-js" data-lang="js"><span class="kd">function</span> <span class="nx">Promise</span><span class="p">(</span><span class="nx">fn</span><span class="p">)</span> <span class="p">{</span>
+  <span class="kd">var</span> <span class="nx">state</span> <span class="o">=</span> <span class="s1">'pending'</span><span class="p">;</span>
+  <span class="kd">var</span> <span class="nx">value</span><span class="p">;</span>
+  <span class="kd">var</span> <span class="nx">deferred</span> <span class="o">=</span> <span class="kc">null</span><span class="p">;</span>
+
+  <span class="kd">function</span> <span class="nx">resolve</span><span class="p">(</span><span class="nx">newValue</span><span class="p">)</span> <span class="p">{</span>
+    <span class="nx">value</span> <span class="o">=</span> <span class="nx">newValue</span><span class="p">;</span>
+    <span class="nx">state</span> <span class="o">=</span> <span class="s1">'resolved'</span><span class="p">;</span>
+
+    <span class="k">if</span><span class="p">(</span><span class="nx">deferred</span><span class="p">)</span> <span class="p">{</span>
+      <span class="nx">handle</span><span class="p">(</span><span class="nx">deferred</span><span class="p">);</span>
+    <span class="p">}</span>
+  <span class="p">}</span>
+
+  <span class="kd">function</span> <span class="nx">handle</span><span class="p">(</span><span class="nx">handler</span><span class="p">)</span> <span class="p">{</span>
+    <span class="k">if</span><span class="p">(</span><span class="nx">state</span> <span class="o">===</span> <span class="s1">'pending'</span><span class="p">)</span> <span class="p">{</span>
+      <span class="nx">deferred</span> <span class="o">=</span> <span class="nx">handler</span><span class="p">;</span>
+      <span class="k">return</span><span class="p">;</span>
+    <span class="p">}</span>
+
+    <span class="k">if</span><span class="p">(</span><span class="o">!</span><span class="nx">handler</span><span class="p">.</span><span class="nx">onResolved</span><span class="p">)</span> <span class="p">{</span>
+      <span class="nx">handler</span><span class="p">.</span><span class="nx">resolve</span><span class="p">(</span><span class="nx">value</span><span class="p">);</span>
+      <span class="k">return</span><span class="p">;</span>
+    <span class="p">}</span>
+
+    <span class="kd">var</span> <span class="nx">ret</span> <span class="o">=</span> <span class="nx">handler</span><span class="p">.</span><span class="nx">onResolved</span><span class="p">(</span><span class="nx">value</span><span class="p">);</span>
+    <span class="nx">handler</span><span class="p">.</span><span class="nx">resolve</span><span class="p">(</span><span class="nx">ret</span><span class="p">);</span>
+  <span class="p">}</span>
+
+  <span class="k">this</span><span class="p">.</span><span class="nx">then</span> <span class="o">=</span> <span class="kd">function</span><span class="p">(</span><span class="nx">onResolved</span><span class="p">)</span> <span class="p">{</span>
+    <span class="k">return</span> <span class="k">new</span> <span class="nx">Promise</span><span class="p">(</span><span class="kd">function</span><span class="p">(</span><span class="nx">resolve</span><span class="p">)</span> <span class="p">{</span>
+      <span class="nx">handle</span><span class="p">({</span>
+        <span class="na">onResolved</span><span class="p">:</span> <span class="nx">onResolved</span><span class="p">,</span>
+        <span class="na">resolve</span><span class="p">:</span> <span class="nx">resolve</span>
+      <span class="p">});</span>
+    <span class="p">});</span>
+  <span class="p">};</span>
+
+  <span class="nx">fn</span><span class="p">(</span><span class="nx">resolve</span><span class="p">);</span>
+<span class="p">}</span>
+</code></pre></div>
+<p><a href="http://blog.mediumequalsmessage.com/promise-deferred-objects-in-javascript-pt1-theory-and-semantics">http://blog.mediumequalsmessage.com/promise-deferred-objects-in-javascript-pt1-theory-and-semantics</a>
+<a href="https://gist.github.com/domenic/3889970">https://gist.github.com/domenic/3889970</a></p>
 
   </div>
 

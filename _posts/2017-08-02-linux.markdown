@@ -1,0 +1,55 @@
+---
+layout: post
+title:  "Top 10 Linux Job Interview Questions"
+date:   2016-08-02
+categories: js
+---
+
+### Linux kernal
+
+`uname -a`
+
+### ip address
+
+`ifconfig`
+
+### free disk space
+
+`df -ah`
+
+### check the total size of a directory's contents on disk
+
+`du -sh`
+
+### check for open ports
+
+`netstat -tulpn` mac有问题。。。
+
+### check cpu usage of a given process
+
+`ps aux | grep nginx`
+
+`top`
+
+### dealing with mounts
+
+```shell
+ls /mnt
+mount /dev/sda2 /mnt
+```
+
+***check existing mount***
+
+`mount`
+
+*****
+
+### SSH
+
+vim /etc/ssh/sshd_config
+
+
+
+
+
+

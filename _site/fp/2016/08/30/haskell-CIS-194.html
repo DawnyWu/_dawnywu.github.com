@@ -6,11 +6,11 @@
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
   <meta name="viewport" content="width=device-width, initial-scale=1">
 
-  <title>Build my own angular: regexp</title>
-  <meta name="description" content="var FN_ARGS = /^function\s*[^\(]*\(\s*([^\)]*)\)/m;">
+  <title>Haskell CIS 194</title>
+  <meta name="description" content="类型没有看懂">
 
   <link rel="stylesheet" href="/css/main.css">
-  <link rel="canonical" href="http://yourdomain.com/js/2016/07/25/regexp.html">
+  <link rel="canonical" href="http://yourdomain.com/fp/2016/08/30/haskell-CIS-194.html">
   <link rel="alternate" type="application/rss+xml" title="Dawny Wu's blog" href="http://yourdomain.com/feed.xml">
 </head>
 
@@ -57,26 +57,30 @@
         <article class="post" itemscope itemtype="http://schema.org/BlogPosting">
 
   <header class="post-header">
-    <h1 class="post-title" itemprop="name headline">Build my own angular: regexp</h1>
-    <p class="post-meta"><time datetime="2016-07-25T00:00:00+08:00" itemprop="datePublished">Jul 25, 2016</time></p>
+    <h1 class="post-title" itemprop="name headline">Haskell CIS 194</h1>
+    <p class="post-meta"><time datetime="2016-08-30T00:00:00+08:00" itemprop="datePublished">Aug 30, 2016</time></p>
   </header>
 
   <div class="post-content" itemprop="articleBody">
-    <p><code>var FN_ARGS = /^function\s*[^\(]*\(\s*([^\)]*)\)/m;</code></p>
+    <h4>类型没有看懂</h4>
+<div class="highlight"><pre><code class="language-haskell" data-lang="haskell"><span class="n">compareWithHundred</span> <span class="o">::</span> <span class="p">(</span><span class="kt">Num</span> <span class="n">a</span><span class="p">,</span> <span class="kt">Ord</span> <span class="n">a</span><span class="p">)</span> <span class="o">=&gt;</span> <span class="n">a</span> <span class="o">-&gt;</span> <span class="kt">Ordering</span>  
+<span class="n">compareWithHundred</span> <span class="o">=</span> <span class="n">compare</span> <span class="mi">100</span>  
+</code></pre></div>
+<h4>elem 为什么要加反引号？</h4>
+<div class="highlight"><pre><code class="language-haskell" data-lang="haskell"><span class="p">(`</span><span class="n">elem</span><span class="p">`</span> <span class="p">[</span><span class="sc">'A'</span><span class="o">..</span><span class="sc">'Z'</span><span class="p">])</span> 
+</code></pre></div>
+<h4>这两种为什么一样的。。。。</h4>
+<div class="highlight"><pre><code class="language-haskell" data-lang="haskell"><span class="n">addThree</span> <span class="o">::</span> <span class="p">(</span><span class="kt">Num</span> <span class="n">a</span><span class="p">)</span> <span class="o">=&gt;</span> <span class="n">a</span> <span class="o">-&gt;</span> <span class="n">a</span> <span class="o">-&gt;</span> <span class="n">a</span> <span class="o">-&gt;</span> <span class="n">a</span>  
+<span class="n">addThree</span> <span class="n">x</span> <span class="n">y</span> <span class="n">z</span> <span class="o">=</span> <span class="n">x</span> <span class="o">+</span> <span class="n">y</span> <span class="o">+</span> <span class="n">z</span>  
 
-<ul>
-<li><code>/ˆ</code> We begin by anchoring the match to the beginning of input</li>
-<li><code>function</code> Every function begins with the function keyword. . .</li>
-<li><code>\s*</code> . . . followed by (optionally) some whitespace. . .</li>
-<li><code>[ˆ\(]*</code> . . . followed by the (optional) function name - characters other than ‘(’. . . </li>
-<li><code>\(</code> . . . followed by the opening parenthesis of the argument list. . .</li>
-<li><code>\s*</code> . . . followed by (optionally) some whitespace. . .</li>
-<li><code>(</code> . . . followed by the argument list, which we capture in a capturing group. . . </li>
-<li><code>[ˆ\)]*</code> . . . into which we read a succession of any characters other than ‘)’. . .</li>
-<li><code>)</code> . . . and when done reading we close the capturing group. . .</li>
-<li><code>\)</code> . . . and still match the closing parenthesis of the argument list. . .</li>
-<li><code>/m</code> . . . and define the whole regular expression to match over multiple lines.</li>
-</ul>
+<span class="n">addThree</span> <span class="o">::</span> <span class="p">(</span><span class="kt">Num</span> <span class="n">a</span><span class="p">)</span> <span class="o">=&gt;</span> <span class="n">a</span> <span class="o">-&gt;</span> <span class="n">a</span> <span class="o">-&gt;</span> <span class="n">a</span> <span class="o">-&gt;</span> <span class="n">a</span>  
+<span class="n">addThree</span> <span class="o">=</span> <span class="nf">\</span><span class="n">x</span> <span class="o">-&gt;</span> <span class="nf">\</span><span class="n">y</span> <span class="o">-&gt;</span> <span class="nf">\</span><span class="n">z</span> <span class="o">-&gt;</span> <span class="n">x</span> <span class="o">+</span> <span class="n">y</span> <span class="o">+</span> <span class="n">z</span>  
+</code></pre></div>
+<h3>Type and Typeclass</h3>
+
+<p>value constructors are just functions that take the fields as parameters and return a value of some type (like Shape) as a result. </p>
+
+<p>type constructors can take types as parameters to produce new types. </p>
 
   </div>
 

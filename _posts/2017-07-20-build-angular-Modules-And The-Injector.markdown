@@ -495,7 +495,7 @@ it('instantiates an annotated constructor function', function() {
 
 其实总起上感觉和上边invoke的使用方法是类似的
 
-先创建一个空对象，然后作为this运行构造函数
+先创建一个空对象，然后作为this运行构造函数,正好可以使用invoke函数
 
 ```js
 function instantiate(Type) {
@@ -504,6 +504,37 @@ function instantiate(Type) {
   return instance;
 }
 ```
+
+但是使用`invoke`并不完全等价使用`new Constructor()`
+
+我们知道js中创建一个类，需要构造函数来创建`instance variable`,用`constructor.prototype`来创建`instance method`
+
+`new Constructor()`除了建立一个新对象，运行`constructor`外，还会拥有`constructor.prototype`上定义的`instance method`, 这是怎么做到的呢？
+
+这是因为在new的内部，新创建的obj的__proto__指向了`constructor.prototype`,恩，就是这样，所以我们需要多做一些事情
+
+
+```js
+function instantiate(Type) {
+  var UnwrappedType = _.isArray(Type) ? _.last(Type) : Type; 
+  var instance = Object.create(UnwrappedType.prototype); 
+  invoke(Type, instance);
+  return instance;
+}
+```
+
+也要支持locals
+
+```js
+function instantiate(Type, locals) {
+  var UnwrappedType = _.isArray(Type) ? _.last(Type) : Type; 
+  var instance = Object.create(UnwrappedType.prototype); 
+  invoke(Type, instance, locals);
+  return instance;
+}
+```
+
+`injector`目前看到的功能是创建module,invoke普通函数,instantiate构造函数,便显出可以自动为函数填充参数并运行的功能
 
 
 

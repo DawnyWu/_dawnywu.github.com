@@ -1,0 +1,14 @@
+---
+layout: post
+title:  "web hack"
+date:   2016-08-05
+categories: js
+---
+
+### hub
+
+A hub is just a simple box you plug network cables in and it will copy all signals to all connected ports.
+
+### switch
+
+The difference between a hub and a switch is a switch remembers the MAC address of the network card connected to the port and sends traffic only to the port it’s destinated to. 

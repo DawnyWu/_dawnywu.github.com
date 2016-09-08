@@ -26,6 +26,8 @@ it('allows injecting the instance injector to $get', function() {
 })
 ```
 
+他这个是怎么做到的呢？invoke $get方法，invoke会自动准备好参数,参数会去cache里找,$injector就是injector
+
 ```js
 var instanceInjector = instanceCache.$injector =
 createInternalInjector(instanceCache, function(name) {
@@ -58,6 +60,9 @@ it('allows injecting the provider injector to provider', function(){
   expect(injector.get('b').toBe(42);
 })
 ```
+
+这个同理，传入的$injector是providerCache的injector,可以从providerCache中找东西
+
 
 ```js
 var providerInjector = providerCache.$injector = 
@@ -104,9 +109,113 @@ it('does not allow injecting the $provide service to $get', function() {
 
 `$provide` object you inject is in fact the `$provide` object we already have - the one with the `constant` and `provider` methods.
 
+说明只允许providerCache能访问到$provide变量，$provide object就是原来的那个$provide
+
+```js
+providerCache.$provide = { 
+  constant: function(key, value) {
+    if (key === 'hasOwnProperty') {
+      throw 'hasOwnProperty is not a valid constant name!';
+    }
+    providerCache[key] = value;
+    instanceCache[key] = value;
+  },
+  provider: function(key, provider) {
+    if (_.isFunction(provider)) {
+      provider = providerInjector.instantiate(provider);
+    }
+    providerCache[key + 'Provider'] = provider;
+  }
+};
+```
+
+然后在原来调用$provide的地方修改下即可
+
+
 #### Config Blocks
 
 a `config block` is an arbitrary function that has its dependencies injected from the provider cache. 
+
+```js
+it('injects config blocks with provider injector', function() {
+  var module = angular.module('myModule', []);
+  // config可以传入$provide
+  module.config(function($provide) {
+    $provide.constant('a', 42);
+  });
+
+  var injector = createInjector(['myModule']);
+  expect(injector.get('a')).toBe(42);
+});
+```
+
+`$provide`会注入`providerCache.$provide`，
+
+```js
+// old
+var invokeLater = function(method) { 
+  return function() {
+    invokeQueue.push([method, arguments]);
+    return moduleInstance; 
+  };
+};
+
+//new
+var invokeLater = function(service, method, arrayMethod) {
+  return function() {
+    var item = [service, method, arguments]; 
+    invokeQueue[arrayMethod || 'push'](item); 
+    return moduleInstance;
+  };
+};
+```
+
+使用的时候是这样
+
+```js
+var moduleInstance = {
+  name: name,
+  requires: requires,
+  constant: invokeLater('$provide', 'constant', 'unshift'), 
+  provider: invokeLater('$provide', 'provider'), 
+  _invokeQueue: invokeQueue
+};
+```
+
+现在脑子完全乱掉，看不懂了。。。
+
+```js
+// invokeLater('$provide', 'constant', 'unshift'), 
+var invokeLater = function(service, method, arrayMethod) {
+  return function() {
+    var item = [service, method, arguments]; 
+    invokeQueue[arrayMethod || 'push'](item); 
+    return moduleInstance;
+  };
+};
+
+//返回的函数是
+//constant: invokeLater('$provide', 'constant', 'unshift'), 
+//provider: invokeLater('$provide', 'provider'),
+//arguments是constant('a', 3), provider('b', function(){})
+function() {
+  var item = ['$provide', 'constant', arguments]; 
+  invokeQueue['unshift' || 'push'](item); 
+  return moduleInstance;
+}
+
+```
+
+
+
+
+
+
+
+
+
+
+
 
 #### Run Blocks
 
@@ -128,7 +237,6 @@ it('injects run blocks with the instance injector', function() {
   var module = angular.module('myModule', []);
 
   module.provider('a', {$get: _.constant(42)});
-
   var gotA; 
 
   module.run(function(a) {gotA = a; });

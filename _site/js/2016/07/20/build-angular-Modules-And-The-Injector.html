@@ -460,13 +460,37 @@
 
 <p>其实总起上感觉和上边invoke的使用方法是类似的</p>
 
-<p>先创建一个空对象，然后作为this运行构造函数</p>
+<p>先创建一个空对象，然后作为this运行构造函数,正好可以使用invoke函数</p>
 <div class="highlight"><pre><code class="language-js" data-lang="js"><span class="kd">function</span> <span class="nx">instantiate</span><span class="p">(</span><span class="nx">Type</span><span class="p">)</span> <span class="p">{</span>
   <span class="kd">var</span> <span class="nx">instance</span> <span class="o">=</span> <span class="p">{};</span> 
   <span class="nx">invoke</span><span class="p">(</span><span class="nx">Type</span><span class="p">,</span> <span class="nx">instance</span><span class="p">);</span> 
   <span class="k">return</span> <span class="nx">instance</span><span class="p">;</span>
 <span class="p">}</span>
 </code></pre></div>
+<p>但是使用<code>invoke</code>并不完全等价使用<code>new Constructor()</code></p>
+
+<p>我们知道js中创建一个类，需要构造函数来创建<code>instance variable</code>,用<code>constructor.prototype</code>来创建<code>instance method</code></p>
+
+<p><code>new Constructor()</code>除了建立一个新对象，运行<code>constructor</code>外，还会拥有<code>constructor.prototype</code>上定义的<code>instance method</code>, 这是怎么做到的呢？</p>
+
+<p>这是因为在new的内部，新创建的obj的__proto__指向了<code>constructor.prototype</code>,恩，就是这样，所以我们需要多做一些事情</p>
+<div class="highlight"><pre><code class="language-js" data-lang="js"><span class="kd">function</span> <span class="nx">instantiate</span><span class="p">(</span><span class="nx">Type</span><span class="p">)</span> <span class="p">{</span>
+  <span class="kd">var</span> <span class="nx">UnwrappedType</span> <span class="o">=</span> <span class="nx">_</span><span class="p">.</span><span class="nx">isArray</span><span class="p">(</span><span class="nx">Type</span><span class="p">)</span> <span class="p">?</span> <span class="nx">_</span><span class="p">.</span><span class="nx">last</span><span class="p">(</span><span class="nx">Type</span><span class="p">)</span> <span class="p">:</span> <span class="nx">Type</span><span class="p">;</span> 
+  <span class="kd">var</span> <span class="nx">instance</span> <span class="o">=</span> <span class="nb">Object</span><span class="p">.</span><span class="nx">create</span><span class="p">(</span><span class="nx">UnwrappedType</span><span class="p">.</span><span class="nx">prototype</span><span class="p">);</span> 
+  <span class="nx">invoke</span><span class="p">(</span><span class="nx">Type</span><span class="p">,</span> <span class="nx">instance</span><span class="p">);</span>
+  <span class="k">return</span> <span class="nx">instance</span><span class="p">;</span>
+<span class="p">}</span>
+</code></pre></div>
+<p>也要支持locals</p>
+<div class="highlight"><pre><code class="language-js" data-lang="js"><span class="kd">function</span> <span class="nx">instantiate</span><span class="p">(</span><span class="nx">Type</span><span class="p">,</span> <span class="nx">locals</span><span class="p">)</span> <span class="p">{</span>
+  <span class="kd">var</span> <span class="nx">UnwrappedType</span> <span class="o">=</span> <span class="nx">_</span><span class="p">.</span><span class="nx">isArray</span><span class="p">(</span><span class="nx">Type</span><span class="p">)</span> <span class="p">?</span> <span class="nx">_</span><span class="p">.</span><span class="nx">last</span><span class="p">(</span><span class="nx">Type</span><span class="p">)</span> <span class="p">:</span> <span class="nx">Type</span><span class="p">;</span> 
+  <span class="kd">var</span> <span class="nx">instance</span> <span class="o">=</span> <span class="nb">Object</span><span class="p">.</span><span class="nx">create</span><span class="p">(</span><span class="nx">UnwrappedType</span><span class="p">.</span><span class="nx">prototype</span><span class="p">);</span> 
+  <span class="nx">invoke</span><span class="p">(</span><span class="nx">Type</span><span class="p">,</span> <span class="nx">instance</span><span class="p">,</span> <span class="nx">locals</span><span class="p">);</span>
+  <span class="k">return</span> <span class="nx">instance</span><span class="p">;</span>
+<span class="p">}</span>
+</code></pre></div>
+<p><code>injector</code>目前看到的功能是创建module,invoke普通函数,instantiate构造函数,便显出可以自动为函数填充参数并运行的功能</p>
+
   </div>
 
 </article>

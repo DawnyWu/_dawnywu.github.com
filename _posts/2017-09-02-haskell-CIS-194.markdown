@@ -1,0 +1,198 @@
+---
+layout: post
+title:  "Haskell CIS 194"
+date:   2016-09-02
+categories: fp
+---
+
+### 进度
+
+Week 7跳过
+
+
+
+
+### Enumeration types
+
+```haskell
+data Thing = Shoe 
+           | Ship 
+           | SealingWax 
+           | Cabbage 
+           | King
+  deriving Show
+```
+
+我们创建了一个新的type,我们可以为这种type定义方法
+
+
+```haskell
+isSmall :: Thing -> Bool
+isSmall Shoe       = True
+isSmall Ship       = False
+isSmall SealingWax = True
+isSmall Cabbage    = True
+isSmall King       = False
+```
+
+### Beyond enumerations
+
+```haskell
+data FailableDouble = Failure
+                    | OK Double
+  deriving Show
+```
+
+我们又定义了一种type.
+
+`Failure`和`OK Double`叫做`data constructor`
+
+`Failure`是type FailableDouble的一个值，而OK并不是, Ok加上一个Double的值才是type FailableDouble的一个值
+
+```haskell
+-- Notice how the type constructor and data constructor are both named Person
+data Person = Person String Int Thing
+  deriving Show
+
+brent :: Person
+brent = Person "Brent" 31 SealingWax
+
+stan :: Person
+stan  = Person "Stan" 94 Cabbage
+
+getAge :: Person -> Int
+getAge (Person _ a _) = a
+```
+
+#### haskell-type-vs-data-constructor
+
+[http://stackoverflow.com/questions/18204308/haskell-type-vs-data-constructor](http://stackoverflow.com/questions/18204308/haskell-type-vs-data-constructor)
+
+In a data declaration
+
+a `type constructor` is the thing on the left hand side of the equals sign.
+
+The `data constructor(s)` are the things on the right hand side of the equals sign. 
+
+You use `type constructors` where a type is expected, and you use `data constructors` where a value is expected.
+
+### Polymorphism
+
+把只针对Int的List转换为多态
+
+```haskell
+data IntList = Empty | Cons Int IntList
+  deriving Show
+
+-- Polymorphic
+data List t = E | C t (List t)
+```
+
+```haskell
+keepOnlyEven :: IntList -> IntList
+keepOnlyEven Empty = Empty
+keepOnlyEven (Cons x xs)
+  | even x    = Cons x (keepOnlyEven xs)
+  | otherwise = keepOnlyEven xs
+
+-- Polymorphic
+filterList _ E = E
+filterList p (C x xs)
+  | p x       = C x (filterList p xs)
+  | otherwise = filterList p xs
+
+mapList :: (a -> b) -> List a -> List b
+mapList _ E        = E
+mapList f (C x xs) = C (f x) (mapList f xs)
+```
+
+### IO
+
+两种写法
+
+```haskell
+-- 用了 >> 和 >>= 两个函数
+main = putStrLn "Please enter a number: " >> (readLn >>= (\n -> putStrLn (show (n+1))))
+
+main = do
+       putStrLn "Greetings!  What is your name?"
+       inpStr <- getLine
+       putStrLn $ "Welcome to Haskell, " ++ inpStr ++ "!"
+```
+
+### Functor
+
+```haskell
+map :: (a -> b) -> [a] -> [b]
+
+treeMap :: (a -> b) -> Tree a -> Tree b
+
+maybeEval :: (ExprT -> Int) -> Maybe ExprT -> Maybe Int
+
+maybeMap :: (a -> b) -> Maybe a -> Maybe b
+```
+
+我们好像可以看出一些规律
+
+`thingMap :: (a -> b) -> f a -> f b`
+
+有一种`f`作为`Container`,可以被一个函数`map over`
+
+### Kind
+
+```haskell
+Prelude> :k Int
+Int :: *
+Prelude> :k Bool
+Bool :: *
+Prelude> :k Char
+Char :: *
+Prelude> :k Maybe Int
+Maybe Int :: *
+
+Prelude> :k Maybe
+Maybe :: * -> *
+Prelude> :k []
+[] :: * -> *
+Prelude :k [] Int
+[] Int :: *
+Prelude> :k [Int]  -- special syntax for [] Int
+[Int] :: *
+Prelude> :k Tree
+Tree :: * -> *
+```
+
+`Maybe :: * -> *`类似这样的叫做`type constructor`, it can take as input `Int :: *` and produce the new type `Maybe Int :: *`
+
+```haskell
+first = fmap (+) (Just 3)
+second = fmap first (Just 4)
+```
+
+有问题的。first已经成了一个包裹着（+3）的Container,不是一个函数了，下一句会有问题的
+
+据说这样就可以了
+
+`pure (+) <*> Just 3 <*> Just 4`
+
+
+```haskell
+class (Functor f) => Applicative f where
+    pure :: a -> f a
+    (<*>) :: f (a -> b) -> f a -> f b
+```
+
+### Monad
+
+```haskell
+do
+   putStrLn "What is your name?"
+   name <- getLine
+   putStrLn ("Welcome, " ++ name ++ "!")
+```
+
+```haskell
+putStrLn "What is your name?"
+>>= (\_ -> getLine)
+>>= (\name -> putStrLn ("Welcome, " ++ name ++ "!"))
+```

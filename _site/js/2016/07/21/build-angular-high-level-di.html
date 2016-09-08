@@ -79,7 +79,9 @@
 
   <span class="nx">expect</span><span class="p">(</span><span class="nx">injector</span><span class="p">.</span><span class="nx">get</span><span class="p">(</span><span class="s1">'b'</span><span class="p">)).</span><span class="nx">toBe</span><span class="p">(</span><span class="mi">42</span><span class="p">)</span>
 <span class="p">})</span>
-</code></pre></div><div class="highlight"><pre><code class="language-js" data-lang="js"><span class="kd">var</span> <span class="nx">instanceInjector</span> <span class="o">=</span> <span class="nx">instanceCache</span><span class="p">.</span><span class="nx">$injector</span> <span class="o">=</span>
+</code></pre></div>
+<p>他这个是怎么做到的呢？invoke $get方法，invoke会自动准备好参数,参数会去cache里找,$injector就是injector</p>
+<div class="highlight"><pre><code class="language-js" data-lang="js"><span class="kd">var</span> <span class="nx">instanceInjector</span> <span class="o">=</span> <span class="nx">instanceCache</span><span class="p">.</span><span class="nx">$injector</span> <span class="o">=</span>
 <span class="nx">createInternalInjector</span><span class="p">(</span><span class="nx">instanceCache</span><span class="p">,</span> <span class="kd">function</span><span class="p">(</span><span class="nx">name</span><span class="p">)</span> <span class="p">{</span>
   <span class="kd">var</span> <span class="nx">provider</span> <span class="o">=</span> <span class="nx">providerInjector</span><span class="p">.</span><span class="nx">get</span><span class="p">(</span><span class="nx">name</span> <span class="o">+</span> <span class="s1">'Provider'</span><span class="p">);</span>
   <span class="k">return</span> <span class="nx">instanceInjector</span><span class="p">.</span><span class="nx">invoke</span><span class="p">(</span><span class="nx">provider</span><span class="p">.</span><span class="nx">$get</span><span class="p">,</span> <span class="nx">provider</span><span class="p">);</span> 
@@ -106,7 +108,9 @@
 
   <span class="nx">expect</span><span class="p">(</span><span class="nx">injector</span><span class="p">.</span><span class="nx">get</span><span class="p">(</span><span class="s1">'b'</span><span class="p">).</span><span class="nx">toBe</span><span class="p">(</span><span class="mi">42</span><span class="p">);</span>
 <span class="p">})</span>
-</code></pre></div><div class="highlight"><pre><code class="language-js" data-lang="js"><span class="kd">var</span> <span class="nx">providerInjector</span> <span class="o">=</span> <span class="nx">providerCache</span><span class="p">.</span><span class="nx">$injector</span> <span class="o">=</span> 
+</code></pre></div>
+<p>这个同理，传入的$injector是providerCache的injector,可以从providerCache中找东西</p>
+<div class="highlight"><pre><code class="language-js" data-lang="js"><span class="kd">var</span> <span class="nx">providerInjector</span> <span class="o">=</span> <span class="nx">providerCache</span><span class="p">.</span><span class="nx">$injector</span> <span class="o">=</span> 
 <span class="nx">createInternalInjector</span><span class="p">(</span><span class="nx">providerCache</span><span class="p">,</span> <span class="kd">function</span><span class="p">()</span> <span class="p">{</span>
   <span class="k">throw</span> <span class="s1">'Unknown provider: '</span><span class="o">+</span><span class="nx">path</span><span class="p">.</span><span class="nx">join</span><span class="p">(</span><span class="s1">'&lt;-'</span><span class="p">);</span>
 <span class="p">})</span>
@@ -143,10 +147,87 @@
 </code></pre></div>
 <p><code>$provide</code> object you inject is in fact the <code>$provide</code> object we already have - the one with the <code>constant</code> and <code>provider</code> methods.</p>
 
+<p>说明只允许providerCache能访问到$provide变量，$provide object就是原来的那个$provide</p>
+<div class="highlight"><pre><code class="language-js" data-lang="js"><span class="nx">providerCache</span><span class="p">.</span><span class="nx">$provide</span> <span class="o">=</span> <span class="p">{</span> 
+  <span class="na">constant</span><span class="p">:</span> <span class="kd">function</span><span class="p">(</span><span class="nx">key</span><span class="p">,</span> <span class="nx">value</span><span class="p">)</span> <span class="p">{</span>
+    <span class="k">if</span> <span class="p">(</span><span class="nx">key</span> <span class="o">===</span> <span class="s1">'hasOwnProperty'</span><span class="p">)</span> <span class="p">{</span>
+      <span class="k">throw</span> <span class="s1">'hasOwnProperty is not a valid constant name!'</span><span class="p">;</span>
+    <span class="p">}</span>
+    <span class="nx">providerCache</span><span class="p">[</span><span class="nx">key</span><span class="p">]</span> <span class="o">=</span> <span class="nx">value</span><span class="p">;</span>
+    <span class="nx">instanceCache</span><span class="p">[</span><span class="nx">key</span><span class="p">]</span> <span class="o">=</span> <span class="nx">value</span><span class="p">;</span>
+  <span class="p">},</span>
+  <span class="na">provider</span><span class="p">:</span> <span class="kd">function</span><span class="p">(</span><span class="nx">key</span><span class="p">,</span> <span class="nx">provider</span><span class="p">)</span> <span class="p">{</span>
+    <span class="k">if</span> <span class="p">(</span><span class="nx">_</span><span class="p">.</span><span class="nx">isFunction</span><span class="p">(</span><span class="nx">provider</span><span class="p">))</span> <span class="p">{</span>
+      <span class="nx">provider</span> <span class="o">=</span> <span class="nx">providerInjector</span><span class="p">.</span><span class="nx">instantiate</span><span class="p">(</span><span class="nx">provider</span><span class="p">);</span>
+    <span class="p">}</span>
+    <span class="nx">providerCache</span><span class="p">[</span><span class="nx">key</span> <span class="o">+</span> <span class="s1">'Provider'</span><span class="p">]</span> <span class="o">=</span> <span class="nx">provider</span><span class="p">;</span>
+  <span class="p">}</span>
+<span class="p">};</span>
+</code></pre></div>
+<p>然后在原来调用$provide的地方修改下即可</p>
+
 <h4>Config Blocks</h4>
 
 <p>a <code>config block</code> is an arbitrary function that has its dependencies injected from the provider cache. </p>
+<div class="highlight"><pre><code class="language-js" data-lang="js"><span class="nx">it</span><span class="p">(</span><span class="s1">'injects config blocks with provider injector'</span><span class="p">,</span> <span class="kd">function</span><span class="p">()</span> <span class="p">{</span>
+  <span class="kd">var</span> <span class="nx">module</span> <span class="o">=</span> <span class="nx">angular</span><span class="p">.</span><span class="nx">module</span><span class="p">(</span><span class="s1">'myModule'</span><span class="p">,</span> <span class="p">[]);</span>
+  <span class="c1">// config可以传入$provide</span>
+  <span class="nx">module</span><span class="p">.</span><span class="nx">config</span><span class="p">(</span><span class="kd">function</span><span class="p">(</span><span class="nx">$provide</span><span class="p">)</span> <span class="p">{</span>
+    <span class="nx">$provide</span><span class="p">.</span><span class="nx">constant</span><span class="p">(</span><span class="s1">'a'</span><span class="p">,</span> <span class="mi">42</span><span class="p">);</span>
+  <span class="p">});</span>
 
+  <span class="kd">var</span> <span class="nx">injector</span> <span class="o">=</span> <span class="nx">createInjector</span><span class="p">([</span><span class="s1">'myModule'</span><span class="p">]);</span>
+  <span class="nx">expect</span><span class="p">(</span><span class="nx">injector</span><span class="p">.</span><span class="nx">get</span><span class="p">(</span><span class="s1">'a'</span><span class="p">)).</span><span class="nx">toBe</span><span class="p">(</span><span class="mi">42</span><span class="p">);</span>
+<span class="p">});</span>
+</code></pre></div>
+<p><code>$provide</code>会注入<code>providerCache.$provide</code>，</p>
+<div class="highlight"><pre><code class="language-js" data-lang="js"><span class="c1">// old</span>
+<span class="kd">var</span> <span class="nx">invokeLater</span> <span class="o">=</span> <span class="kd">function</span><span class="p">(</span><span class="nx">method</span><span class="p">)</span> <span class="p">{</span> 
+  <span class="k">return</span> <span class="kd">function</span><span class="p">()</span> <span class="p">{</span>
+    <span class="nx">invokeQueue</span><span class="p">.</span><span class="nx">push</span><span class="p">([</span><span class="nx">method</span><span class="p">,</span> <span class="nx">arguments</span><span class="p">]);</span>
+    <span class="k">return</span> <span class="nx">moduleInstance</span><span class="p">;</span> 
+  <span class="p">};</span>
+<span class="p">};</span>
+
+<span class="c1">//new</span>
+<span class="kd">var</span> <span class="nx">invokeLater</span> <span class="o">=</span> <span class="kd">function</span><span class="p">(</span><span class="nx">service</span><span class="p">,</span> <span class="nx">method</span><span class="p">,</span> <span class="nx">arrayMethod</span><span class="p">)</span> <span class="p">{</span>
+  <span class="k">return</span> <span class="kd">function</span><span class="p">()</span> <span class="p">{</span>
+    <span class="kd">var</span> <span class="nx">item</span> <span class="o">=</span> <span class="p">[</span><span class="nx">service</span><span class="p">,</span> <span class="nx">method</span><span class="p">,</span> <span class="nx">arguments</span><span class="p">];</span> 
+    <span class="nx">invokeQueue</span><span class="p">[</span><span class="nx">arrayMethod</span> <span class="o">||</span> <span class="s1">'push'</span><span class="p">](</span><span class="nx">item</span><span class="p">);</span> 
+    <span class="k">return</span> <span class="nx">moduleInstance</span><span class="p">;</span>
+  <span class="p">};</span>
+<span class="p">};</span>
+</code></pre></div>
+<p>使用的时候是这样</p>
+<div class="highlight"><pre><code class="language-js" data-lang="js"><span class="kd">var</span> <span class="nx">moduleInstance</span> <span class="o">=</span> <span class="p">{</span>
+  <span class="na">name</span><span class="p">:</span> <span class="nx">name</span><span class="p">,</span>
+  <span class="na">requires</span><span class="p">:</span> <span class="nx">requires</span><span class="p">,</span>
+  <span class="na">constant</span><span class="p">:</span> <span class="nx">invokeLater</span><span class="p">(</span><span class="s1">'$provide'</span><span class="p">,</span> <span class="s1">'constant'</span><span class="p">,</span> <span class="s1">'unshift'</span><span class="p">),</span> 
+  <span class="na">provider</span><span class="p">:</span> <span class="nx">invokeLater</span><span class="p">(</span><span class="s1">'$provide'</span><span class="p">,</span> <span class="s1">'provider'</span><span class="p">),</span> 
+  <span class="na">_invokeQueue</span><span class="p">:</span> <span class="nx">invokeQueue</span>
+<span class="p">};</span>
+</code></pre></div>
+<p>现在脑子完全乱掉，看不懂了。。。</p>
+<div class="highlight"><pre><code class="language-js" data-lang="js"><span class="c1">// invokeLater('$provide', 'constant', 'unshift'), </span>
+<span class="kd">var</span> <span class="nx">invokeLater</span> <span class="o">=</span> <span class="kd">function</span><span class="p">(</span><span class="nx">service</span><span class="p">,</span> <span class="nx">method</span><span class="p">,</span> <span class="nx">arrayMethod</span><span class="p">)</span> <span class="p">{</span>
+  <span class="k">return</span> <span class="kd">function</span><span class="p">()</span> <span class="p">{</span>
+    <span class="kd">var</span> <span class="nx">item</span> <span class="o">=</span> <span class="p">[</span><span class="nx">service</span><span class="p">,</span> <span class="nx">method</span><span class="p">,</span> <span class="nx">arguments</span><span class="p">];</span> 
+    <span class="nx">invokeQueue</span><span class="p">[</span><span class="nx">arrayMethod</span> <span class="o">||</span> <span class="s1">'push'</span><span class="p">](</span><span class="nx">item</span><span class="p">);</span> 
+    <span class="k">return</span> <span class="nx">moduleInstance</span><span class="p">;</span>
+  <span class="p">};</span>
+<span class="p">};</span>
+
+<span class="c1">//返回的函数是</span>
+<span class="c1">//constant: invokeLater('$provide', 'constant', 'unshift'), </span>
+<span class="c1">//provider: invokeLater('$provide', 'provider'),</span>
+<span class="c1">//arguments是constant('a', 3), provider('b', function(){})</span>
+<span class="kd">function</span><span class="p">()</span> <span class="p">{</span>
+  <span class="kd">var</span> <span class="nx">item</span> <span class="o">=</span> <span class="p">[</span><span class="s1">'$provide'</span><span class="p">,</span> <span class="s1">'constant'</span><span class="p">,</span> <span class="nx">arguments</span><span class="p">];</span> 
+  <span class="nx">invokeQueue</span><span class="p">[</span><span class="s1">'unshift'</span> <span class="o">||</span> <span class="s1">'push'</span><span class="p">](</span><span class="nx">item</span><span class="p">);</span> 
+  <span class="k">return</span> <span class="nx">moduleInstance</span><span class="p">;</span>
+<span class="p">}</span>
+
+</code></pre></div>
 <h4>Run Blocks</h4>
 <div class="highlight"><pre><code class="language-js" data-lang="js"><span class="nx">it</span><span class="p">(</span><span class="s1">'runs run blocks when the injector is created'</span><span class="p">,</span> <span class="kd">function</span><span class="p">(){</span> 
   <span class="kd">var</span> <span class="nx">module</span> <span class="o">=</span> <span class="nx">angular</span><span class="p">.</span><span class="nx">module</span><span class="p">(</span><span class="s1">'myModule'</span><span class="p">,</span> <span class="p">[]);</span>
@@ -162,7 +243,6 @@
   <span class="kd">var</span> <span class="nx">module</span> <span class="o">=</span> <span class="nx">angular</span><span class="p">.</span><span class="nx">module</span><span class="p">(</span><span class="s1">'myModule'</span><span class="p">,</span> <span class="p">[]);</span>
 
   <span class="nx">module</span><span class="p">.</span><span class="nx">provider</span><span class="p">(</span><span class="s1">'a'</span><span class="p">,</span> <span class="p">{</span><span class="na">$get</span><span class="p">:</span> <span class="nx">_</span><span class="p">.</span><span class="nx">constant</span><span class="p">(</span><span class="mi">42</span><span class="p">)});</span>
-
   <span class="kd">var</span> <span class="nx">gotA</span><span class="p">;</span> 
 
   <span class="nx">module</span><span class="p">.</span><span class="nx">run</span><span class="p">(</span><span class="kd">function</span><span class="p">(</span><span class="nx">a</span><span class="p">)</span> <span class="p">{</span><span class="nx">gotA</span> <span class="o">=</span> <span class="nx">a</span><span class="p">;</span> <span class="p">});</span>

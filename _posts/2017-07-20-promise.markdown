@@ -5,6 +5,51 @@ date:   2016-07-21
 categories: js
 ---
 
+我们想`doSomething`之后执行一个函数,有下边两种写法
+
+`doSomthing`之后运行回调函数，这回调函数是参数，所以想怎样就怎样，要注意一点的是，`value`这个值是`doSomething`函数内部传递的，你再外部只能接受
+
+```js
+doSomething(function(value) {
+  console.log('Got a value:' + value);
+});
+```
+
+我们细细这函数是如何定义的呢？内部构造是怎么样的
+
+```js
+function doSomething(callback){
+  // ...
+  // 搞啊搞
+  // 搞出个值传给callback,外部可改不了的哦，只能接受
+  var value = 44
+  callback(value)
+}
+```
+
+`doSomething`也能是这样的,`.then`里边写之前的回调函数
+
+```js
+doSomething().then(function(value) {
+  console.log('Got a value:' + value);
+});
+```
+
+我们猜猜他是怎么实现的呢？
+
+```js
+function doSomething(){
+  // ...
+  // 搞啊搞
+  var value = 44
+  return {
+    then: callback(value)
+  }
+}
+```
+
+下边是Promise使用时的例子，我们以它为spec
+
 ```js
 function doSomething() {
   return new Promise(function(resolve) {
@@ -13,6 +58,20 @@ function doSomething() {
   });
 }
 ```
+
+我们可以推测`new Promise`返回一个object, 里边有 `{then: callback}`
+
+那我们简单实现`Promise`
+
+```js
+function Promise(fn){
+  this.then = function(callback){
+    callback()
+  }
+}
+```
+
+原blog里是这么实现的
 
 ```js
 function Promise(fn) {
@@ -24,9 +83,133 @@ function Promise(fn) {
   function resolve(value) {
     callback(value);
   }
-  // fn是一个接收resolve fn的函数
+
   fn(resolve);
 }
 ```
 
-new Promise().then(callback)
+问题来了，这个resolve究竟是什么呢？说明我们有一个事情一直没有想通，回调函数的参数并不是他自己可以控制，改变的，而是函数本身内部传给他的。这就说明resolve这个函数是Promise内部有的。我们快改写一下。。。
+
+```js
+function Promise(fn){
+  this.then = function(callback){
+    callback()
+  }
+
+  function resolve(){}
+
+
+}
+```
+
+
+```js
+function Promise(fn) {
+  var state = 'pending';
+  var value;
+  var deferred;
+
+  function resolve(newValue) {
+    value = newValue;
+    state = 'resolved';
+
+    if(deferred) {
+      handle(deferred);
+    }
+  }
+
+  function handle(onResolved) {
+    if(state === 'pending') {
+      deferred = onResolved;
+      return;
+    }
+
+    onResolved(value);
+  }
+
+  this.then = function(onResolved) {
+    handle(onResolved);
+  };
+  
+  fn(resolve);
+}
+```
+
+Promise是一个构造函数，他还需要传入一个函数是为什么呢？如果传入的仅仅是resolved, rejected会怎么样呢？
+
+```js
+function readJSON(filename){
+  return new Promise(function (fulfill, reject){
+    readFile(filename, 'utf8').done(function (res){
+      try {
+        fulfill(JSON.parse(res));
+      } catch (ex) {
+        reject(ex);
+      }
+    }, reject);
+  });
+}
+```
+
+
+
+
+
+```js
+function Promise(fn) {
+  var state = 'pending';
+  var value;
+  var deferred = null;
+
+  function resolve(newValue) {
+    value = newValue;
+    state = 'resolved';
+
+    if(deferred) {
+      handle(deferred);
+    }
+  }
+
+  function handle(handler) {
+    if(state === 'pending') {
+      deferred = handler;
+      return;
+    }
+
+    if(!handler.onResolved) {
+      handler.resolve(value);
+      return;
+    }
+
+    var ret = handler.onResolved(value);
+    handler.resolve(ret);
+  }
+
+  this.then = function(onResolved) {
+    return new Promise(function(resolve) {
+      handle({
+        onResolved: onResolved,
+        resolve: resolve
+      });
+    });
+  };
+
+  fn(resolve);
+}
+```
+
+
+
+
+
+
+
+
+
+
+
+
+
+[http://blog.mediumequalsmessage.com/promise-deferred-objects-in-javascript-pt1-theory-and-semantics](http://blog.mediumequalsmessage.com/promise-deferred-objects-in-javascript-pt1-theory-and-semantics)
+[https://gist.github.com/domenic/3889970](https://gist.github.com/domenic/3889970)
+

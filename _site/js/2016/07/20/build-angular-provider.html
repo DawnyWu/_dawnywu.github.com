@@ -228,7 +228,7 @@
   <span class="p">}</span> 
 <span class="p">}</span>
 </code></pre></div>
-<p>provider环形依赖问题略过</p>
+<h4>Circular Dependencies</h4>
 
 <h4>Provider Constructors</h4>
 <div class="highlight"><pre><code class="language-js" data-lang="js"><span class="nx">provider</span><span class="err">:</span> <span class="kd">function</span><span class="p">(</span><span class="nx">key</span><span class="p">,</span> <span class="nx">provider</span><span class="p">)</span> <span class="p">{</span> 
@@ -483,6 +483,221 @@
 <p>When constants are registered to a module, the module loader always adds them to the front of the invoke queue.</p>
 
 <p>实现的原理很简单，把其他类型推入invokeQueue的时候用的<code>push</code>方法，对<code>constant</code>使用<code>unshift</code>方法</p>
+
+<h3>思想进化史</h3>
+
+<p>原来<code>module</code>只记录<code>constant</code>task,现在有<code>provider</code>task了</p>
+<div class="highlight"><pre><code class="language-js" data-lang="js"><span class="kd">var</span> <span class="nx">moduleInstance</span> <span class="o">=</span> <span class="p">{</span>
+  <span class="na">name</span><span class="p">:</span> <span class="nx">name</span><span class="p">,</span>
+  <span class="na">requires</span><span class="p">:</span> <span class="nx">requires</span><span class="p">,</span>
+  <span class="c1">// module.constant('a', 2)</span>
+  <span class="na">constant</span><span class="p">:</span> <span class="kd">function</span><span class="p">(</span><span class="nx">key</span><span class="p">,</span> <span class="nx">value</span><span class="p">)</span> <span class="p">{</span>
+    <span class="nx">invokeQueue</span><span class="p">.</span><span class="nx">push</span><span class="p">([</span><span class="s1">'constant'</span><span class="p">,</span> <span class="p">[</span><span class="nx">key</span><span class="p">,</span> <span class="nx">value</span><span class="p">]]);</span>
+  <span class="p">},</span>
+  <span class="c1">// module.provider('b', { $get: function() {return 42} })</span>
+  <span class="na">provider</span><span class="p">:</span> <span class="kd">function</span><span class="p">(</span><span class="nx">key</span><span class="p">,</span> <span class="nx">provider</span><span class="p">)</span> <span class="p">{</span> 
+    <span class="nx">invokeQueue</span><span class="p">.</span><span class="nx">push</span><span class="p">([</span><span class="s1">'provider'</span><span class="p">,</span> <span class="p">[</span><span class="nx">key</span><span class="p">,</span> <span class="nx">provider</span><span class="p">]]);</span>
+  <span class="p">},</span>
+  <span class="na">_invokeQueue</span><span class="p">:</span> <span class="nx">invokeQueue</span>
+<span class="p">};</span>
+</code></pre></div>
+<p>现在invokeQueue的样子大概是</p>
+<div class="highlight"><pre><code class="language-js" data-lang="js"><span class="p">[</span>
+  <span class="p">[</span><span class="s1">'constant'</span><span class="p">,</span> <span class="p">[</span><span class="s1">'a'</span><span class="p">,</span> <span class="mi">2</span><span class="p">]],</span>
+  <span class="p">[</span><span class="s1">'constant'</span><span class="p">,</span> <span class="p">[</span><span class="s1">'a'</span><span class="p">,</span> <span class="mi">2</span><span class="p">]],</span>
+  <span class="p">[</span><span class="s1">'constant'</span><span class="p">,</span> <span class="p">[</span><span class="s1">'a'</span><span class="p">,</span> <span class="mi">2</span><span class="p">]],</span>
+  <span class="p">[</span><span class="s1">'provider'</span><span class="p">,</span> <span class="p">[</span><span class="s1">'b'</span><span class="p">,</span> <span class="p">{</span> <span class="na">$get</span><span class="p">:</span> <span class="kd">function</span><span class="p">()</span> <span class="p">{</span><span class="k">return</span> <span class="mi">42</span><span class="p">}</span> <span class="p">}]],</span>
+  <span class="p">[</span><span class="s1">'provider'</span><span class="p">,</span> <span class="p">[</span><span class="s1">'b'</span><span class="p">,</span> <span class="p">{</span> <span class="na">$get</span><span class="p">:</span> <span class="kd">function</span><span class="p">()</span> <span class="p">{</span><span class="k">return</span> <span class="mi">42</span><span class="p">}</span> <span class="p">}]],</span>
+  <span class="p">[</span><span class="s1">'provider'</span><span class="p">,</span> <span class="p">[</span><span class="s1">'b'</span><span class="p">,</span> <span class="p">{</span> <span class="na">$get</span><span class="p">:</span> <span class="kd">function</span><span class="p">()</span> <span class="p">{</span><span class="k">return</span> <span class="mi">42</span><span class="p">}</span> <span class="p">}]],</span>
+<span class="p">]</span> 
+</code></pre></div>
+<p>抽象出<code>invokeLater</code>函数,有时候会奇怪<code>arguments</code>是什么？是module.constant(arguments), module.provider(arguments)</p>
+<div class="highlight"><pre><code class="language-js" data-lang="js"><span class="c1">//var moduleInstance = {</span>
+<span class="c1">//  name: name,</span>
+<span class="c1">//  requires: requires,</span>
+<span class="c1">//  constant: invokeLater('constant'), </span>
+<span class="c1">//  provider: invokeLater('provider'), </span>
+<span class="c1">//  _invokeQueue: invokeQueue</span>
+<span class="c1">//};</span>
+
+<span class="kd">var</span> <span class="nx">invokeLater</span> <span class="o">=</span> <span class="kd">function</span><span class="p">(</span><span class="nx">method</span><span class="p">)</span> <span class="p">{</span> 
+  <span class="k">return</span> <span class="kd">function</span><span class="p">()</span> <span class="p">{</span>
+    <span class="nx">invokeQueue</span><span class="p">.</span><span class="nx">push</span><span class="p">([</span><span class="nx">method</span><span class="p">,</span> <span class="nx">arguments</span><span class="p">]);</span>
+    <span class="k">return</span> <span class="nx">moduleInstance</span><span class="p">;</span> 
+  <span class="p">};</span>
+<span class="p">};</span>
+</code></pre></div>
+<p>$provide object中存有如何运行task的代码</p>
+<div class="highlight"><pre><code class="language-js" data-lang="js"><span class="kd">var</span> <span class="nx">$provide</span> <span class="o">=</span> <span class="p">{</span>
+  <span class="na">constant</span><span class="p">:</span> <span class="kd">function</span><span class="p">(</span><span class="nx">key</span><span class="p">,</span> <span class="nx">value</span><span class="p">)</span> <span class="p">{</span>
+    <span class="k">if</span> <span class="p">(</span><span class="nx">key</span> <span class="o">===</span> <span class="s1">'hasOwnProperty'</span><span class="p">)</span> <span class="p">{</span>
+      <span class="k">throw</span> <span class="s1">'hasOwnProperty is not a valid constant name!'</span><span class="p">;</span>
+    <span class="p">}</span>
+    <span class="nx">cache</span><span class="p">[</span><span class="nx">key</span><span class="p">]</span> <span class="o">=</span> <span class="nx">value</span><span class="p">;</span>
+  <span class="p">},</span>
+  <span class="na">provider</span><span class="p">:</span> <span class="kd">function</span><span class="p">(</span><span class="nx">key</span><span class="p">,</span> <span class="nx">provider</span><span class="p">)</span> <span class="p">{</span>
+    <span class="nx">cache</span><span class="p">[</span><span class="nx">key</span><span class="p">]</span> <span class="o">=</span> <span class="nx">provider</span><span class="p">.</span><span class="nx">$get</span><span class="p">();</span>
+  <span class="p">}</span> 
+<span class="p">};</span>
+</code></pre></div>
+<p>上边的代码看似够用了，但是当<code>$get</code>函数需要依赖注入的时候怎么办。。。</p>
+<div class="highlight"><pre><code class="language-js" data-lang="js"><span class="nx">module</span><span class="p">.</span><span class="nx">provider</span><span class="p">(</span><span class="s1">'b'</span><span class="p">,</span> <span class="p">{</span>
+  <span class="na">$get</span><span class="p">:</span> <span class="kd">function</span><span class="p">(</span><span class="nx">a</span><span class="p">)</span> <span class="p">{</span> <span class="k">return</span> <span class="nx">a</span> <span class="o">+</span> <span class="mi">2</span><span class="p">;</span> <span class="p">}</span>
+<span class="p">});</span>
+</code></pre></div>
+<p>在运行<code>provider.$get()</code>时要找到所需的参数<code>a</code>,我们好像有之前的<code>invoke</code>函数可以用哦,于是修改为</p>
+<div class="highlight"><pre><code class="language-js" data-lang="js"><span class="kd">var</span> <span class="nx">$provide</span> <span class="o">=</span> <span class="p">{</span>
+  <span class="na">constant</span><span class="p">:</span> <span class="kd">function</span><span class="p">(</span><span class="nx">key</span><span class="p">,</span> <span class="nx">value</span><span class="p">)</span> <span class="p">{</span>
+    <span class="k">if</span> <span class="p">(</span><span class="nx">key</span> <span class="o">===</span> <span class="s1">'hasOwnProperty'</span><span class="p">)</span> <span class="p">{</span>
+      <span class="k">throw</span> <span class="s1">'hasOwnProperty is not a valid constant name!'</span><span class="p">;</span>
+    <span class="p">}</span>
+    <span class="nx">cache</span><span class="p">[</span><span class="nx">key</span><span class="p">]</span> <span class="o">=</span> <span class="nx">value</span><span class="p">;</span>
+  <span class="p">},</span>
+  <span class="na">provider</span><span class="p">:</span> <span class="kd">function</span><span class="p">(</span><span class="nx">key</span><span class="p">,</span> <span class="nx">provider</span><span class="p">)</span> <span class="p">{</span>
+    <span class="nx">cache</span><span class="p">[</span><span class="nx">key</span><span class="p">]</span> <span class="o">=</span> <span class="nx">invoke</span><span class="p">(</span><span class="nx">provider</span><span class="p">.</span><span class="nx">$get</span><span class="p">,</span> <span class="nx">provider</span><span class="p">);</span>
+  <span class="p">}</span> 
+<span class="p">};</span>
+</code></pre></div>
+<p><code>invoke</code>调用函数的时候会在<code>cache</code>中找函数所需的变量并注入,第二个参数<code>provider</code>的原因是设定<code>this</code>,以免<code>$get函数</code>调用<code>provider obj</code>中的其他value时不能找到</p>
+
+<p>虽然<code>injector</code>和<code>provider</code>在书里是分两个章节写的，可在代码中是一部分，没有<code>injector</code>的<code>invoke</code>等功能，<code>provider</code>是不能完成依赖注入功能的</p>
+
+<p>现在要实现lazy的功能了,也就是provider只有在使用的时候运行,使用之前一直都是个没有运行的函数,我们需要在创建另一个<code>providerCache</code>来存<code>provider</code>。为了做区别，provider没有运行前名字后边加个<code>Provider</code>后缀 </p>
+
+<p><code>$provide object</code>变成了这样</p>
+<div class="highlight"><pre><code class="language-js" data-lang="js"><span class="c1">// old:</span>
+<span class="c1">// var $provide = {</span>
+<span class="c1">//   constant: function(key, value) {</span>
+<span class="c1">//     if (key === 'hasOwnProperty') {</span>
+<span class="c1">//       throw 'hasOwnProperty is not a valid constant name!';</span>
+<span class="c1">//     }</span>
+<span class="c1">//     cache[key] = value;</span>
+<span class="c1">//   },</span>
+<span class="c1">//   provider: function(key, provider) {</span>
+<span class="c1">//     cache[key] = invoke(provider.$get, provider);</span>
+<span class="c1">//   } </span>
+<span class="c1">// };</span>
+<span class="kd">var</span> <span class="nx">$provide</span> <span class="o">=</span> <span class="p">{</span>
+  <span class="na">constant</span><span class="p">:</span> <span class="kd">function</span><span class="p">(</span><span class="nx">key</span><span class="p">,</span> <span class="nx">value</span><span class="p">)</span> <span class="p">{</span>
+    <span class="k">if</span> <span class="p">(</span><span class="nx">key</span> <span class="o">===</span> <span class="s1">'hasOwnProperty'</span><span class="p">)</span> <span class="p">{</span>
+      <span class="k">throw</span> <span class="s1">'hasOwnProperty is not a valid constant name!'</span><span class="p">;</span>
+    <span class="p">}</span>
+    <span class="nx">instanceCache</span><span class="p">[</span><span class="nx">key</span><span class="p">]</span> <span class="o">=</span> <span class="nx">value</span><span class="p">;</span>
+  <span class="p">},</span>
+  <span class="na">provider</span><span class="p">:</span> <span class="kd">function</span><span class="p">(</span><span class="nx">key</span><span class="p">,</span> <span class="nx">provider</span><span class="p">)</span> <span class="p">{</span>
+    <span class="nx">providerCache</span><span class="p">[</span><span class="nx">key</span> <span class="o">+</span> <span class="s1">'Provider'</span><span class="p">]</span> <span class="o">=</span> <span class="nx">provider</span><span class="p">;</span>
+  <span class="p">}</span> 
+<span class="p">};</span>
+</code></pre></div>
+<p>如上代码所示，分别存入不同的<code>Cache</code>,<code>provider:</code>中不再执行<code>invoke</code>，因为要<code>lazy</code>,加个后缀保存一下就可以了</p>
+
+<p>我们知道<code>invoke</code>的原理就是在<code>cache</code>中找所需的参数，那么现在<code>cache</code>变成两个了，我们创建一个<code>getService</code>函数来做这件事情,其实我觉得倒不如叫<code>getFromCache</code>什么的。。。</p>
+<div class="highlight"><pre><code class="language-js" data-lang="js"><span class="kd">function</span> <span class="nx">getService</span><span class="p">(</span><span class="nx">name</span><span class="p">)</span> <span class="p">{</span>
+  <span class="k">if</span> <span class="p">(</span><span class="nx">instanceCache</span><span class="p">.</span><span class="nx">hasOwnProperty</span><span class="p">(</span><span class="nx">name</span><span class="p">))</span> <span class="p">{</span>
+    <span class="k">return</span> <span class="nx">instanceCache</span><span class="p">[</span><span class="nx">name</span><span class="p">];</span>
+  <span class="p">}</span> <span class="k">else</span> <span class="k">if</span> <span class="p">(</span><span class="nx">providerCache</span><span class="p">.</span><span class="nx">hasOwnProperty</span><span class="p">(</span><span class="nx">name</span> <span class="o">+</span> <span class="s1">'Provider'</span><span class="p">))</span> <span class="p">{</span>
+    <span class="kd">var</span> <span class="nx">provider</span> <span class="o">=</span> <span class="nx">providerCache</span><span class="p">[</span><span class="nx">name</span> <span class="o">+</span> <span class="s1">'Provider'</span><span class="p">];</span>
+    <span class="k">return</span> <span class="nx">invoke</span><span class="p">(</span><span class="nx">provider</span><span class="p">.</span><span class="nx">$get</span><span class="p">,</span> <span class="nx">provider</span><span class="p">);</span> 
+  <span class="p">}</span>
+<span class="p">}</span>
+</code></pre></div>
+<p>然后<code>invoke</code>函数就改写为</p>
+<div class="highlight"><pre><code class="language-js" data-lang="js"><span class="kd">function</span> <span class="nx">invoke</span><span class="p">(</span><span class="nx">fn</span><span class="p">,</span> <span class="nx">self</span><span class="p">,</span> <span class="nx">locals</span><span class="p">)</span> <span class="p">{</span>
+  <span class="kd">var</span> <span class="nx">args</span> <span class="o">=</span> <span class="nx">_</span><span class="p">.</span><span class="nx">map</span><span class="p">(</span><span class="nx">annotate</span><span class="p">(</span><span class="nx">fn</span><span class="p">),</span> <span class="kd">function</span><span class="p">(</span><span class="nx">token</span><span class="p">)</span> <span class="p">{</span>
+    <span class="k">if</span> <span class="p">(</span><span class="nx">_</span><span class="p">.</span><span class="nx">isString</span><span class="p">(</span><span class="nx">token</span><span class="p">))</span> <span class="p">{</span>
+      <span class="k">return</span> <span class="nx">locals</span> <span class="o">&amp;&amp;</span> <span class="nx">locals</span><span class="p">.</span><span class="nx">hasOwnProperty</span><span class="p">(</span><span class="nx">token</span><span class="p">)</span> <span class="p">?</span>
+              <span class="nx">locals</span><span class="p">[</span><span class="nx">token</span><span class="p">]</span> <span class="p">:</span>
+              <span class="c1">// 从cache中取用这句了</span>
+              <span class="nx">getService</span><span class="p">(</span><span class="nx">token</span><span class="p">);</span> 
+    <span class="p">}</span> <span class="k">else</span> <span class="p">{</span>
+      <span class="k">throw</span> <span class="s1">'Incorrect injection token! Expected a string, got '</span><span class="o">+</span><span class="nx">token</span><span class="p">;</span> 
+    <span class="p">}</span>
+  <span class="p">});</span>
+  <span class="k">if</span> <span class="p">(</span><span class="nx">_</span><span class="p">.</span><span class="nx">isArray</span><span class="p">(</span><span class="nx">fn</span><span class="p">))</span> <span class="p">{</span>
+    <span class="nx">fn</span> <span class="o">=</span> <span class="nx">_</span><span class="p">.</span><span class="nx">last</span><span class="p">(</span><span class="nx">fn</span><span class="p">);</span>
+  <span class="p">}</span>
+  <span class="k">return</span> <span class="nx">fn</span><span class="p">.</span><span class="nx">apply</span><span class="p">(</span><span class="nx">self</span><span class="p">,</span> <span class="nx">args</span><span class="p">);</span> 
+<span class="p">}</span>
+</code></pre></div>
+<p><code>injector</code>对外的<code>has</code>和<code>get</code>无非是<code>cache</code>对外的<code>get</code>接口而已,所以也要改一下喽</p>
+<div class="highlight"><pre><code class="language-js" data-lang="js"><span class="k">return</span> <span class="p">{</span>
+  <span class="na">has</span><span class="p">:</span> <span class="kd">function</span><span class="p">(</span><span class="nx">key</span><span class="p">)</span> <span class="p">{</span>
+    <span class="c1">// 要查两个cache</span>
+    <span class="k">return</span> <span class="nx">instanceCache</span><span class="p">.</span><span class="nx">hasOwnProperty</span><span class="p">(</span><span class="nx">key</span><span class="p">)</span> <span class="o">||</span> 
+    <span class="nx">providerCache</span><span class="p">.</span><span class="nx">hasOwnProperty</span><span class="p">(</span><span class="nx">key</span> <span class="o">+</span> <span class="s1">'Provider'</span><span class="p">);</span>
+  <span class="p">},</span>
+  <span class="na">get</span><span class="p">:</span> <span class="nx">getService</span><span class="p">,</span>
+  <span class="na">annotate</span><span class="p">:</span> <span class="nx">annotate</span><span class="p">,</span>
+  <span class="na">invoke</span><span class="p">:</span> <span class="nx">invoke</span>
+<span class="p">};</span>
+</code></pre></div>
+<p>现在要实现<code>provider</code>的<code>singleton</code>, 也就是<code>provider</code>只运行一遍</p>
+
+<p>只需要运行后把它存入<code>instance cache</code>就好了,原来在<code>providerCache</code>中是<code>XXProvider</code>,现在存入instanceCache就把Provider几个字去掉了</p>
+<div class="highlight"><pre><code class="language-js" data-lang="js"><span class="kd">function</span> <span class="nx">getService</span><span class="p">(</span><span class="nx">name</span><span class="p">)</span> <span class="p">{</span>
+  <span class="k">if</span> <span class="p">(</span><span class="nx">instanceCache</span><span class="p">.</span><span class="nx">hasOwnProperty</span><span class="p">(</span><span class="nx">name</span><span class="p">))</span> <span class="p">{</span>
+    <span class="k">return</span> <span class="nx">instanceCache</span><span class="p">[</span><span class="nx">name</span><span class="p">];</span>
+  <span class="p">}</span> <span class="k">else</span> <span class="k">if</span> <span class="p">(</span><span class="nx">providerCache</span><span class="p">.</span><span class="nx">hasOwnProperty</span><span class="p">(</span><span class="nx">name</span> <span class="o">+</span> <span class="s1">'Provider'</span><span class="p">))</span> <span class="p">{</span>
+    <span class="kd">var</span> <span class="nx">provider</span> <span class="o">=</span> <span class="nx">providerCache</span><span class="p">[</span><span class="nx">name</span> <span class="o">+</span> <span class="s1">'Provider'</span><span class="p">];</span>
+    <span class="kd">var</span> <span class="nx">instance</span> <span class="o">=</span> <span class="nx">instanceCache</span><span class="p">[</span><span class="nx">name</span><span class="p">]</span> <span class="o">=</span> <span class="nx">invoke</span><span class="p">(</span><span class="nx">provider</span><span class="p">.</span><span class="nx">$get</span><span class="p">);</span> 
+    <span class="k">return</span> <span class="nx">instance</span><span class="p">;</span>
+  <span class="p">}</span> 
+<span class="p">}</span>
+</code></pre></div>
+<p>后来我们要支持<code>Provider Constructors</code>, 原来我们的provider是一个有<code>$get</code>方法的对象，现在是一个构造函数，它实例化出来的对象是有<code>$get</code>方法的。</p>
+
+<p>我们之前说过provider归根到底是一个有<code>$get</code>方法的对象而已，我们要把<code>Provider Constructors</code>实例化,然后把对象放到<code>providerCache</code>里就好了</p>
+<div class="highlight"><pre><code class="language-js" data-lang="js"><span class="nx">provider</span><span class="err">:</span> <span class="kd">function</span><span class="p">(</span><span class="nx">key</span><span class="p">,</span> <span class="nx">provider</span><span class="p">)</span> <span class="p">{</span>
+  <span class="c1">// 实例化provider constructor,然后存入providerCache</span>
+  <span class="k">if</span> <span class="p">(</span><span class="nx">_</span><span class="p">.</span><span class="nx">isFunction</span><span class="p">(</span><span class="nx">provider</span><span class="p">))</span> <span class="p">{</span>
+    <span class="nx">provider</span> <span class="o">=</span> <span class="nx">instantiate</span><span class="p">(</span><span class="nx">provider</span><span class="p">);</span>
+  <span class="p">}</span>
+  <span class="nx">providerCache</span><span class="p">[</span><span class="nx">key</span> <span class="o">+</span> <span class="s1">'Provider'</span><span class="p">]</span> <span class="o">=</span> <span class="nx">provider</span><span class="p">;</span>
+<span class="p">}</span>
+</code></pre></div>
+<p><del>那么现在<code>providerCache</code>里有两种东西</del></p>
+
+<p>只有一种东西而已,就是一个有<code>$get</code>方法的对象, 这时候并没有添加新的依赖注入问题，之前的注入代码不需要改动的</p>
+
+<p>那构造函数这种方式提供<code>provider</code>有什么特殊的地方呢？
+它可以注入另外一个constructor provider, 这个是怎么实现的呢？</p>
+<div class="highlight"><pre><code class="language-js" data-lang="js"><span class="nx">module</span><span class="p">.</span><span class="nx">provider</span><span class="p">(</span><span class="s1">'a'</span><span class="p">,</span> <span class="kd">function</span> <span class="nx">AProvider</span><span class="p">()</span> <span class="p">{</span> 
+  <span class="kd">var</span> <span class="nx">value</span> <span class="o">=</span> <span class="mi">1</span><span class="p">;</span>
+  <span class="k">this</span><span class="p">.</span><span class="nx">setValue</span> <span class="o">=</span> <span class="kd">function</span><span class="p">(</span><span class="nx">v</span><span class="p">)</span> <span class="p">{</span> <span class="nx">value</span> <span class="o">=</span> <span class="nx">v</span><span class="p">;</span> <span class="p">};</span> 
+  <span class="k">this</span><span class="p">.</span><span class="nx">$get</span> <span class="o">=</span> <span class="kd">function</span><span class="p">()</span> <span class="p">{</span> <span class="k">return</span> <span class="nx">value</span><span class="p">;</span> <span class="p">};</span>
+<span class="p">});</span>
+
+<span class="nx">module</span><span class="p">.</span><span class="nx">provider</span><span class="p">(</span><span class="s1">'b'</span><span class="p">,</span> <span class="kd">function</span> <span class="nx">BProvider</span><span class="p">(</span><span class="nx">aProvider</span><span class="p">)</span> <span class="p">{</span>
+  <span class="nx">aProvider</span><span class="p">.</span><span class="nx">setValue</span><span class="p">(</span><span class="mi">2</span><span class="p">);</span>
+  <span class="k">this</span><span class="p">.</span><span class="nx">$get</span> <span class="o">=</span> <span class="kd">function</span><span class="p">()</span> <span class="p">{</span> <span class="p">};</span> 
+<span class="p">});</span>
+
+<span class="c1">// aProvider obj</span>
+<span class="p">{</span>
+  <span class="nl">setValue</span><span class="p">:</span> <span class="nx">fun</span><span class="p">,</span>
+  <span class="nx">$get</span><span class="err">:</span> <span class="nx">fun</span><span class="p">,</span>
+<span class="p">}</span>
+</code></pre></div>
+<p>实例化的时候运行<code>instantiate</code>,代码如下，运行invoke的时候会去<code>cache</code>中查找<code>aProvider</code>,<code>aProvider</code>是一个object,不是构造函数哦。这个查找功能是代理给<code>getService</code>函数的,因为参数名字就叫XXProvider,所以直接去providerCache中找就可以了,原来的参数都是类似a，然后存入cache前变的名子</p>
+<div class="highlight"><pre><code class="language-js" data-lang="js"><span class="c1">// 新加这句</span>
+<span class="p">}</span> <span class="k">else</span> <span class="k">if</span> <span class="p">(</span><span class="nx">providerCache</span><span class="p">.</span><span class="nx">hasOwnProperty</span><span class="p">(</span><span class="nx">name</span><span class="p">))</span> <span class="p">{</span>
+  <span class="k">return</span> <span class="nx">providerCache</span><span class="p">[</span><span class="nx">name</span><span class="p">];</span>
+<span class="p">}</span> <span class="k">else</span> <span class="k">if</span> <span class="p">(</span><span class="nx">providerCache</span><span class="p">.</span><span class="nx">hasOwnProperty</span><span class="p">(</span><span class="nx">name</span> <span class="o">+</span> <span class="s1">'Provider'</span><span class="p">))</span> <span class="p">{</span>
+</code></pre></div><div class="highlight"><pre><code class="language-js" data-lang="js"><span class="kd">function</span> <span class="nx">instantiate</span><span class="p">(</span><span class="nx">Type</span><span class="p">,</span> <span class="nx">locals</span><span class="p">)</span> <span class="p">{</span>
+  <span class="kd">var</span> <span class="nx">UnwrappedType</span> <span class="o">=</span> <span class="nx">_</span><span class="p">.</span><span class="nx">isArray</span><span class="p">(</span><span class="nx">Type</span><span class="p">)</span> <span class="p">?</span> <span class="nx">_</span><span class="p">.</span><span class="nx">last</span><span class="p">(</span><span class="nx">Type</span><span class="p">)</span> <span class="p">:</span> <span class="nx">Type</span><span class="p">;</span>
+  <span class="c1">// 实例化Type类,可是locals还没有用上</span>
+  <span class="kd">var</span> <span class="nx">instance</span> <span class="o">=</span> <span class="nb">Object</span><span class="p">.</span><span class="nx">create</span><span class="p">(</span><span class="nx">UnwrappedType</span><span class="p">.</span><span class="nx">prototype</span><span class="p">);</span> 
+  <span class="c1">// invoke(fn, self, locals)</span>
+  <span class="nx">invoke</span><span class="p">(</span><span class="nx">Type</span><span class="p">,</span> <span class="nx">instance</span><span class="p">,</span> <span class="nx">locals</span><span class="p">);</span>
+  <span class="k">return</span> <span class="nx">instance</span><span class="p">;</span>
+<span class="p">}</span>
+</code></pre></div>
+<p>以前我们注入的是constant,或者$get函数的返回值，现在我们可以注入一个provider了有木有。。。。</p>
+
+<p>providerCache现在又用来提供provider,又用来执行$get函数提供给isntanceCache</p>
+
+<p>由于一大堆spec....此处省略，我们需要两种injector, 一种The injection that happens between provider constructors only deals with other providers.
+一种The injection that happens between $get methods and the external injector API only deals with instances. </p>
 
   </div>
 

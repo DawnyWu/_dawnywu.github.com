@@ -6,11 +6,11 @@
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
   <meta name="viewport" content="width=device-width, initial-scale=1">
 
-  <title>Build my own angular: regexp</title>
-  <meta name="description" content="var FN_ARGS = /^function\s*[^\(]*\(\s*([^\)]*)\)/m;">
+  <title>Webpack Fundamental</title>
+  <meta name="description" content="">
 
   <link rel="stylesheet" href="/css/main.css">
-  <link rel="canonical" href="http://yourdomain.com/js/2016/07/25/regexp.html">
+  <link rel="canonical" href="http://yourdomain.com/webpack/2016/08/30/webpack-element.html">
   <link rel="alternate" type="application/rss+xml" title="Dawny Wu's blog" href="http://yourdomain.com/feed.xml">
 </head>
 
@@ -57,27 +57,12 @@
         <article class="post" itemscope itemtype="http://schema.org/BlogPosting">
 
   <header class="post-header">
-    <h1 class="post-title" itemprop="name headline">Build my own angular: regexp</h1>
-    <p class="post-meta"><time datetime="2016-07-25T00:00:00+08:00" itemprop="datePublished">Jul 25, 2016</time></p>
+    <h1 class="post-title" itemprop="name headline">Webpack Fundamental</h1>
+    <p class="post-meta"><time datetime="2016-08-30T00:00:00+08:00" itemprop="datePublished">Aug 30, 2016</time></p>
   </header>
 
   <div class="post-content" itemprop="articleBody">
-    <p><code>var FN_ARGS = /^function\s*[^\(]*\(\s*([^\)]*)\)/m;</code></p>
-
-<ul>
-<li><code>/ˆ</code> We begin by anchoring the match to the beginning of input</li>
-<li><code>function</code> Every function begins with the function keyword. . .</li>
-<li><code>\s*</code> . . . followed by (optionally) some whitespace. . .</li>
-<li><code>[ˆ\(]*</code> . . . followed by the (optional) function name - characters other than ‘(’. . . </li>
-<li><code>\(</code> . . . followed by the opening parenthesis of the argument list. . .</li>
-<li><code>\s*</code> . . . followed by (optionally) some whitespace. . .</li>
-<li><code>(</code> . . . followed by the argument list, which we capture in a capturing group. . . </li>
-<li><code>[ˆ\)]*</code> . . . into which we read a succession of any characters other than ‘)’. . .</li>
-<li><code>)</code> . . . and when done reading we close the capturing group. . .</li>
-<li><code>\)</code> . . . and still match the closing parenthesis of the argument list. . .</li>
-<li><code>/m</code> . . . and define the whole regular expression to match over multiple lines.</li>
-</ul>
-
+    
   </div>
 
 </article>
