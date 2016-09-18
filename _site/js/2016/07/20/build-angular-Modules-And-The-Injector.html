@@ -10,8 +10,8 @@
   <meta name="description" content="Modules: Modules are collections of application configuration information.They are where you register your services, controllers, directives, filters, and ot...">
 
   <link rel="stylesheet" href="/css/main.css">
-  <link rel="canonical" href="http://yourdomain.com/js/2016/07/20/build-angular-Modules-And-The-Injector.html">
-  <link rel="alternate" type="application/rss+xml" title="Dawny Wu's blog" href="http://yourdomain.com/feed.xml">
+  <link rel="canonical" href="/js/2016/07/20/build-angular-Modules-And-The-Injector.html">
+  <link rel="alternate" type="application/rss+xml" title="" href="/feed.xml">
 </head>
 
 
@@ -21,7 +21,7 @@
 
   <div class="wrapper">
 
-    <a class="site-title" href="/">Dawny Wu's blog</a>
+    <a class="site-title" href="/"></a>
 
     <nav class="site-nav">
       <a href="#" class="menu-icon">
@@ -62,45 +62,55 @@
   </header>
 
   <div class="post-content" itemprop="articleBody">
-    <p><code>Modules</code>: Modules are collections of application configuration information.They are where you register your services, controllers, directives, filters, and other application components.</p>
+    <p><code class="highlighter-rouge">Modules</code>: Modules are collections of application configuration information.They are where you register your services, controllers, directives, filters, and other application components.</p>
 
-<p><code>Injector</code>: It is the injector that really brings an application to life. </p>
+<p><code class="highlighter-rouge">Injector</code>: It is the injector that really brings an application to life.</p>
 
-<h3>module</h3>
+<h3 id="module">module</h3>
 
-<p><code>module</code>由<code>window.angular.module</code>管理</p>
+<p><code class="highlighter-rouge">module</code>由<code class="highlighter-rouge">window.angular.module</code>管理</p>
 
-<p><code>angular.module</code>方法： 输入<code>module name</code>, <code>module&#39;s dependencies</code>,输出<code>module object</code></p>
+<p><code class="highlighter-rouge">angular.module</code>方法： 输入<code class="highlighter-rouge">module name</code>, <code class="highlighter-rouge">module's dependencies</code>,输出<code class="highlighter-rouge">module object</code></p>
 
-<p>若<code>module name</code>相同会覆盖之前的<code>module</code></p>
-<div class="highlight"><pre><code class="language-js" data-lang="js"><span class="c1">// spec</span>
+<p>若<code class="highlighter-rouge">module name</code>相同会覆盖之前的<code class="highlighter-rouge">module</code></p>
+
+<div class="language-js highlighter-rouge"><pre class="highlight"><code><span class="c1">// spec</span>
 <span class="kd">var</span> <span class="nx">myModule</span> <span class="o">=</span> <span class="nb">window</span><span class="p">.</span><span class="nx">angular</span><span class="p">.</span><span class="nx">module</span><span class="p">(</span><span class="s1">'myModule'</span><span class="p">,</span> <span class="p">[</span><span class="s1">'myOtherModule'</span><span class="p">]);</span>
 <span class="nx">myModule</span><span class="p">.</span><span class="nx">name</span> <span class="o">=</span> <span class="s1">'myModule'</span>
 <span class="nx">myModule</span><span class="p">.</span><span class="nx">requires</span> <span class="o">=</span> <span class="p">[</span><span class="s1">'myOtherModule'</span><span class="p">]</span>
-</code></pre></div><div class="highlight"><pre><code class="language-js" data-lang="js"><span class="kd">var</span> <span class="nx">createModule</span> <span class="o">=</span> <span class="kd">function</span><span class="p">(</span><span class="nx">name</span><span class="p">,</span> <span class="nx">requires</span><span class="p">)</span> <span class="p">{</span>
+</code></pre>
+</div>
+
+<div class="language-js highlighter-rouge"><pre class="highlight"><code><span class="kd">var</span> <span class="nx">createModule</span> <span class="o">=</span> <span class="kd">function</span><span class="p">(</span><span class="nx">name</span><span class="p">,</span> <span class="nx">requires</span><span class="p">)</span> <span class="p">{</span>
   <span class="kd">var</span> <span class="nx">moduleInstance</span> <span class="o">=</span> <span class="p">{</span>
     <span class="na">name</span><span class="p">:</span> <span class="nx">name</span><span class="p">,</span>
     <span class="na">requires</span><span class="p">:</span> <span class="nx">requires</span>
   <span class="p">};</span>
   <span class="k">return</span> <span class="nx">moduleInstance</span><span class="p">;</span> 
 <span class="p">};</span>
-</code></pre></div>
+</code></pre>
+</div>
+
 <p>angular.module不止需要有set功能，还要有get功能</p>
 
-<h3>Injector</h3>
-<div class="highlight"><pre><code class="language-js" data-lang="js"><span class="c1">// create module</span>
+<h3 id="injector">Injector</h3>
+
+<div class="language-js highlighter-rouge"><pre class="highlight"><code><span class="c1">// create module</span>
 <span class="kd">var</span> <span class="nx">module</span> <span class="o">=</span> <span class="nx">angular</span><span class="p">.</span><span class="nx">module</span><span class="p">(</span><span class="s1">'myModule'</span><span class="p">,</span> <span class="p">[]);</span> 
 <span class="nx">module</span><span class="p">.</span><span class="nx">constant</span><span class="p">(</span><span class="s1">'aConstant'</span><span class="p">,</span> <span class="mi">42</span><span class="p">);</span>
 
 <span class="kd">var</span> <span class="nx">injector</span> <span class="o">=</span> <span class="nx">createInjector</span><span class="p">([</span><span class="s1">'myModule'</span><span class="p">]);</span> 
 <span class="nx">expect</span><span class="p">(</span><span class="nx">injector</span><span class="p">.</span><span class="nx">has</span><span class="p">(</span><span class="s1">'aConstant'</span><span class="p">)).</span><span class="nx">toBe</span><span class="p">(</span><span class="kc">true</span><span class="p">);</span>
-</code></pre></div>
-<p>看似很神奇，根据<code>module name</code>创建的<code>injector</code>竟然了解<code>module</code>的内部</p>
+</code></pre>
+</div>
 
-<p>其实是从<code>angular.module</code>里面根据<code>module name</code>找到的<code>module</code></p>
+<p>看似很神奇，根据<code class="highlighter-rouge">module name</code>创建的<code class="highlighter-rouge">injector</code>竟然了解<code class="highlighter-rouge">module</code>的内部</p>
 
-<p><code>module</code>包含一系列任务，它并不实例化<code>module</code>,实例化由<code>injector</code>完成,一系列的任务成为<code>invoke queue.</code>,每个<code>module</code>都有<code>invoke queue</code></p>
-<div class="highlight"><pre><code class="language-js" data-lang="js"><span class="nx">invokeQueue</span><span class="o">=</span><span class="p">[</span>
+<p>其实是从<code class="highlighter-rouge">angular.module</code>里面根据<code class="highlighter-rouge">module name</code>找到的<code class="highlighter-rouge">module</code></p>
+
+<p><code class="highlighter-rouge">module</code>包含一系列任务，它并不实例化<code class="highlighter-rouge">module</code>,实例化由<code class="highlighter-rouge">injector</code>完成,一系列的任务成为<code class="highlighter-rouge">invoke queue.</code>,每个<code class="highlighter-rouge">module</code>都有<code class="highlighter-rouge">invoke queue</code></p>
+
+<div class="language-js highlighter-rouge"><pre class="highlight"><code><span class="nx">invokeQueue</span><span class="o">=</span><span class="p">[</span>
               <span class="p">[</span><span class="s1">'constant'</span><span class="p">,</span> <span class="p">[</span><span class="s1">'aConstant'</span><span class="p">,</span> <span class="mi">42</span><span class="p">]]</span>
             <span class="p">]</span>
 
@@ -112,26 +122,35 @@
             <span class="p">},</span>
   <span class="na">_invokeQueue</span><span class="p">:</span> <span class="nx">invokeQueue</span>
 <span class="p">};</span>
-</code></pre></div>
-<p>创建<code>injecotr</code>的时候把_invokeQueue中的任务都运行一遍就好了,那么<code>injector</code>需要知道<code>_invokeQueue</code>中不同类型的任务要如何处理，这里我们创建一个<code>$provide</code> object</p>
-<div class="highlight"><pre><code class="language-js" data-lang="js"><span class="kd">var</span> <span class="nx">$provide</span> <span class="o">=</span> <span class="p">{</span>
+</code></pre>
+</div>
+
+<p>创建<code class="highlighter-rouge">injecotr</code>的时候把_invokeQueue中的任务都运行一遍就好了,那么<code class="highlighter-rouge">injector</code>需要知道<code class="highlighter-rouge">_invokeQueue</code>中不同类型的任务要如何处理，这里我们创建一个<code class="highlighter-rouge">$provide</code> object</p>
+
+<div class="language-js highlighter-rouge"><pre class="highlight"><code><span class="kd">var</span> <span class="nx">$provide</span> <span class="o">=</span> <span class="p">{</span>
   <span class="na">constant</span><span class="p">:</span> <span class="kd">function</span><span class="p">(</span><span class="nx">key</span><span class="p">,</span> <span class="nx">value</span><span class="p">)</span> <span class="p">{</span>
               <span class="nx">cache</span><span class="p">[</span><span class="nx">key</span><span class="p">]</span> <span class="o">=</span> <span class="nx">value</span><span class="p">;</span>
             <span class="p">}</span>
 <span class="p">};</span>
-</code></pre></div>
+</code></pre>
+</div>
+
 <blockquote>
-<p>感觉好像凡是允许创建object的地方都要检查下，不能允许用户定义<code>hasOwnProperty</code>key...</p>
+  <p>感觉好像凡是允许创建object的地方都要检查下，不能允许用户定义<code class="highlighter-rouge">hasOwnProperty</code>key…</p>
 </blockquote>
 
 <p>injector实例化module后，对外提供接口</p>
-<div class="highlight"><pre><code class="language-js" data-lang="js"><span class="k">return</span> <span class="p">{</span>
+
+<div class="language-js highlighter-rouge"><pre class="highlight"><code><span class="k">return</span> <span class="p">{</span>
   <span class="na">has</span><span class="p">:</span> <span class="kd">function</span><span class="p">(</span><span class="nx">key</span><span class="p">)</span> <span class="p">{</span><span class="k">return</span> <span class="nx">cache</span><span class="p">.</span><span class="nx">hasOwnProperty</span><span class="p">(</span><span class="nx">key</span><span class="p">);</span> <span class="p">},</span>
   <span class="na">get</span><span class="p">:</span> <span class="kd">function</span><span class="p">(</span><span class="nx">key</span><span class="p">)</span> <span class="p">{</span> <span class="k">return</span> <span class="nx">cache</span><span class="p">[</span><span class="nx">key</span><span class="p">];</span> <span class="p">}</span>
 <span class="p">};</span>
-</code></pre></div>
-<h4>module 依赖的时候</h4>
-<div class="highlight"><pre><code class="language-js" data-lang="js"><span class="c1">// spec</span>
+</code></pre>
+</div>
+
+<h4 id="module-">module 依赖的时候</h4>
+
+<div class="language-js highlighter-rouge"><pre class="highlight"><code><span class="c1">// spec</span>
 <span class="nx">it</span><span class="p">(</span><span class="s1">'loads the transitively required modules of a module'</span><span class="p">,</span> <span class="kd">function</span><span class="p">()</span> <span class="p">{</span>
   <span class="kd">var</span> <span class="nx">module1</span> <span class="o">=</span> <span class="nx">angular</span><span class="p">.</span><span class="nx">module</span><span class="p">(</span><span class="s1">'myModule'</span><span class="p">,</span> <span class="p">[]);</span>
   <span class="kd">var</span> <span class="nx">module2</span> <span class="o">=</span> <span class="nx">angular</span><span class="p">.</span><span class="nx">module</span><span class="p">(</span><span class="s1">'myOtherModule'</span><span class="p">,</span> <span class="p">[</span><span class="s1">'myModule'</span><span class="p">]);</span>
@@ -145,7 +164,10 @@
   <span class="nx">expect</span><span class="p">(</span><span class="nx">injector</span><span class="p">.</span><span class="nx">has</span><span class="p">(</span><span class="s1">'anotherConstant'</span><span class="p">)).</span><span class="nx">toBe</span><span class="p">(</span><span class="kc">true</span><span class="p">);</span> 
   <span class="nx">expect</span><span class="p">(</span><span class="nx">injector</span><span class="p">.</span><span class="nx">has</span><span class="p">(</span><span class="s1">'aThirdConstant'</span><span class="p">)).</span><span class="nx">toBe</span><span class="p">(</span><span class="kc">true</span><span class="p">);</span>
 <span class="p">});</span>
-</code></pre></div><div class="highlight"><pre><code class="language-js" data-lang="js"><span class="nx">_</span><span class="p">.</span><span class="nx">forEach</span><span class="p">(</span><span class="nx">modulesToLoad</span><span class="p">,</span> <span class="kd">function</span> <span class="nx">loadModule</span><span class="p">(</span><span class="nx">moduleName</span><span class="p">)</span> <span class="p">{</span>
+</code></pre>
+</div>
+
+<div class="language-js highlighter-rouge"><pre class="highlight"><code><span class="nx">_</span><span class="p">.</span><span class="nx">forEach</span><span class="p">(</span><span class="nx">modulesToLoad</span><span class="p">,</span> <span class="kd">function</span> <span class="nx">loadModule</span><span class="p">(</span><span class="nx">moduleName</span><span class="p">)</span> <span class="p">{</span>
   <span class="kd">var</span> <span class="nx">module</span> <span class="o">=</span> <span class="nx">angular</span><span class="p">.</span><span class="nx">module</span><span class="p">(</span><span class="nx">moduleName</span><span class="p">);</span> 
   <span class="c1">// 递归的load</span>
   <span class="nx">_</span><span class="p">.</span><span class="nx">forEach</span><span class="p">(</span><span class="nx">module</span><span class="p">.</span><span class="nx">requires</span><span class="p">,</span> <span class="nx">loadModule</span><span class="p">);</span> 
@@ -155,23 +177,32 @@
     <span class="nx">$provide</span><span class="p">[</span><span class="nx">method</span><span class="p">].</span><span class="nx">apply</span><span class="p">(</span><span class="nx">$provide</span><span class="p">,</span> <span class="nx">args</span><span class="p">);</span>
   <span class="p">});</span> 
 <span class="p">});</span>
-</code></pre></div>
+</code></pre>
+</div>
+
 <p><strong><em>circular dependency的问题</em></strong></p>
-<div class="highlight"><pre><code class="language-js" data-lang="js"><span class="nx">it</span><span class="p">(</span><span class="s1">'loads each module only once'</span><span class="p">,</span> <span class="kd">function</span><span class="p">()</span> <span class="p">{</span> 
+
+<div class="language-js highlighter-rouge"><pre class="highlight"><code><span class="nx">it</span><span class="p">(</span><span class="s1">'loads each module only once'</span><span class="p">,</span> <span class="kd">function</span><span class="p">()</span> <span class="p">{</span> 
   <span class="nx">angular</span><span class="p">.</span><span class="nx">module</span><span class="p">(</span><span class="s1">'myModule'</span><span class="p">,</span> <span class="p">[</span><span class="s1">'myOtherModule'</span><span class="p">]);</span> 
   <span class="nx">angular</span><span class="p">.</span><span class="nx">module</span><span class="p">(</span><span class="s1">'myOtherModule'</span><span class="p">,</span> <span class="p">[</span><span class="s1">'myModule'</span><span class="p">]);</span>
 
   <span class="nx">createInjector</span><span class="p">([</span><span class="s1">'myModule'</span><span class="p">]);</span>
 <span class="p">});</span>
-</code></pre></div>
-<p>为解决这个问题，引入<code>var loadedModules = {};</code> object, 记录加载了哪些<code>module</code></p>
-<div class="highlight"><pre><code class="language-js" data-lang="js"><span class="nx">_</span><span class="p">.</span><span class="nx">forEach</span><span class="p">(</span><span class="nx">modulesToLoad</span><span class="p">,</span> <span class="kd">function</span> <span class="nx">loadModule</span><span class="p">(</span><span class="nx">moduleName</span><span class="p">)</span> <span class="p">{</span> 
+</code></pre>
+</div>
+
+<p>为解决这个问题，引入<code class="highlighter-rouge">var loadedModules = {};</code> object, 记录加载了哪些<code class="highlighter-rouge">module</code></p>
+
+<div class="language-js highlighter-rouge"><pre class="highlight"><code><span class="nx">_</span><span class="p">.</span><span class="nx">forEach</span><span class="p">(</span><span class="nx">modulesToLoad</span><span class="p">,</span> <span class="kd">function</span> <span class="nx">loadModule</span><span class="p">(</span><span class="nx">moduleName</span><span class="p">)</span> <span class="p">{</span> 
   <span class="k">if</span> <span class="p">(</span><span class="o">!</span><span class="nx">loadedModules</span><span class="p">.</span><span class="nx">hasOwnProperty</span><span class="p">(</span><span class="nx">moduleName</span><span class="p">))</span> <span class="p">{</span>
     <span class="nx">loadedModules</span><span class="p">[</span><span class="nx">moduleName</span><span class="p">]</span> <span class="o">=</span> <span class="kc">true</span><span class="p">;</span>
     <span class="p">...</span>
-</code></pre></div>
-<h3>Dependency Injection</h3>
-<div class="highlight"><pre><code class="language-js" data-lang="js"><span class="nx">it</span><span class="p">(</span><span class="s1">'invokes an annotated function with dependency injection'</span><span class="p">,</span> <span class="kd">function</span><span class="p">()</span> <span class="p">{</span>
+</code></pre>
+</div>
+
+<h3 id="dependency-injection">Dependency Injection</h3>
+
+<div class="language-js highlighter-rouge"><pre class="highlight"><code><span class="nx">it</span><span class="p">(</span><span class="s1">'invokes an annotated function with dependency injection'</span><span class="p">,</span> <span class="kd">function</span><span class="p">()</span> <span class="p">{</span>
   <span class="kd">var</span> <span class="nx">module</span> <span class="o">=</span> <span class="nx">angular</span><span class="p">.</span><span class="nx">module</span><span class="p">(</span><span class="s1">'myModule'</span><span class="p">,</span> <span class="p">[]);</span>
   <span class="nx">module</span><span class="p">.</span><span class="nx">constant</span><span class="p">(</span><span class="s1">'a'</span><span class="p">,</span> <span class="mi">1</span><span class="p">);</span>
   <span class="nx">module</span><span class="p">.</span><span class="nx">constant</span><span class="p">(</span><span class="s1">'b'</span><span class="p">,</span> <span class="mi">2</span><span class="p">);</span>
@@ -190,9 +221,12 @@
   <span class="p">});</span>
   <span class="k">return</span> <span class="nx">fn</span><span class="p">.</span><span class="nx">apply</span><span class="p">(</span><span class="kc">null</span><span class="p">,</span> <span class="nx">args</span><span class="p">);</span> 
 <span class="p">}</span>
-</code></pre></div>
+</code></pre>
+</div>
+
 <p>当函数是object value时，this需要注意处理</p>
-<div class="highlight"><pre><code class="language-js" data-lang="js"><span class="nx">it</span><span class="p">(</span><span class="s1">'invokes a function with the given this context'</span><span class="p">,</span> <span class="kd">function</span><span class="p">()</span> <span class="p">{</span> 
+
+<div class="language-js highlighter-rouge"><pre class="highlight"><code><span class="nx">it</span><span class="p">(</span><span class="s1">'invokes a function with the given this context'</span><span class="p">,</span> <span class="kd">function</span><span class="p">()</span> <span class="p">{</span> 
   <span class="kd">var</span> <span class="nx">module</span> <span class="o">=</span> <span class="nx">angular</span><span class="p">.</span><span class="nx">module</span><span class="p">(</span><span class="s1">'myModule'</span><span class="p">,</span> <span class="p">[]);</span> 
   <span class="nx">module</span><span class="p">.</span><span class="nx">constant</span><span class="p">(</span><span class="s1">'a'</span><span class="p">,</span> <span class="mi">1</span><span class="p">);</span>
   <span class="kd">var</span> <span class="nx">injector</span> <span class="o">=</span> <span class="nx">createInjector</span><span class="p">([</span><span class="s1">'myModule'</span><span class="p">]);</span>
@@ -203,7 +237,10 @@
   <span class="nx">obj</span><span class="p">.</span><span class="nx">fn</span><span class="p">.</span><span class="nx">$inject</span> <span class="o">=</span> <span class="p">[</span><span class="s1">'a'</span><span class="p">];</span>
   <span class="nx">expect</span><span class="p">(</span><span class="nx">injector</span><span class="p">.</span><span class="nx">invoke</span><span class="p">(</span><span class="nx">obj</span><span class="p">.</span><span class="nx">fn</span><span class="p">,</span> <span class="nx">obj</span><span class="p">)).</span><span class="nx">toBe</span><span class="p">(</span><span class="mi">3</span><span class="p">);</span>
 <span class="p">});</span>
-</code></pre></div><div class="highlight"><pre><code class="language-js" data-lang="js"><span class="kd">function</span> <span class="nx">invoke</span><span class="p">(</span><span class="nx">fn</span><span class="p">,</span> <span class="nx">self</span><span class="p">)</span> <span class="p">{</span>
+</code></pre>
+</div>
+
+<div class="language-js highlighter-rouge"><pre class="highlight"><code><span class="kd">function</span> <span class="nx">invoke</span><span class="p">(</span><span class="nx">fn</span><span class="p">,</span> <span class="nx">self</span><span class="p">)</span> <span class="p">{</span>
   <span class="kd">var</span> <span class="nx">args</span> <span class="o">=</span> <span class="nx">_</span><span class="p">.</span><span class="nx">map</span><span class="p">(</span><span class="nx">fn</span><span class="p">.</span><span class="nx">$inject</span><span class="p">,</span> <span class="kd">function</span><span class="p">(</span><span class="nx">token</span><span class="p">)</span> <span class="p">{</span>
     <span class="k">if</span> <span class="p">(</span><span class="nx">_</span><span class="p">.</span><span class="nx">isString</span><span class="p">(</span><span class="nx">token</span><span class="p">))</span> <span class="p">{</span> 
       <span class="k">return</span> <span class="nx">cache</span><span class="p">[</span><span class="nx">token</span><span class="p">];</span>
@@ -214,9 +251,12 @@
   <span class="c1">// 之前是null</span>
   <span class="k">return</span> <span class="nx">fn</span><span class="p">.</span><span class="nx">apply</span><span class="p">(</span><span class="nx">self</span><span class="p">,</span> <span class="nx">args</span><span class="p">);</span> 
 <span class="p">}</span>
-</code></pre></div>
+</code></pre>
+</div>
+
 <p>有的时候我们需要覆盖掉为fn提供的变量</p>
-<div class="highlight"><pre><code class="language-js" data-lang="js"><span class="nx">it</span><span class="p">(</span><span class="s1">'overrides dependencies with locals when invoking'</span><span class="p">,</span> <span class="kd">function</span><span class="p">()</span> <span class="p">{</span>
+
+<div class="language-js highlighter-rouge"><pre class="highlight"><code><span class="nx">it</span><span class="p">(</span><span class="s1">'overrides dependencies with locals when invoking'</span><span class="p">,</span> <span class="kd">function</span><span class="p">()</span> <span class="p">{</span>
   <span class="kd">var</span> <span class="nx">module</span> <span class="o">=</span> <span class="nx">angular</span><span class="p">.</span><span class="nx">module</span><span class="p">(</span><span class="s1">'myModule'</span><span class="p">,</span> <span class="p">[]);</span>
   <span class="nx">module</span><span class="p">.</span><span class="nx">constant</span><span class="p">(</span><span class="s1">'a'</span><span class="p">,</span> <span class="mi">1</span><span class="p">);</span>
   <span class="nx">module</span><span class="p">.</span><span class="nx">constant</span><span class="p">(</span><span class="s1">'b'</span><span class="p">,</span> <span class="mi">2</span><span class="p">);</span>
@@ -227,7 +267,10 @@
   <span class="c1">// 我们提供b覆盖modle的b</span>
   <span class="nx">expect</span><span class="p">(</span><span class="nx">injector</span><span class="p">.</span><span class="nx">invoke</span><span class="p">(</span><span class="nx">fn</span><span class="p">,</span> <span class="kc">undefined</span><span class="p">,</span> <span class="p">{</span><span class="na">b</span><span class="p">:</span> <span class="mi">3</span><span class="p">})).</span><span class="nx">toBe</span><span class="p">(</span><span class="mi">4</span><span class="p">);</span>
 <span class="p">});</span>
-</code></pre></div><div class="highlight"><pre><code class="language-js" data-lang="js"><span class="c1">// 添加了locals变量</span>
+</code></pre>
+</div>
+
+<div class="language-js highlighter-rouge"><pre class="highlight"><code><span class="c1">// 添加了locals变量</span>
 <span class="kd">function</span> <span class="nx">invoke</span><span class="p">(</span><span class="nx">fn</span><span class="p">,</span> <span class="nx">self</span><span class="p">,</span> <span class="nx">locals</span><span class="p">)</span> <span class="p">{</span>
   <span class="kd">var</span> <span class="nx">args</span> <span class="o">=</span> <span class="nx">_</span><span class="p">.</span><span class="nx">map</span><span class="p">(</span><span class="nx">fn</span><span class="p">.</span><span class="nx">$inject</span><span class="p">,</span> <span class="kd">function</span><span class="p">(</span><span class="nx">token</span><span class="p">)</span> <span class="p">{</span>
     <span class="k">if</span> <span class="p">(</span><span class="nx">_</span><span class="p">.</span><span class="nx">isString</span><span class="p">(</span><span class="nx">token</span><span class="p">))</span> <span class="p">{</span>
@@ -241,9 +284,12 @@
   <span class="p">});</span>
   <span class="k">return</span> <span class="nx">fn</span><span class="p">.</span><span class="nx">apply</span><span class="p">(</span><span class="nx">self</span><span class="p">,</span> <span class="nx">args</span><span class="p">);</span> 
 <span class="p">}</span>
-</code></pre></div>
-<h4>Array-Style Dependency Annotation</h4>
-<div class="highlight"><pre><code class="language-js" data-lang="js"><span class="c1">// spec</span>
+</code></pre>
+</div>
+
+<h4 id="array-style-dependency-annotation">Array-Style Dependency Annotation</h4>
+
+<div class="language-js highlighter-rouge"><pre class="highlight"><code><span class="c1">// spec</span>
 <span class="kd">var</span> <span class="nx">injector</span> <span class="o">=</span> <span class="nx">createInjector</span><span class="p">([]);</span> 
 <span class="kd">var</span> <span class="nx">fn</span> <span class="o">=</span> <span class="kd">function</span><span class="p">()</span> <span class="p">{</span> <span class="p">};</span>
 <span class="nx">fn</span><span class="p">.</span><span class="nx">$inject</span> <span class="o">=</span> <span class="p">[</span><span class="s1">'a'</span><span class="p">,</span> <span class="s1">'b'</span><span class="p">];</span>
@@ -254,7 +300,10 @@
 <span class="kd">var</span> <span class="nx">injector</span> <span class="o">=</span> <span class="nx">createInjector</span><span class="p">([]);</span>
 <span class="kd">var</span> <span class="nx">fn</span> <span class="o">=</span> <span class="p">[</span><span class="s1">'a'</span><span class="p">,</span> <span class="s1">'b'</span><span class="p">,</span> <span class="kd">function</span><span class="p">()</span> <span class="p">{</span> <span class="p">}];</span> 
 <span class="nx">expect</span><span class="p">(</span><span class="nx">injector</span><span class="p">.</span><span class="nx">annotate</span><span class="p">(</span><span class="nx">fn</span><span class="p">)).</span><span class="nx">toEqual</span><span class="p">([</span><span class="s1">'a'</span><span class="p">,</span> <span class="s1">'b'</span><span class="p">]);</span>
-</code></pre></div><div class="highlight"><pre><code class="language-js" data-lang="js"><span class="kd">function</span> <span class="nx">annotate</span><span class="p">(</span><span class="nx">fn</span><span class="p">)</span> <span class="p">{</span> 
+</code></pre>
+</div>
+
+<div class="language-js highlighter-rouge"><pre class="highlight"><code><span class="kd">function</span> <span class="nx">annotate</span><span class="p">(</span><span class="nx">fn</span><span class="p">)</span> <span class="p">{</span> 
   <span class="k">if</span> <span class="p">(</span><span class="nx">_</span><span class="p">.</span><span class="nx">isArray</span><span class="p">(</span><span class="nx">fn</span><span class="p">))</span> <span class="p">{</span>
     <span class="k">return</span> <span class="nx">fn</span><span class="p">.</span><span class="nx">slice</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="nx">fn</span><span class="p">.</span><span class="nx">length</span> <span class="o">-</span> <span class="mi">1</span><span class="p">);</span> 
   <span class="p">}</span> <span class="k">else</span> <span class="k">if</span> <span class="p">(</span><span class="nx">fn</span><span class="p">.</span><span class="nx">$inject</span><span class="p">)</span> <span class="p">{</span>
@@ -263,14 +312,20 @@
     <span class="k">return</span> <span class="p">[];</span> 
   <span class="p">}</span>
 <span class="p">}</span>
-</code></pre></div>
+</code></pre>
+</div>
+
 <p>有的时候fn没有提供参数。。。那么我们只能去fn的里边去找，从定义fn的表达式去找</p>
-<div class="highlight"><pre><code class="language-js" data-lang="js"><span class="kd">var</span> <span class="nx">injector</span> <span class="o">=</span> <span class="nx">createInjector</span><span class="p">([]);</span>
+
+<div class="language-js highlighter-rouge"><pre class="highlight"><code><span class="kd">var</span> <span class="nx">injector</span> <span class="o">=</span> <span class="nx">createInjector</span><span class="p">([]);</span>
 <span class="kd">var</span> <span class="nx">fn</span> <span class="o">=</span> <span class="kd">function</span><span class="p">(</span><span class="nx">a</span><span class="p">,</span> <span class="nx">b</span><span class="p">)</span> <span class="p">{</span> <span class="p">};</span> 
 <span class="nx">expect</span><span class="p">(</span><span class="nx">injector</span><span class="p">.</span><span class="nx">annotate</span><span class="p">(</span><span class="nx">fn</span><span class="p">)).</span><span class="nx">toEqual</span><span class="p">([</span><span class="s1">'a'</span><span class="p">,</span> <span class="s1">'b'</span><span class="p">]);</span>
-</code></pre></div>
+</code></pre>
+</div>
+
 <p>使用正则表达式</p>
-<div class="highlight"><pre><code class="language-js" data-lang="js"><span class="c1">// match arguments</span>
+
+<div class="language-js highlighter-rouge"><pre class="highlight"><code><span class="c1">// match arguments</span>
 <span class="kd">var</span> <span class="nx">FN_ARGS</span> <span class="o">=</span> <span class="sr">/^function</span><span class="se">\s</span><span class="sr">*</span><span class="se">[^\(]</span><span class="sr">*</span><span class="se">\(\s</span><span class="sr">*</span><span class="se">([^\)]</span><span class="sr">*</span><span class="se">)\)</span><span class="sr">/m</span><span class="p">;</span>
 
 <span class="c1">// match any heading and trailing whitespace in a string</span>
@@ -290,26 +345,35 @@
     <span class="p">});</span>
   <span class="p">}</span> 
 <span class="p">}</span>
-</code></pre></div>
+</code></pre>
+</div>
+
 <p>此处省略一大段处理代码中有comment的内容</p>
 
 <p>还要处理函数参数有下划线的情况,此处省略。。。</p>
-<div class="highlight"><pre><code class="language-js" data-lang="js"><span class="kd">var</span> <span class="nx">injector</span> <span class="o">=</span> <span class="nx">createInjector</span><span class="p">([]);</span>
+
+<div class="language-js highlighter-rouge"><pre class="highlight"><code><span class="kd">var</span> <span class="nx">injector</span> <span class="o">=</span> <span class="nx">createInjector</span><span class="p">([]);</span>
 <span class="kd">var</span> <span class="nx">fn</span> <span class="o">=</span> <span class="kd">function</span><span class="p">(</span><span class="nx">a</span><span class="p">,</span> <span class="nx">_b_</span><span class="p">,</span> <span class="nx">c_</span><span class="p">,</span> <span class="nx">_d</span><span class="p">,</span> <span class="nx">an_argument</span><span class="p">)</span> <span class="p">{</span> <span class="p">};</span> 
 <span class="nx">expect</span><span class="p">(</span><span class="nx">injector</span><span class="p">.</span><span class="nx">annotate</span><span class="p">(</span><span class="nx">fn</span><span class="p">)).</span><span class="nx">toEqual</span><span class="p">([</span><span class="s1">'a'</span><span class="p">,</span> <span class="s1">'b'</span><span class="p">,</span> <span class="s1">'c_'</span><span class="p">,</span> <span class="s1">'_d'</span><span class="p">,</span> <span class="s1">'an_argument'</span><span class="p">]);</span>
-</code></pre></div>
-<h4>Integrating Annotation with Invocation</h4>
+</code></pre>
+</div>
 
-<p>We are now able to extract dependency names using the three different methods that Angular supports: <code>$inject</code>, <code>array wrapper</code>, and <code>function source extraction</code>.</p>
-<div class="highlight"><pre><code class="language-js" data-lang="js"><span class="c1">// spec</span>
+<h4 id="integrating-annotation-with-invocation">Integrating Annotation with Invocation</h4>
+
+<p>We are now able to extract dependency names using the three different methods that Angular supports: <code class="highlighter-rouge">$inject</code>, <code class="highlighter-rouge">array wrapper</code>, and <code class="highlighter-rouge">function source extraction</code>.</p>
+
+<div class="language-js highlighter-rouge"><pre class="highlight"><code><span class="c1">// spec</span>
 <span class="kd">var</span> <span class="nx">fn</span> <span class="o">=</span> <span class="p">[</span><span class="s1">'a'</span><span class="p">,</span> <span class="s1">'b'</span><span class="p">,</span> <span class="kd">function</span><span class="p">(</span><span class="nx">one</span><span class="p">,</span> <span class="nx">two</span><span class="p">)</span> <span class="p">{</span> <span class="k">return</span> <span class="nx">one</span> <span class="o">+</span> <span class="nx">two</span><span class="p">;</span> <span class="p">}];</span>
 <span class="nx">expect</span><span class="p">(</span><span class="nx">injector</span><span class="p">.</span><span class="nx">invoke</span><span class="p">(</span><span class="nx">fn</span><span class="p">)).</span><span class="nx">toBe</span><span class="p">(</span><span class="mi">3</span><span class="p">);</span>
 
 <span class="kd">var</span> <span class="nx">fn</span> <span class="o">=</span> <span class="kd">function</span><span class="p">(</span><span class="nx">a</span><span class="p">,</span> <span class="nx">b</span><span class="p">)</span> <span class="p">{</span> <span class="k">return</span> <span class="nx">a</span> <span class="o">+</span> <span class="nx">b</span><span class="p">;</span> <span class="p">};</span>
 <span class="nx">expect</span><span class="p">(</span><span class="nx">injector</span><span class="p">.</span><span class="nx">invoke</span><span class="p">(</span><span class="nx">fn</span><span class="p">)).</span><span class="nx">toBe</span><span class="p">(</span><span class="mi">3</span><span class="p">);</span>
-</code></pre></div>
-<h4>Instantiating Objects with Dependency Injection</h4>
-<div class="highlight"><pre><code class="language-js" data-lang="js"><span class="nx">it</span><span class="p">(</span><span class="s1">'instantiates an annotated constructor function'</span><span class="p">,</span> <span class="kd">function</span><span class="p">()</span> <span class="p">{</span> 
+</code></pre>
+</div>
+
+<h4 id="instantiating-objects-with-dependency-injection">Instantiating Objects with Dependency Injection</h4>
+
+<div class="language-js highlighter-rouge"><pre class="highlight"><code><span class="nx">it</span><span class="p">(</span><span class="s1">'instantiates an annotated constructor function'</span><span class="p">,</span> <span class="kd">function</span><span class="p">()</span> <span class="p">{</span> 
   <span class="kd">var</span> <span class="nx">module</span> <span class="o">=</span> <span class="nx">angular</span><span class="p">.</span><span class="nx">module</span><span class="p">(</span><span class="s1">'myModule'</span><span class="p">,</span> <span class="p">[]);</span> 
   <span class="nx">module</span><span class="p">.</span><span class="nx">constant</span><span class="p">(</span><span class="s1">'a'</span><span class="p">,</span> <span class="mi">1</span><span class="p">);</span>
   <span class="nx">module</span><span class="p">.</span><span class="nx">constant</span><span class="p">(</span><span class="s1">'b'</span><span class="p">,</span> <span class="mi">2</span><span class="p">);</span>
@@ -329,31 +393,40 @@
   <span class="kd">var</span> <span class="nx">instance</span> <span class="o">=</span> <span class="nx">injector</span><span class="p">.</span><span class="nx">instantiate</span><span class="p">(</span><span class="nx">Type</span><span class="p">);</span>
   <span class="nx">expect</span><span class="p">(</span><span class="nx">instance</span><span class="p">.</span><span class="nx">result</span><span class="p">).</span><span class="nx">toBe</span><span class="p">(</span><span class="mi">3</span><span class="p">);</span>
 <span class="p">});</span>
-</code></pre></div>
+</code></pre>
+</div>
+
 <p>简单实现的instantiate函数</p>
-<div class="highlight"><pre><code class="language-js" data-lang="js"><span class="kd">function</span> <span class="nx">instantiate</span><span class="p">(</span><span class="nx">Type</span><span class="p">)</span> <span class="p">{</span> 
+
+<div class="language-js highlighter-rouge"><pre class="highlight"><code><span class="kd">function</span> <span class="nx">instantiate</span><span class="p">(</span><span class="nx">Type</span><span class="p">)</span> <span class="p">{</span> 
   <span class="kd">var</span> <span class="nx">instance</span> <span class="o">=</span> <span class="p">{};</span> 
   <span class="c1">// invoke在上边实现过，相当于Type.apply(null, instance)</span>
   <span class="nx">invoke</span><span class="p">(</span><span class="nx">Type</span><span class="p">,</span> <span class="nx">instance</span><span class="p">);</span> 
   <span class="k">return</span> <span class="nx">instance</span><span class="p">;</span>
 <span class="p">}</span>
-</code></pre></div>
+</code></pre>
+</div>
+
 <p>上边的实现测试可以通过，但是与new 构造函数相比，上边的方法还是有区别的</p>
 
-<p>When you construct an object with <code>new</code>, you also set up the prototype chain of the object based on the prototype chain of the constructor.We should respect this behavior in <code>injector.instantiate</code>.</p>
-<div class="highlight"><pre><code class="language-js" data-lang="js"><span class="kd">function</span> <span class="nx">instantiate</span><span class="p">(</span><span class="nx">Type</span><span class="p">)</span> <span class="p">{</span>
+<p>When you construct an object with <code class="highlighter-rouge">new</code>, you also set up the prototype chain of the object based on the prototype chain of the constructor.We should respect this behavior in <code class="highlighter-rouge">injector.instantiate</code>.</p>
+
+<div class="language-js highlighter-rouge"><pre class="highlight"><code><span class="kd">function</span> <span class="nx">instantiate</span><span class="p">(</span><span class="nx">Type</span><span class="p">)</span> <span class="p">{</span>
   <span class="kd">var</span> <span class="nx">UnwrappedType</span> <span class="o">=</span> <span class="nx">_</span><span class="p">.</span><span class="nx">isArray</span><span class="p">(</span><span class="nx">Type</span><span class="p">)</span> <span class="p">?</span> <span class="nx">_</span><span class="p">.</span><span class="nx">last</span><span class="p">(</span><span class="nx">Type</span><span class="p">)</span> <span class="p">:</span> <span class="nx">Type</span><span class="p">;</span> 
   <span class="kd">var</span> <span class="nx">instance</span> <span class="o">=</span> <span class="nb">Object</span><span class="p">.</span><span class="nx">create</span><span class="p">(</span><span class="nx">UnwrappedType</span><span class="p">.</span><span class="nx">prototype</span><span class="p">);</span> 
   <span class="nx">invoke</span><span class="p">(</span><span class="nx">Type</span><span class="p">,</span> <span class="nx">instance</span><span class="p">);</span>
   <span class="k">return</span> <span class="nx">instance</span><span class="p">;</span>
 <span class="p">}</span>
-</code></pre></div>
-<hr>
+</code></pre>
+</div>
 
-<h3>invoke函数进化史</h3>
+<hr />
 
-<p><code>angular</code>要实现依赖注入，要实现函数可以自动寻找所需参数的功能，比如<code>function(a,b)</code>,<code>angular</code>可以在运行时找到模块中已有的<code>a,b</code>,<code>invoke</code>就是负责准备函数所需的参数，然后运行函数</p>
-<div class="highlight"><pre><code class="language-js" data-lang="js"><span class="kd">function</span> <span class="nx">invoke</span><span class="p">(</span><span class="nx">fn</span><span class="p">)</span> <span class="p">{</span>
+<h3 id="invoke">invoke函数进化史</h3>
+
+<p><code class="highlighter-rouge">angular</code>要实现依赖注入，要实现函数可以自动寻找所需参数的功能，比如<code class="highlighter-rouge">function(a,b)</code>,<code class="highlighter-rouge">angular</code>可以在运行时找到模块中已有的<code class="highlighter-rouge">a,b</code>,<code class="highlighter-rouge">invoke</code>就是负责准备函数所需的参数，然后运行函数</p>
+
+<div class="language-js highlighter-rouge"><pre class="highlight"><code><span class="kd">function</span> <span class="nx">invoke</span><span class="p">(</span><span class="nx">fn</span><span class="p">)</span> <span class="p">{</span>
   <span class="kd">var</span> <span class="nx">args</span> <span class="o">=</span> <span class="nx">_</span><span class="p">.</span><span class="nx">map</span><span class="p">(</span><span class="nx">fn</span><span class="p">.</span><span class="nx">$inject</span><span class="p">,</span> <span class="kd">function</span><span class="p">(</span><span class="nx">token</span><span class="p">)</span> <span class="p">{</span>
     <span class="k">if</span> <span class="p">(</span><span class="nx">_</span><span class="p">.</span><span class="nx">isString</span><span class="p">(</span><span class="nx">token</span><span class="p">))</span> <span class="p">{</span> 
       <span class="k">return</span> <span class="nx">cache</span><span class="p">[</span><span class="nx">token</span><span class="p">];</span>
@@ -363,9 +436,12 @@
   <span class="p">});</span>
   <span class="k">return</span> <span class="nx">fn</span><span class="p">.</span><span class="nx">apply</span><span class="p">(</span><span class="kc">null</span><span class="p">,</span> <span class="nx">args</span><span class="p">);</span> 
 <span class="p">}</span>
-</code></pre></div>
-<p>当spec是下边的时候我们就要注意一下<code>this</code>的问题，上边调用函数的语句是<code>fn.apply(null, args)</code>，没有this什么事。可是如果fn是一个obj中的value,并且fn中调用了obj中的其他值的话，之前<code>fn.apply(null, args)</code>的写法就是有问题的，我们要改写为<code>fn.apply(this, args)</code></p>
-<div class="highlight"><pre><code class="language-js" data-lang="js"><span class="nx">it</span><span class="p">(</span><span class="s1">'invokes a function with the given this context'</span><span class="p">,</span> <span class="kd">function</span><span class="p">()</span> <span class="p">{</span> 
+</code></pre>
+</div>
+
+<p>当spec是下边的时候我们就要注意一下<code class="highlighter-rouge">this</code>的问题，上边调用函数的语句是<code class="highlighter-rouge">fn.apply(null, args)</code>，没有this什么事。可是如果fn是一个obj中的value,并且fn中调用了obj中的其他值的话，之前<code class="highlighter-rouge">fn.apply(null, args)</code>的写法就是有问题的，我们要改写为<code class="highlighter-rouge">fn.apply(this, args)</code></p>
+
+<div class="language-js highlighter-rouge"><pre class="highlight"><code><span class="nx">it</span><span class="p">(</span><span class="s1">'invokes a function with the given this context'</span><span class="p">,</span> <span class="kd">function</span><span class="p">()</span> <span class="p">{</span> 
   <span class="kd">var</span> <span class="nx">module</span> <span class="o">=</span> <span class="nx">angular</span><span class="p">.</span><span class="nx">module</span><span class="p">(</span><span class="s1">'myModule'</span><span class="p">,</span> <span class="p">[]);</span> 
   <span class="nx">module</span><span class="p">.</span><span class="nx">constant</span><span class="p">(</span><span class="s1">'a'</span><span class="p">,</span> <span class="mi">1</span><span class="p">);</span>
   <span class="kd">var</span> <span class="nx">injector</span> <span class="o">=</span> <span class="nx">createInjector</span><span class="p">([</span><span class="s1">'myModule'</span><span class="p">]);</span>
@@ -374,7 +450,10 @@
   <span class="nx">obj</span><span class="p">.</span><span class="nx">fn</span><span class="p">.</span><span class="nx">$inject</span> <span class="o">=</span> <span class="p">[</span><span class="s1">'a'</span><span class="p">];</span>
   <span class="nx">expect</span><span class="p">(</span><span class="nx">injector</span><span class="p">.</span><span class="nx">invoke</span><span class="p">(</span><span class="nx">obj</span><span class="p">.</span><span class="nx">fn</span><span class="p">,</span> <span class="nx">obj</span><span class="p">)).</span><span class="nx">toBe</span><span class="p">(</span><span class="mi">3</span><span class="p">);</span>
 <span class="p">});</span>
-</code></pre></div><div class="highlight"><pre><code class="language-js" data-lang="js"><span class="kd">function</span> <span class="nx">invoke</span><span class="p">(</span><span class="nx">fn</span><span class="p">,</span> <span class="nx">self</span><span class="p">)</span> <span class="p">{</span>
+</code></pre>
+</div>
+
+<div class="language-js highlighter-rouge"><pre class="highlight"><code><span class="kd">function</span> <span class="nx">invoke</span><span class="p">(</span><span class="nx">fn</span><span class="p">,</span> <span class="nx">self</span><span class="p">)</span> <span class="p">{</span>
   <span class="kd">var</span> <span class="nx">args</span> <span class="o">=</span> <span class="nx">_</span><span class="p">.</span><span class="nx">map</span><span class="p">(</span><span class="nx">fn</span><span class="p">.</span><span class="nx">$inject</span><span class="p">,</span> <span class="kd">function</span><span class="p">(</span><span class="nx">token</span><span class="p">)</span> <span class="p">{</span>
     <span class="k">if</span> <span class="p">(</span><span class="nx">_</span><span class="p">.</span><span class="nx">isString</span><span class="p">(</span><span class="nx">token</span><span class="p">))</span> <span class="p">{</span> 
       <span class="k">return</span> <span class="nx">cache</span><span class="p">[</span><span class="nx">token</span><span class="p">];</span>
@@ -384,9 +463,12 @@
   <span class="p">});</span>
   <span class="k">return</span> <span class="nx">fn</span><span class="p">.</span><span class="nx">apply</span><span class="p">(</span><span class="nx">self</span><span class="p">,</span> <span class="nx">args</span><span class="p">);</span> 
 <span class="p">}</span>
-</code></pre></div>
-<p>我们还需要invoke函数可以接收locals, <code>injector.invoke(fn, undefined, {b: 3})</code>,所以准备参数的时候优先从<code>locals</code>找，然后再从<code>cache</code>中找</p>
-<div class="highlight"><pre><code class="language-js" data-lang="js"><span class="kd">function</span> <span class="nx">invoke</span><span class="p">(</span><span class="nx">fn</span><span class="p">,</span> <span class="nx">self</span><span class="p">,</span> <span class="nx">locals</span><span class="p">)</span> <span class="p">{</span>
+</code></pre>
+</div>
+
+<p>我们还需要invoke函数可以接收locals, <code class="highlighter-rouge">injector.invoke(fn, undefined, {b: 3})</code>,所以准备参数的时候优先从<code class="highlighter-rouge">locals</code>找，然后再从<code class="highlighter-rouge">cache</code>中找</p>
+
+<div class="language-js highlighter-rouge"><pre class="highlight"><code><span class="kd">function</span> <span class="nx">invoke</span><span class="p">(</span><span class="nx">fn</span><span class="p">,</span> <span class="nx">self</span><span class="p">,</span> <span class="nx">locals</span><span class="p">)</span> <span class="p">{</span>
   <span class="kd">var</span> <span class="nx">args</span> <span class="o">=</span> <span class="nx">_</span><span class="p">.</span><span class="nx">map</span><span class="p">(</span><span class="nx">fn</span><span class="p">.</span><span class="nx">$inject</span><span class="p">,</span> <span class="kd">function</span><span class="p">(</span><span class="nx">token</span><span class="p">)</span> <span class="p">{</span>
     <span class="k">if</span> <span class="p">(</span><span class="nx">_</span><span class="p">.</span><span class="nx">isString</span><span class="p">(</span><span class="nx">token</span><span class="p">))</span> <span class="p">{</span>
       <span class="k">return</span> <span class="nx">locals</span> <span class="o">&amp;&amp;</span> <span class="nx">locals</span><span class="p">.</span><span class="nx">hasOwnProperty</span><span class="p">(</span><span class="nx">token</span><span class="p">)</span> <span class="p">?</span>
@@ -398,11 +480,14 @@
   <span class="p">});</span>
   <span class="k">return</span> <span class="nx">fn</span><span class="p">.</span><span class="nx">apply</span><span class="p">(</span><span class="nx">self</span><span class="p">,</span> <span class="nx">args</span><span class="p">);</span> 
 <span class="p">}</span>
-</code></pre></div>
-<p>目前使用invoke的方式是<code>fn = function(m,n){}</code>, <code>injector.invoke(fn)</code>, <code>fn.$inject(a,b)</code>,写起来比较麻烦，我们希望这种写法 <code>[&#39;a&#39;, &#39;b&#39;, function(one, two) { return one + two; }]</code></p>
+</code></pre>
+</div>
 
-<p>添加<code>annotate</code>函数,用来获取函数所需的参数</p>
-<div class="highlight"><pre><code class="language-js" data-lang="js"><span class="kd">function</span> <span class="nx">annotate</span><span class="p">(</span><span class="nx">fn</span><span class="p">)</span> <span class="p">{</span>
+<p>目前使用invoke的方式是<code class="highlighter-rouge">fn = function(m,n){}</code>, <code class="highlighter-rouge">injector.invoke(fn)</code>, <code class="highlighter-rouge">fn.$inject(a,b)</code>,写起来比较麻烦，我们希望这种写法 <code class="highlighter-rouge">['a', 'b', function(one, two) { return one + two; }] </code></p>
+
+<p>添加<code class="highlighter-rouge">annotate</code>函数,用来获取函数所需的参数</p>
+
+<div class="language-js highlighter-rouge"><pre class="highlight"><code><span class="kd">function</span> <span class="nx">annotate</span><span class="p">(</span><span class="nx">fn</span><span class="p">)</span> <span class="p">{</span>
   <span class="k">if</span> <span class="p">(</span><span class="nx">_</span><span class="p">.</span><span class="nx">isArray</span><span class="p">(</span><span class="nx">fn</span><span class="p">))</span> <span class="p">{</span>
     <span class="k">return</span> <span class="nx">fn</span><span class="p">.</span><span class="nx">slice</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="nx">fn</span><span class="p">.</span><span class="nx">length</span> <span class="o">-</span> <span class="mi">1</span><span class="p">);</span>
   <span class="p">}</span> <span class="k">else</span> <span class="k">if</span> <span class="p">(</span><span class="nx">fn</span><span class="p">.</span><span class="nx">$inject</span><span class="p">)</span> <span class="p">{</span>
@@ -420,7 +505,10 @@
     <span class="p">});</span>
   <span class="p">}</span>
 <span class="p">}</span>
-</code></pre></div><div class="highlight"><pre><code class="language-js" data-lang="js"><span class="kd">function</span> <span class="nx">invoke</span><span class="p">(</span><span class="nx">fn</span><span class="p">,</span> <span class="nx">self</span><span class="p">,</span> <span class="nx">locals</span><span class="p">)</span> <span class="p">{</span>
+</code></pre>
+</div>
+
+<div class="language-js highlighter-rouge"><pre class="highlight"><code><span class="kd">function</span> <span class="nx">invoke</span><span class="p">(</span><span class="nx">fn</span><span class="p">,</span> <span class="nx">self</span><span class="p">,</span> <span class="nx">locals</span><span class="p">)</span> <span class="p">{</span>
   <span class="kd">var</span> <span class="nx">args</span> <span class="o">=</span> <span class="nx">_</span><span class="p">.</span><span class="nx">map</span><span class="p">(</span><span class="nx">annotate</span><span class="p">(</span><span class="nx">fn</span><span class="p">),</span> <span class="kd">function</span><span class="p">(</span><span class="nx">token</span><span class="p">)</span> <span class="p">{</span>
     <span class="k">if</span> <span class="p">(</span><span class="nx">_</span><span class="p">.</span><span class="nx">isString</span><span class="p">(</span><span class="nx">token</span><span class="p">))</span> <span class="p">{</span>
       <span class="k">return</span> <span class="nx">locals</span> <span class="o">&amp;&amp;</span> <span class="nx">locals</span><span class="p">.</span><span class="nx">hasOwnProperty</span><span class="p">(</span><span class="nx">token</span><span class="p">)</span> <span class="p">?</span>
@@ -435,13 +523,16 @@
   <span class="p">}</span>
   <span class="k">return</span> <span class="nx">fn</span><span class="p">.</span><span class="nx">apply</span><span class="p">(</span><span class="nx">self</span><span class="p">,</span> <span class="nx">args</span><span class="p">);</span>
 <span class="p">}</span>
-</code></pre></div>
-<hr>
+</code></pre>
+</div>
 
-<h3>instantiate函数的进化史</h3>
+<hr />
 
-<p>之前讲的都是注入<code>plain function</code>,其实也是可以注入<code>构造函数</code>的,使用<code>injector.instantiate</code></p>
-<div class="highlight"><pre><code class="language-js" data-lang="js"><span class="nx">it</span><span class="p">(</span><span class="s1">'instantiates an annotated constructor function'</span><span class="p">,</span> <span class="kd">function</span><span class="p">()</span> <span class="p">{</span> 
+<h3 id="instantiate">instantiate函数的进化史</h3>
+
+<p>之前讲的都是注入<code class="highlighter-rouge">plain function</code>,其实也是可以注入<code class="highlighter-rouge">构造函数</code>的,使用<code class="highlighter-rouge">injector.instantiate</code></p>
+
+<div class="language-js highlighter-rouge"><pre class="highlight"><code><span class="nx">it</span><span class="p">(</span><span class="s1">'instantiates an annotated constructor function'</span><span class="p">,</span> <span class="kd">function</span><span class="p">()</span> <span class="p">{</span> 
   <span class="kd">var</span> <span class="nx">module</span> <span class="o">=</span> <span class="nx">angular</span><span class="p">.</span><span class="nx">module</span><span class="p">(</span><span class="s1">'myModule'</span><span class="p">,</span> <span class="p">[]);</span> 
   <span class="nx">module</span><span class="p">.</span><span class="nx">constant</span><span class="p">(</span><span class="s1">'a'</span><span class="p">,</span> <span class="mi">1</span><span class="p">);</span>
   <span class="nx">module</span><span class="p">.</span><span class="nx">constant</span><span class="p">(</span><span class="s1">'b'</span><span class="p">,</span> <span class="mi">2</span><span class="p">);</span>
@@ -455,41 +546,53 @@
   <span class="kd">var</span> <span class="nx">instance</span> <span class="o">=</span> <span class="nx">injector</span><span class="p">.</span><span class="nx">instantiate</span><span class="p">(</span><span class="nx">Type</span><span class="p">);</span>
   <span class="nx">expect</span><span class="p">(</span><span class="nx">instance</span><span class="p">.</span><span class="nx">result</span><span class="p">).</span><span class="nx">toBe</span><span class="p">(</span><span class="mi">3</span><span class="p">);</span>
 <span class="p">});</span>
-</code></pre></div>
-<p>之前为了方便书写，<code>invoke</code>可以接受<code>array</code>形式的参数，<code>instantiate</code>也是可以的哦,形如<code>injector.instantiate([&#39;a&#39;, &#39;b&#39;, Type])</code>。也可以根据构造函数定义自动提取所需变量，利用正则表达式，<code>annotate</code>函数中有细节</p>
+</code></pre>
+</div>
+
+<p>之前为了方便书写，<code class="highlighter-rouge">invoke</code>可以接受<code class="highlighter-rouge">array</code>形式的参数，<code class="highlighter-rouge">instantiate</code>也是可以的哦,形如<code class="highlighter-rouge">injector.instantiate(['a', 'b', Type])</code>。也可以根据构造函数定义自动提取所需变量，利用正则表达式，<code class="highlighter-rouge">annotate</code>函数中有细节</p>
 
 <p>其实总起上感觉和上边invoke的使用方法是类似的</p>
 
 <p>先创建一个空对象，然后作为this运行构造函数,正好可以使用invoke函数</p>
-<div class="highlight"><pre><code class="language-js" data-lang="js"><span class="kd">function</span> <span class="nx">instantiate</span><span class="p">(</span><span class="nx">Type</span><span class="p">)</span> <span class="p">{</span>
+
+<div class="language-js highlighter-rouge"><pre class="highlight"><code><span class="kd">function</span> <span class="nx">instantiate</span><span class="p">(</span><span class="nx">Type</span><span class="p">)</span> <span class="p">{</span>
   <span class="kd">var</span> <span class="nx">instance</span> <span class="o">=</span> <span class="p">{};</span> 
   <span class="nx">invoke</span><span class="p">(</span><span class="nx">Type</span><span class="p">,</span> <span class="nx">instance</span><span class="p">);</span> 
   <span class="k">return</span> <span class="nx">instance</span><span class="p">;</span>
 <span class="p">}</span>
-</code></pre></div>
-<p>但是使用<code>invoke</code>并不完全等价使用<code>new Constructor()</code></p>
+</code></pre>
+</div>
 
-<p>我们知道js中创建一个类，需要构造函数来创建<code>instance variable</code>,用<code>constructor.prototype</code>来创建<code>instance method</code></p>
+<p>但是使用<code class="highlighter-rouge">invoke</code>并不完全等价使用<code class="highlighter-rouge">new Constructor()</code></p>
 
-<p><code>new Constructor()</code>除了建立一个新对象，运行<code>constructor</code>外，还会拥有<code>constructor.prototype</code>上定义的<code>instance method</code>, 这是怎么做到的呢？</p>
+<p>我们知道js中创建一个类，需要构造函数来创建<code class="highlighter-rouge">instance variable</code>,用<code class="highlighter-rouge">constructor.prototype</code>来创建<code class="highlighter-rouge">instance method</code></p>
 
-<p>这是因为在new的内部，新创建的obj的__proto__指向了<code>constructor.prototype</code>,恩，就是这样，所以我们需要多做一些事情</p>
-<div class="highlight"><pre><code class="language-js" data-lang="js"><span class="kd">function</span> <span class="nx">instantiate</span><span class="p">(</span><span class="nx">Type</span><span class="p">)</span> <span class="p">{</span>
+<p><code class="highlighter-rouge">new Constructor()</code>除了建立一个新对象，运行<code class="highlighter-rouge">constructor</code>外，还会拥有<code class="highlighter-rouge">constructor.prototype</code>上定义的<code class="highlighter-rouge">instance method</code>, 这是怎么做到的呢？</p>
+
+<p>这是因为在new的内部，新创建的obj的__proto__指向了<code class="highlighter-rouge">constructor.prototype</code>,恩，就是这样，所以我们需要多做一些事情</p>
+
+<div class="language-js highlighter-rouge"><pre class="highlight"><code><span class="kd">function</span> <span class="nx">instantiate</span><span class="p">(</span><span class="nx">Type</span><span class="p">)</span> <span class="p">{</span>
   <span class="kd">var</span> <span class="nx">UnwrappedType</span> <span class="o">=</span> <span class="nx">_</span><span class="p">.</span><span class="nx">isArray</span><span class="p">(</span><span class="nx">Type</span><span class="p">)</span> <span class="p">?</span> <span class="nx">_</span><span class="p">.</span><span class="nx">last</span><span class="p">(</span><span class="nx">Type</span><span class="p">)</span> <span class="p">:</span> <span class="nx">Type</span><span class="p">;</span> 
   <span class="kd">var</span> <span class="nx">instance</span> <span class="o">=</span> <span class="nb">Object</span><span class="p">.</span><span class="nx">create</span><span class="p">(</span><span class="nx">UnwrappedType</span><span class="p">.</span><span class="nx">prototype</span><span class="p">);</span> 
   <span class="nx">invoke</span><span class="p">(</span><span class="nx">Type</span><span class="p">,</span> <span class="nx">instance</span><span class="p">);</span>
   <span class="k">return</span> <span class="nx">instance</span><span class="p">;</span>
 <span class="p">}</span>
-</code></pre></div>
+</code></pre>
+</div>
+
 <p>也要支持locals</p>
-<div class="highlight"><pre><code class="language-js" data-lang="js"><span class="kd">function</span> <span class="nx">instantiate</span><span class="p">(</span><span class="nx">Type</span><span class="p">,</span> <span class="nx">locals</span><span class="p">)</span> <span class="p">{</span>
+
+<div class="language-js highlighter-rouge"><pre class="highlight"><code><span class="kd">function</span> <span class="nx">instantiate</span><span class="p">(</span><span class="nx">Type</span><span class="p">,</span> <span class="nx">locals</span><span class="p">)</span> <span class="p">{</span>
   <span class="kd">var</span> <span class="nx">UnwrappedType</span> <span class="o">=</span> <span class="nx">_</span><span class="p">.</span><span class="nx">isArray</span><span class="p">(</span><span class="nx">Type</span><span class="p">)</span> <span class="p">?</span> <span class="nx">_</span><span class="p">.</span><span class="nx">last</span><span class="p">(</span><span class="nx">Type</span><span class="p">)</span> <span class="p">:</span> <span class="nx">Type</span><span class="p">;</span> 
   <span class="kd">var</span> <span class="nx">instance</span> <span class="o">=</span> <span class="nb">Object</span><span class="p">.</span><span class="nx">create</span><span class="p">(</span><span class="nx">UnwrappedType</span><span class="p">.</span><span class="nx">prototype</span><span class="p">);</span> 
   <span class="nx">invoke</span><span class="p">(</span><span class="nx">Type</span><span class="p">,</span> <span class="nx">instance</span><span class="p">,</span> <span class="nx">locals</span><span class="p">);</span>
   <span class="k">return</span> <span class="nx">instance</span><span class="p">;</span>
 <span class="p">}</span>
-</code></pre></div>
-<p><code>injector</code>目前看到的功能是创建module,invoke普通函数,instantiate构造函数,便显出可以自动为函数填充参数并运行的功能</p>
+</code></pre>
+</div>
+
+<p><code class="highlighter-rouge">injector</code>目前看到的功能是创建module,invoke普通函数,instantiate构造函数,便显出可以自动为函数填充参数并运行的功能</p>
+
 
   </div>
 
@@ -502,39 +605,26 @@
 
   <div class="wrapper">
 
-    <h2 class="footer-heading">Dawny Wu's blog</h2>
+    <h2 class="footer-heading"></h2>
 
     <div class="footer-col-wrapper">
       <div class="footer-col footer-col-1">
         <ul class="contact-list">
-          <li>Dawny Wu's blog</li>
-          <li><a href="mailto:nothing@gmail.com">nothing@gmail.com</a></li>
+          <li></li>
+          <li><a href="mailto:"></a></li>
         </ul>
       </div>
 
       <div class="footer-col footer-col-2">
         <ul class="social-media-list">
           
-          <li>
-            <a href="https://github.com/jekyll"><span class="icon icon--github"><svg viewBox="0 0 16 16"><path fill="#828282" d="M7.999,0.431c-4.285,0-7.76,3.474-7.76,7.761 c0,3.428,2.223,6.337,5.307,7.363c0.388,0.071,0.53-0.168,0.53-0.374c0-0.184-0.007-0.672-0.01-1.32 c-2.159,0.469-2.614-1.04-2.614-1.04c-0.353-0.896-0.862-1.135-0.862-1.135c-0.705-0.481,0.053-0.472,0.053-0.472 c0.779,0.055,1.189,0.8,1.189,0.8c0.692,1.186,1.816,0.843,2.258,0.645c0.071-0.502,0.271-0.843,0.493-1.037 C4.86,11.425,3.049,10.76,3.049,7.786c0-0.847,0.302-1.54,0.799-2.082C3.768,5.507,3.501,4.718,3.924,3.65 c0,0,0.652-0.209,2.134,0.796C6.677,4.273,7.34,4.187,8,4.184c0.659,0.003,1.323,0.089,1.943,0.261 c1.482-1.004,2.132-0.796,2.132-0.796c0.423,1.068,0.157,1.857,0.077,2.054c0.497,0.542,0.798,1.235,0.798,2.082 c0,2.981-1.814,3.637-3.543,3.829c0.279,0.24,0.527,0.713,0.527,1.437c0,1.037-0.01,1.874-0.01,2.129 c0,0.208,0.14,0.449,0.534,0.373c3.081-1.028,5.302-3.935,5.302-7.362C15.76,3.906,12.285,0.431,7.999,0.431z"/></svg>
-</span><span class="username">jekyll</span></a>
 
-          </li>
-          
-
-          
-          <li>
-            <a href="https://twitter.com/jekyllrb"><span class="icon icon--twitter"><svg viewBox="0 0 16 16"><path fill="#828282" d="M15.969,3.058c-0.586,0.26-1.217,0.436-1.878,0.515c0.675-0.405,1.194-1.045,1.438-1.809c-0.632,0.375-1.332,0.647-2.076,0.793c-0.596-0.636-1.446-1.033-2.387-1.033c-1.806,0-3.27,1.464-3.27,3.27 c0,0.256,0.029,0.506,0.085,0.745C5.163,5.404,2.753,4.102,1.14,2.124C0.859,2.607,0.698,3.168,0.698,3.767 c0,1.134,0.577,2.135,1.455,2.722C1.616,6.472,1.112,6.325,0.671,6.08c0,0.014,0,0.027,0,0.041c0,1.584,1.127,2.906,2.623,3.206 C3.02,9.402,2.731,9.442,2.433,9.442c-0.211,0-0.416-0.021-0.615-0.059c0.416,1.299,1.624,2.245,3.055,2.271 c-1.119,0.877-2.529,1.4-4.061,1.4c-0.264,0-0.524-0.015-0.78-0.046c1.447,0.928,3.166,1.469,5.013,1.469 c6.015,0,9.304-4.983,9.304-9.304c0-0.142-0.003-0.283-0.009-0.423C14.976,4.29,15.531,3.714,15.969,3.058z"/></svg>
-</span><span class="username">jekyllrb</span></a>
-
-          </li>
           
         </ul>
       </div>
 
       <div class="footer-col footer-col-3">
-        <p>Write an awesome description for your new site here. You can edit this line in _config.yml. It will appear in your document head meta (for Google search results) and in your feed.xml site description.
-</p>
+        <p></p>
       </div>
     </div>
 

@@ -6,6 +6,8 @@ categories: fp
 ---
 https://blog.jcoglan.com/2011/03/05/translation-from-haskell-to-javascript-of-selected-portions-of-the-best-introduction-to-monads-ive-ever-read/
 
+http://adit.io/posts/2013-04-17-functors,_applicatives,_and_monads_in_pictures.html
+
 ```js
 var sine = function(x) { return Math.sin(x) };
 
@@ -191,4 +193,170 @@ var grandchildren = compose(bind(children), bind(children));
 grandchildren(unit(div))
 // -> [<h1>…</h1>, <p>…</p>, ...]
 ```
+
+### Haskell符号
+
+***fmap***
+
+单纯的函数如+3是不能运用在Container中的data上的，用fmap就可以了
+
+`fmap (+3) Just(2)`
+
+符号如下
+
+```haskell
+getPostTitle <$> (findPost 1)
+```
+
+fmap可以应用在两个函数上，作用是`function composition`
+
+`fmap (+3) (+1)`
+
+***Applicatives***
+
+它把function也封在Container中,可以对封在Container中的data使用
+
+Applicative的符号是<*>
+
+`Just (+3) <*> Just 2 == Just 5`
+
+fmap可以做如下的事情
+
+
+```haskell
+-- 相当于fmap (+3) (Just 5)
+> (+) <$> (Just 5)
+Just (+5)
+```
+
+可是`fmap Just(+3) (Just 5)`这种就做不了了
+
+```haskell
+> Just (+5) <$> (Just 4)
+ERROR ??? WHAT DOES THIS EVEN MEAN WHY IS THE FUNCTION WRAPPED IN A JUST
+```
+
+这时候就需要Applicative
+
+```haskell
+> (+) <$> (Just 5)
+Just (+5)
+> Just (+5) <*> (Just 3)
+Just 8
+````
+
+```haskell
+> (*) <$> Just 5 <*> Just 3
+Just 15
+
+-- 等价于这样
+
+fmap * Just(5) => Just(*5)
+
+Just(*5) <*> Just 3  => Just(15)
+```
+
+```haskell
+> liftA2 (*) (Just 5) (Just 3)
+Just 15
+```
+
+***Monad***
+
+`>>=`叫做`bind`
+
+```haskell
+half x = if even x
+           then Just (x `div` 2)
+           else Nothing
+```
+
+`half`是一个函数，输入普通的值，输出`Container`
+
+那要是输入`Container`呢？half函数肯定是不能处理的了
+
+这时候我们就需要`>>=` `bind`
+
+```haskell
+> Just 3 >>= half
+Nothing
+> Just 4 >>= half
+Just 2
+> Nothing >>= half
+Nothing
+```
+
+```haskell
+> Just 20 >>= half >>= half >>= half
+Nothing
+```
+
+### IO monad
+
+有三个函数
+
+```haskell
+getLine :: IO String
+readFile :: FilePath -> IO String
+putStrLn :: String -> IO ()
+```
+
+他们都是输入普通数值，输出Container的,这样我们可以把它们串联在一起，用`>>=`
+
+有语法糖可以用
+
+```haskell
+foo = do
+    filename <- getLine
+    contents <- readFile filename
+    putStrLn contents
+```
+
+`functors`: you apply a function to a wrapped value using fmap or <$>
+
+`applicatives`: you apply a wrapped function to a wrapped value using <*> or liftA
+
+`monads`: you apply a function that returns a wrapped value, to a wrapped value using >>= or liftM
+
+### Tuple List
+
+A tuple is a fixed-size collection of values, where each value can have a different type. 
+
+### Record Syntax
+
+```haskell
+data Customer = Customer {
+      customerID      :: CustomerID
+    , customerName    :: String
+    , customerAddress :: Address
+    } deriving (Show)
+```
+
+```haskell
+customerID :: Customer -> Int
+customerID (Customer id _ _) = id
+
+customerName :: Customer -> String
+customerName (Customer _ name _) = name
+
+customerAddress :: Customer -> [String]
+customerAddress (Customer _ _ address) = address
+```
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 

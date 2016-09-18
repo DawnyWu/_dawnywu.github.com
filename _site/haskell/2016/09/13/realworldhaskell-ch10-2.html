@@ -1,0 +1,467 @@
+<!DOCTYPE html>
+<html>
+
+  <head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  <title>file-processing and parsing-a-binary-data-format</title>
+  <meta name="description" content="任务描述A file of either format starts with a header, which in turn begins with a “magic” string describing the format. For a plain file, the string is P2, and f...">
+
+  <link rel="stylesheet" href="/css/main.css">
+  <link rel="canonical" href="/haskell/2016/09/13/realworldhaskell-ch10-2.html">
+  <link rel="alternate" type="application/rss+xml" title="" href="/feed.xml">
+</head>
+
+
+  <body>
+
+    <header class="site-header">
+
+  <div class="wrapper">
+
+    <a class="site-title" href="/"></a>
+
+    <nav class="site-nav">
+      <a href="#" class="menu-icon">
+        <svg viewBox="0 0 18 15">
+          <path fill="#424242" d="M18,1.484c0,0.82-0.665,1.484-1.484,1.484H1.484C0.665,2.969,0,2.304,0,1.484l0,0C0,0.665,0.665,0,1.484,0 h15.031C17.335,0,18,0.665,18,1.484L18,1.484z"/>
+          <path fill="#424242" d="M18,7.516C18,8.335,17.335,9,16.516,9H1.484C0.665,9,0,8.335,0,7.516l0,0c0-0.82,0.665-1.484,1.484-1.484 h15.031C17.335,6.031,18,6.696,18,7.516L18,7.516z"/>
+          <path fill="#424242" d="M18,13.516C18,14.335,17.335,15,16.516,15H1.484C0.665,15,0,14.335,0,13.516l0,0 c0-0.82,0.665-1.484,1.484-1.484h15.031C17.335,12.031,18,12.696,18,13.516L18,13.516z"/>
+        </svg>
+      </a>
+
+      <div class="trigger">
+        
+          
+          <a class="page-link" href="/about/">About</a>
+          
+        
+          
+        
+          
+        
+          
+        
+      </div>
+    </nav>
+
+  </div>
+
+</header>
+
+
+    <div class="page-content">
+      <div class="wrapper">
+        <article class="post" itemscope itemtype="http://schema.org/BlogPosting">
+
+  <header class="post-header">
+    <h1 class="post-title" itemprop="name headline">file-processing and parsing-a-binary-data-format</h1>
+    <p class="post-meta"><time datetime="2016-09-13T00:00:00+08:00" itemprop="datePublished">Sep 13, 2016</time></p>
+  </header>
+
+  <div class="post-content" itemprop="articleBody">
+    <h3 id="section">任务描述</h3>
+<p>A file of either format starts with a header, which in turn begins with a “magic” string describing the format. For a plain file, the string is P2, and for raw, it’s P5.</p>
+
+<p>The magic string is followed by white space, then by three numbers: <code class="highlighter-rouge">the width</code>, <code class="highlighter-rouge">height</code>, and <code class="highlighter-rouge">maximum grey value of the image</code>. These numbers are represented as ASCII decimal numbers, separated by white space.</p>
+
+<p>After the maximum grey value comes the image data. <code class="highlighter-rouge">In a raw file</code>, this is a string of binary values. <code class="highlighter-rouge">In a plain file</code>, the values are represented as ASCII decimal numbers separated by single space characters.</p>
+
+<p><code class="highlighter-rouge">A raw file</code> can contain a sequence of images, one after the other, each with its own header. <code class="highlighter-rouge">A plain file</code> contains only one image.</p>
+
+<h3 id="section-1">开始干活</h3>
+
+<p><code class="highlighter-rouge">parseP5 :: L.ByteString -&gt; Maybe (Greymap, L.ByteString)</code></p>
+
+<p>This will take a ByteString, and if the parse succeeds, it will return a single parsed Greymap, along with the string that remains after parsing.</p>
+
+<p>Our parsing function has to consume a little bit of its input at a time.</p>
+
+<ul>
+  <li>First, we need to assure ourselves that we’re really looking at a raw PGM file;</li>
+  <li>then we need to parse the numbers from the remainder of the header;</li>
+  <li>then we consume the bitmap data.</li>
+</ul>
+
+<div class="language-haskell highlighter-rouge"><pre class="highlight"><code><span class="n">parseP5</span> <span class="n">s</span> <span class="o">=</span>
+  <span class="kr">case</span> <span class="n">matchHeader</span> <span class="p">(</span><span class="kt">L8</span><span class="o">.</span><span class="n">pack</span> <span class="s">"P5"</span><span class="p">)</span> <span class="n">s</span> <span class="kr">of</span>
+    <span class="kt">Nothing</span> <span class="o">-&gt;</span> <span class="kt">Nothing</span>
+    <span class="kt">Just</span> <span class="n">s1</span> <span class="o">-&gt;</span>
+      <span class="kr">case</span> <span class="n">getNat</span> <span class="n">s1</span> <span class="kr">of</span>
+        <span class="kt">Nothing</span> <span class="o">-&gt;</span> <span class="kt">Nothing</span>
+        <span class="kt">Just</span> <span class="p">(</span><span class="n">width</span><span class="p">,</span> <span class="n">s2</span><span class="p">)</span> <span class="o">-&gt;</span>
+          <span class="kr">case</span> <span class="n">getNat</span> <span class="p">(</span><span class="kt">L8</span><span class="o">.</span><span class="n">dropWhile</span> <span class="n">isSpace</span> <span class="n">s2</span><span class="p">)</span> <span class="kr">of</span>
+            <span class="kt">Nothing</span> <span class="o">-&gt;</span> <span class="kt">Nothing</span>
+            <span class="kt">Just</span> <span class="p">(</span><span class="n">height</span><span class="p">,</span> <span class="n">s3</span><span class="p">)</span> <span class="o">-&gt;</span>
+              <span class="kr">case</span> <span class="n">getNat</span> <span class="p">(</span><span class="kt">L8</span><span class="o">.</span><span class="n">dropWhile</span> <span class="n">isSpace</span> <span class="n">s3</span><span class="p">)</span> <span class="kr">of</span>
+                <span class="kt">Nothing</span> <span class="o">-&gt;</span> <span class="kt">Nothing</span>
+                <span class="kt">Just</span> <span class="p">(</span><span class="n">maxGrey</span><span class="p">,</span> <span class="n">s4</span><span class="p">)</span>
+                  <span class="o">|</span> <span class="n">maxGrey</span> <span class="o">&gt;</span> <span class="mi">255</span> <span class="o">-&gt;</span> <span class="kt">Nothing</span>
+                  <span class="o">|</span> <span class="n">otherwise</span> <span class="o">-&gt;</span>
+                      <span class="kr">case</span> <span class="n">getBytes</span> <span class="mi">1</span> <span class="n">s4</span> <span class="kr">of</span>
+                        <span class="kt">Nothing</span> <span class="o">-&gt;</span> <span class="kt">Nothing</span>
+                        <span class="kt">Just</span> <span class="p">(</span><span class="kr">_</span><span class="p">,</span> <span class="n">s5</span><span class="p">)</span> <span class="o">-&gt;</span>
+                          <span class="kr">case</span> <span class="n">getBytes</span> <span class="p">(</span><span class="n">width</span> <span class="o">*</span> <span class="n">height</span><span class="p">)</span> <span class="n">s5</span> <span class="kr">of</span>
+                            <span class="kt">Nothing</span> <span class="o">-&gt;</span> <span class="kt">Nothing</span>
+                            <span class="kt">Just</span> <span class="p">(</span><span class="n">bitmap</span><span class="p">,</span> <span class="n">s6</span><span class="p">)</span> <span class="o">-&gt;</span>
+                              <span class="kt">Just</span> <span class="p">(</span><span class="kt">Greymap</span> <span class="n">width</span> <span class="n">height</span> <span class="n">maxGrey</span> <span class="n">bitmap</span><span class="p">,</span> <span class="n">s6</span><span class="p">)</span>
+</code></pre>
+</div>
+
+<div class="language-haskell highlighter-rouge"><pre class="highlight"><code><span class="c1">-- file: ch10/PNM.hs</span>
+<span class="c1">-- L.ByteString -&gt; L.ByteString -&gt; Maybe L.ByteString</span>
+<span class="n">matchHeader</span> <span class="n">prefix</span> <span class="n">str</span>
+    <span class="o">|</span> <span class="n">prefix</span> <span class="p">`</span><span class="kt">L8</span><span class="o">.</span><span class="n">isPrefixOf</span><span class="p">`</span> <span class="n">str</span>
+        <span class="o">=</span> <span class="kt">Just</span> <span class="p">(</span><span class="kt">L8</span><span class="o">.</span><span class="n">dropWhile</span> <span class="n">isSpace</span> <span class="p">(</span><span class="kt">L</span><span class="o">.</span><span class="n">drop</span> <span class="p">(</span><span class="kt">L</span><span class="o">.</span><span class="n">length</span> <span class="n">prefix</span><span class="p">)</span> <span class="n">str</span><span class="p">))</span>
+    <span class="o">|</span> <span class="n">otherwise</span>
+        <span class="o">=</span> <span class="kt">Nothing</span>
+
+<span class="c1">-- L.ByteString -&gt; Maybe (Int, L.ByteString)</span>
+<span class="n">getNat</span> <span class="n">s</span> <span class="o">=</span> <span class="kr">case</span> <span class="kt">L8</span><span class="o">.</span><span class="n">readInt</span> <span class="n">s</span> <span class="kr">of</span>
+             <span class="kt">Nothing</span> <span class="o">-&gt;</span> <span class="kt">Nothing</span>
+             <span class="kt">Just</span> <span class="p">(</span><span class="n">num</span><span class="p">,</span><span class="n">rest</span><span class="p">)</span>
+                 <span class="o">|</span> <span class="n">num</span> <span class="o">&lt;=</span> <span class="mi">0</span>    <span class="o">-&gt;</span> <span class="kt">Nothing</span>
+                 <span class="o">|</span> <span class="n">otherwise</span> <span class="o">-&gt;</span> <span class="kt">Just</span> <span class="p">(</span><span class="n">fromIntegral</span> <span class="n">num</span><span class="p">,</span> <span class="n">rest</span><span class="p">)</span>
+
+<span class="c1">-- Int -&gt; L.ByteString -&gt; Maybe (L.ByteString, L.ByteString)</span>
+<span class="n">getBytes</span> <span class="n">n</span> <span class="n">str</span> <span class="o">=</span> <span class="kr">let</span> <span class="n">count</span>           <span class="o">=</span> <span class="n">fromIntegral</span> <span class="n">n</span>
+                     <span class="n">both</span><span class="o">@</span><span class="p">(</span><span class="n">prefix</span><span class="p">,</span><span class="kr">_</span><span class="p">)</span> <span class="o">=</span> <span class="kt">L</span><span class="o">.</span><span class="n">splitAt</span> <span class="n">count</span> <span class="n">str</span>
+                 <span class="kr">in</span> <span class="kr">if</span> <span class="kt">L</span><span class="o">.</span><span class="n">length</span> <span class="n">prefix</span> <span class="o">&lt;</span> <span class="n">count</span>
+                    <span class="kr">then</span> <span class="kt">Nothing</span>
+                    <span class="kr">else</span> <span class="kt">Just</span> <span class="n">both</span>
+</code></pre>
+</div>
+
+<h3 id="section-2">太长了，需要修改</h3>
+
+<p>我们一直再重复一种模式，我们创造，然后拆开Maybe Container。我们使用Just(X,X)模板匹配获得想要的结果，然后运行函数生成Maybe,然后用Just(X,X)…..</p>
+
+<div class="language-haskell highlighter-rouge"><pre class="highlight"><code><span class="p">(</span><span class="o">&gt;&gt;?</span><span class="p">)</span> <span class="o">::</span> <span class="kt">Maybe</span> <span class="n">a</span> <span class="o">-&gt;</span> <span class="p">(</span><span class="n">a</span> <span class="o">-&gt;</span> <span class="kt">Maybe</span> <span class="n">b</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kt">Maybe</span> <span class="n">b</span>
+<span class="kt">Nothing</span> <span class="o">&gt;&gt;?</span> <span class="kr">_</span> <span class="o">=</span> <span class="kt">Nothing</span>
+<span class="kt">Just</span> <span class="n">v</span>  <span class="o">&gt;&gt;?</span> <span class="n">f</span> <span class="o">=</span> <span class="n">f</span> <span class="n">v</span>
+</code></pre>
+</div>
+
+<p>然后上边的楼梯形状代码重构成了如下的样子</p>
+
+<div class="language-haskell highlighter-rouge"><pre class="highlight"><code><span class="c1">-- file: ch10/PNM.hs</span>
+<span class="n">parseP5_take2</span> <span class="o">::</span> <span class="kt">L</span><span class="o">.</span><span class="kt">ByteString</span> <span class="o">-&gt;</span> <span class="kt">Maybe</span> <span class="p">(</span><span class="kt">Greymap</span><span class="p">,</span> <span class="kt">L</span><span class="o">.</span><span class="kt">ByteString</span><span class="p">)</span>
+<span class="n">parseP5_take2</span> <span class="n">s</span> <span class="o">=</span>
+    <span class="n">matchHeader</span> <span class="p">(</span><span class="kt">L8</span><span class="o">.</span><span class="n">pack</span> <span class="s">"P5"</span><span class="p">)</span> <span class="n">s</span>       <span class="o">&gt;&gt;?</span>
+    <span class="nf">\</span><span class="n">s</span> <span class="o">-&gt;</span> <span class="n">skipSpace</span> <span class="p">(</span><span class="nb">()</span><span class="p">,</span> <span class="n">s</span><span class="p">)</span>           <span class="o">&gt;&gt;?</span>
+    <span class="p">(</span><span class="n">getNat</span> <span class="o">.</span> <span class="n">snd</span><span class="p">)</span>                    <span class="o">&gt;&gt;?</span>
+    <span class="n">skipSpace</span>                         <span class="o">&gt;&gt;?</span>
+    <span class="nf">\</span><span class="p">(</span><span class="n">width</span><span class="p">,</span> <span class="n">s</span><span class="p">)</span> <span class="o">-&gt;</span>   <span class="n">getNat</span> <span class="n">s</span>         <span class="o">&gt;&gt;?</span>
+    <span class="n">skipSpace</span>                         <span class="o">&gt;&gt;?</span>
+    <span class="nf">\</span><span class="p">(</span><span class="n">height</span><span class="p">,</span> <span class="n">s</span><span class="p">)</span> <span class="o">-&gt;</span>  <span class="n">getNat</span> <span class="n">s</span>         <span class="o">&gt;&gt;?</span>
+    <span class="nf">\</span><span class="p">(</span><span class="n">maxGrey</span><span class="p">,</span> <span class="n">s</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">getBytes</span> <span class="mi">1</span> <span class="n">s</span>     <span class="o">&gt;&gt;?</span>
+    <span class="p">(</span><span class="n">getBytes</span> <span class="p">(</span><span class="n">width</span> <span class="o">*</span> <span class="n">height</span><span class="p">)</span> <span class="o">.</span> <span class="n">snd</span><span class="p">)</span> <span class="o">&gt;&gt;?</span>
+    <span class="nf">\</span><span class="p">(</span><span class="n">bitmap</span><span class="p">,</span> <span class="n">s</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kt">Just</span> <span class="p">(</span><span class="kt">Greymap</span> <span class="n">width</span> <span class="n">height</span> <span class="n">maxGrey</span> <span class="n">bitmap</span><span class="p">,</span> <span class="n">s</span><span class="p">)</span>
+
+<span class="n">skipSpace</span> <span class="o">::</span> <span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="kt">L</span><span class="o">.</span><span class="kt">ByteString</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kt">Maybe</span> <span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="kt">L</span><span class="o">.</span><span class="kt">ByteString</span><span class="p">)</span>
+<span class="n">skipSpace</span> <span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="n">s</span><span class="p">)</span> <span class="o">=</span> <span class="kt">Just</span> <span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="kt">L8</span><span class="o">.</span><span class="n">dropWhile</span> <span class="n">isSpace</span> <span class="n">s</span><span class="p">)</span>
+</code></pre>
+</div>
+
+<p>像<code class="highlighter-rouge">&gt;&gt;?</code>这种可以串在一起的函数，他的输入输出一定要是相同的才可以</p>
+
+<h3 id="section-3">再改进</h3>
+
+<p>我们在代码里用了很多模板匹配</p>
+
+<div class="language-haskell highlighter-rouge"><pre class="highlight"><code>  <span class="nf">\</span><span class="p">(</span><span class="n">width</span><span class="p">,</span> <span class="n">s</span><span class="p">)</span> <span class="o">-&gt;</span>   <span class="n">getNat</span> <span class="n">s</span>         <span class="o">&gt;&gt;?</span>
+  <span class="n">skipSpace</span>                         <span class="o">&gt;&gt;?</span>
+  <span class="nf">\</span><span class="p">(</span><span class="n">height</span><span class="p">,</span> <span class="n">s</span><span class="p">)</span> <span class="o">-&gt;</span>  <span class="n">getNat</span> <span class="n">s</span>         <span class="o">&gt;&gt;?</span>
+  <span class="nf">\</span><span class="p">(</span><span class="n">maxGrey</span><span class="p">,</span> <span class="n">s</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">getBytes</span> <span class="mi">1</span> <span class="n">s</span>     <span class="o">&gt;&gt;?</span>
+  <span class="p">(</span><span class="n">getBytes</span> <span class="p">(</span><span class="n">width</span> <span class="o">*</span> <span class="n">height</span><span class="p">)</span> <span class="o">.</span> <span class="n">snd</span><span class="p">)</span> <span class="o">&gt;&gt;?</span>
+  <span class="nf">\</span><span class="p">(</span><span class="n">bitmap</span><span class="p">,</span> <span class="n">s</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kt">Just</span> <span class="p">(</span><span class="kt">Greymap</span> <span class="n">width</span> <span class="n">height</span> <span class="n">maxGrey</span> <span class="n">bitmap</span><span class="p">,</span> <span class="n">s</span><span class="p">)</span>
+</code></pre>
+</div>
+
+<p>我们尝试改变它</p>
+
+<div class="language-haskell highlighter-rouge"><pre class="highlight"><code><span class="kr">data</span> <span class="kt">ParseState</span> <span class="o">=</span> <span class="kt">ParseState</span> <span class="p">{</span>
+  <span class="n">string</span> <span class="o">::</span> <span class="kt">L</span><span class="o">.</span><span class="kt">ByteString</span>
+  <span class="p">,</span> <span class="n">offset</span> <span class="o">::</span> <span class="kt">Int64</span>           <span class="c1">-- imported from Data.Int</span>
+<span class="p">}</span> <span class="kr">deriving</span> <span class="p">(</span><span class="kt">Show</span><span class="p">)</span>
+</code></pre>
+</div>
+
+<p>这样我们以后想获得数据就不需要使用模板匹配了，我们用<code class="highlighter-rouge">record syntax</code>定义了一个数据类型，我们可以使用函数<code class="highlighter-rouge">string</code>和<code class="highlighter-rouge">offset</code>来访问</p>
+
+<h3 id="a-more-interesting-parser">A more interesting parser</h3>
+
+<div class="language-haskell highlighter-rouge"><pre class="highlight"><code><span class="c1">-- file: ch10/Parse.hs</span>
+<span class="c1">-- import the Word8 type from Data.Word</span>
+<span class="n">parseByte</span> <span class="o">::</span> <span class="kt">Parse</span> <span class="kt">Word8</span>
+<span class="n">parseByte</span> <span class="o">=</span>
+    <span class="n">getState</span> <span class="o">==&gt;</span> <span class="nf">\</span><span class="n">initState</span> <span class="o">-&gt;</span>
+    <span class="kr">case</span> <span class="kt">L</span><span class="o">.</span><span class="n">uncons</span> <span class="p">(</span><span class="n">string</span> <span class="n">initState</span><span class="p">)</span> <span class="kr">of</span>
+      <span class="kt">Nothing</span> <span class="o">-&gt;</span>
+          <span class="n">bail</span> <span class="s">"no more input"</span>
+      <span class="kt">Just</span> <span class="p">(</span><span class="n">byte</span><span class="p">,</span><span class="n">remainder</span><span class="p">)</span> <span class="o">-&gt;</span>
+          <span class="n">putState</span> <span class="n">newState</span> <span class="o">==&gt;</span> <span class="nf">\</span><span class="kr">_</span> <span class="o">-&gt;</span>
+          <span class="n">identity</span> <span class="n">byte</span>
+        <span class="kr">where</span> <span class="n">newState</span> <span class="o">=</span> <span class="n">initState</span> <span class="p">{</span> <span class="n">string</span> <span class="o">=</span> <span class="n">remainder</span><span class="p">,</span>
+                                     <span class="n">offset</span> <span class="o">=</span> <span class="n">newOffset</span> <span class="p">}</span>
+              <span class="n">newOffset</span> <span class="o">=</span> <span class="n">offset</span> <span class="n">initState</span> <span class="o">+</span> <span class="mi">1</span>
+</code></pre>
+</div>
+
+<ul>
+  <li>
+    <p>The <code class="highlighter-rouge">Data.ByteString</code> module defines a strict type named ByteString. This represents a string of binary or text data in a single array.</p>
+  </li>
+  <li>
+    <p>The <code class="highlighter-rouge">Data.ByteString.Lazy</code> module provides a lazy type, also named ByteString. This represents a string of data as a list of chunks, arrays of up to 64KB in size.</p>
+  </li>
+</ul>
+
+<p>For streaming a large quantity (hundreds of megabytes to terabytes) of data, the <code class="highlighter-rouge">lazy ByteString</code> type is usually best. Its chunk size is tuned to be friendly to a modern CPU’s L1 cache, and a garbage collector can quickly discard chunks of streamed data that are no longer being used.</p>
+
+<p>The <code class="highlighter-rouge">strict ByteString</code> type performs best for applications that are less concerned with memory footprint, or that need to access data randomly. 2 comments</p>
+
+<p>一个应用的例子，查看一个文件是不是ELF格式的(excutable and linkable format),查看文件前4个Byte就可以</p>
+
+<div class="language-haskell highlighter-rouge"><pre class="highlight"><code><span class="kr">import</span> <span class="k">qualified</span> <span class="nn">Data.ByteString.Lazy</span> <span class="k">as</span> <span class="n">L</span>
+
+<span class="n">hasElfMagic</span> <span class="o">::</span> <span class="kt">L</span><span class="o">.</span><span class="kt">ByteString</span> <span class="o">-&gt;</span> <span class="kt">Bool</span>
+<span class="n">hasElfMagic</span> <span class="n">content</span> <span class="o">=</span> <span class="kt">L</span><span class="o">.</span><span class="n">take</span> <span class="mi">4</span> <span class="n">content</span> <span class="o">==</span> <span class="n">elfMagic</span>
+    <span class="kr">where</span> <span class="n">elfMagic</span> <span class="o">=</span> <span class="kt">L</span><span class="o">.</span><span class="n">pack</span> <span class="p">[</span><span class="mh">0x7f</span><span class="p">,</span> <span class="mh">0x45</span><span class="p">,</span> <span class="mh">0x4c</span><span class="p">,</span> <span class="mh">0x46</span><span class="p">]</span>
+</code></pre>
+</div>
+<p>The L.pack function takes a list of Word8 values, and packs them into a lazy ByteString.</p>
+
+<p>应用于判断文件类型</p>
+
+<div class="language-haskell highlighter-rouge"><pre class="highlight"><code><span class="n">isElfFile</span> <span class="o">::</span> <span class="kt">FilePath</span> <span class="o">-&gt;</span> <span class="kt">IO</span> <span class="kt">Bool</span>
+<span class="n">isElfFile</span> <span class="n">path</span> <span class="o">=</span> <span class="kr">do</span>
+  <span class="n">content</span> <span class="o">&lt;-</span> <span class="kt">L</span><span class="o">.</span><span class="n">readFile</span> <span class="n">path</span>
+  <span class="n">return</span> <span class="p">(</span><span class="n">hasElfMagic</span> <span class="n">content</span><span class="p">)</span>
+</code></pre>
+</div>
+
+<div class="language-haskell highlighter-rouge"><pre class="highlight"><code><span class="n">readPrice</span> <span class="o">::</span> <span class="kt">L</span><span class="o">.</span><span class="kt">ByteString</span> <span class="o">-&gt;</span> <span class="kt">Maybe</span> <span class="kt">Int</span>
+<span class="n">readPrice</span> <span class="n">str</span> <span class="o">=</span>
+    <span class="kr">case</span> <span class="kt">L</span><span class="o">.</span><span class="n">readInt</span> <span class="n">str</span> <span class="kr">of</span>
+      <span class="kt">Nothing</span>             <span class="o">-&gt;</span> <span class="kt">Nothing</span>
+      <span class="kt">Just</span> <span class="p">(</span><span class="n">dollars</span><span class="p">,</span><span class="n">rest</span><span class="p">)</span> <span class="o">-&gt;</span>
+        <span class="kr">case</span> <span class="kt">L</span><span class="o">.</span><span class="n">readInt</span> <span class="p">(</span><span class="kt">L</span><span class="o">.</span><span class="n">tail</span> <span class="n">rest</span><span class="p">)</span> <span class="kr">of</span>
+          <span class="kt">Nothing</span>           <span class="o">-&gt;</span> <span class="kt">Nothing</span>
+          <span class="kt">Just</span> <span class="p">(</span><span class="n">cents</span><span class="p">,</span><span class="n">more</span><span class="p">)</span> <span class="o">-&gt;</span>
+            <span class="kt">Just</span> <span class="p">(</span><span class="n">dollars</span> <span class="o">*</span> <span class="mi">100</span> <span class="o">+</span> <span class="n">cents</span><span class="p">)</span>
+</code></pre>
+</div>
+
+<div class="language-haskell highlighter-rouge"><pre class="highlight"><code><span class="c1">-- file: ch08/HighestClose.hs</span>
+<span class="n">highestClose</span> <span class="o">=</span> <span class="n">maximum</span> <span class="o">.</span> <span class="p">(</span><span class="kt">Nothing</span><span class="o">:</span><span class="p">)</span> <span class="o">.</span> <span class="n">map</span> <span class="n">closing</span> <span class="o">.</span> <span class="kt">L</span><span class="o">.</span><span class="n">lines</span>
+
+<span class="n">highestCloseFrom</span> <span class="n">path</span> <span class="o">=</span> <span class="kr">do</span>
+    <span class="n">contents</span> <span class="o">&lt;-</span> <span class="kt">L</span><span class="o">.</span><span class="n">readFile</span> <span class="n">path</span>
+    <span class="n">print</span> <span class="p">(</span><span class="n">highestClose</span> <span class="n">contents</span><span class="p">)</span>
+</code></pre>
+</div>
+
+<div class="language-haskell highlighter-rouge"><pre class="highlight"><code><span class="c1">-- file: ch08/HighestClose.hs</span>
+<span class="n">readPrice</span> <span class="o">::</span> <span class="kt">L</span><span class="o">.</span><span class="kt">ByteString</span> <span class="o">-&gt;</span> <span class="kt">Maybe</span> <span class="kt">Int</span>
+<span class="n">readPrice</span> <span class="n">str</span> <span class="o">=</span>
+    <span class="kr">case</span> <span class="kt">L</span><span class="o">.</span><span class="n">readInt</span> <span class="n">str</span> <span class="kr">of</span>
+      <span class="kt">Nothing</span>             <span class="o">-&gt;</span> <span class="kt">Nothing</span>
+      <span class="kt">Just</span> <span class="p">(</span><span class="n">dollars</span><span class="p">,</span><span class="n">rest</span><span class="p">)</span> <span class="o">-&gt;</span>
+        <span class="kr">case</span> <span class="kt">L</span><span class="o">.</span><span class="n">readInt</span> <span class="p">(</span><span class="kt">L</span><span class="o">.</span><span class="n">tail</span> <span class="n">rest</span><span class="p">)</span> <span class="kr">of</span>
+          <span class="kt">Nothing</span>           <span class="o">-&gt;</span> <span class="kt">Nothing</span>
+          <span class="kt">Just</span> <span class="p">(</span><span class="n">cents</span><span class="p">,</span><span class="n">more</span><span class="p">)</span> <span class="o">-&gt;</span>
+            <span class="kt">Just</span> <span class="p">(</span><span class="n">dollars</span> <span class="o">*</span> <span class="mi">100</span> <span class="o">+</span> <span class="n">cents</span><span class="p">)</span>
+</code></pre>
+</div>
+
+<p>a raw PGM file can contain several images</p>
+
+<p>Since the header of a PGM file is ASCII text, but its body is binary, we import both the text- and binary-oriented ByteString modules.</p>
+
+<div class="language-haskell highlighter-rouge"><pre class="highlight"><code><span class="kr">import</span> <span class="k">qualified</span> <span class="nn">Data.ByteString.Lazy.Char8</span> <span class="k">as</span> <span class="n">L8</span>
+<span class="kr">import</span> <span class="k">qualified</span> <span class="nn">Data.ByteString.Lazy</span> <span class="k">as</span> <span class="n">L</span>
+<span class="kr">import</span> <span class="nn">Data.Char</span> <span class="p">(</span><span class="nf">isSpace</span><span class="p">)</span>
+</code></pre>
+</div>
+
+<div class="language-haskell highlighter-rouge"><pre class="highlight"><code><span class="kr">data</span> <span class="kt">Greymap</span> <span class="o">=</span> <span class="kt">Greymap</span> <span class="p">{</span>
+      <span class="n">greyWidth</span> <span class="o">::</span> <span class="kt">Int</span>
+    <span class="p">,</span> <span class="n">greyHeight</span> <span class="o">::</span> <span class="kt">Int</span>
+    <span class="p">,</span> <span class="n">greyMax</span> <span class="o">::</span> <span class="kt">Int</span>
+    <span class="p">,</span> <span class="n">greyData</span> <span class="o">::</span> <span class="kt">L</span><span class="o">.</span><span class="kt">ByteString</span>
+    <span class="p">}</span> <span class="kr">deriving</span> <span class="p">(</span><span class="kt">Eq</span><span class="p">)</span>
+</code></pre>
+</div>
+
+<p>我们不用compiler为我们实现show方法</p>
+
+<div class="language-haskell highlighter-rouge"><pre class="highlight"><code><span class="kr">instance</span> <span class="kt">Show</span> <span class="kt">Greymap</span> <span class="kr">where</span>
+    <span class="n">show</span> <span class="p">(</span><span class="kt">Greymap</span> <span class="n">w</span> <span class="n">h</span> <span class="n">m</span> <span class="kr">_</span><span class="p">)</span> <span class="o">=</span> <span class="s">"Greymap "</span> <span class="o">++</span> <span class="n">show</span> <span class="n">w</span> <span class="o">++</span> <span class="s">"x"</span> <span class="o">++</span> <span class="n">show</span> <span class="n">h</span> <span class="o">++</span>
+                             <span class="s">" "</span> <span class="o">++</span> <span class="n">show</span> <span class="n">m</span>
+</code></pre>
+</div>
+
+<div class="language-haskell highlighter-rouge"><pre class="highlight"><code><span class="n">parseP5</span> <span class="o">::</span> <span class="kt">L</span><span class="o">.</span><span class="kt">ByteString</span> <span class="o">-&gt;</span> <span class="kt">Maybe</span> <span class="p">(</span><span class="kt">Greymap</span><span class="p">,</span> <span class="kt">L</span><span class="o">.</span><span class="kt">ByteString</span><span class="p">)</span>
+</code></pre>
+</div>
+
+<div class="language-haskell highlighter-rouge"><pre class="highlight"><code><span class="c1">-- file: ch10/PNM.hs</span>
+<span class="n">matchHeader</span> <span class="o">::</span> <span class="kt">L</span><span class="o">.</span><span class="kt">ByteString</span> <span class="o">-&gt;</span> <span class="kt">L</span><span class="o">.</span><span class="kt">ByteString</span> <span class="o">-&gt;</span> <span class="kt">Maybe</span> <span class="kt">L</span><span class="o">.</span><span class="kt">ByteString</span>
+
+<span class="c1">-- "nat" here is short for "natural number"</span>
+<span class="n">getNat</span> <span class="o">::</span> <span class="kt">L</span><span class="o">.</span><span class="kt">ByteString</span> <span class="o">-&gt;</span> <span class="kt">Maybe</span> <span class="p">(</span><span class="kt">Int</span><span class="p">,</span> <span class="kt">L</span><span class="o">.</span><span class="kt">ByteString</span><span class="p">)</span>
+
+<span class="n">getBytes</span> <span class="o">::</span> <span class="kt">Int</span> <span class="o">-&gt;</span> <span class="kt">L</span><span class="o">.</span><span class="kt">ByteString</span>
+         <span class="o">-&gt;</span> <span class="kt">Maybe</span> <span class="p">(</span><span class="kt">L</span><span class="o">.</span><span class="kt">ByteString</span><span class="p">,</span> <span class="kt">L</span><span class="o">.</span><span class="kt">ByteString</span><span class="p">)</span>
+
+<span class="n">parseP5</span> <span class="n">s</span> <span class="o">=</span>
+  <span class="kr">case</span> <span class="n">matchHeader</span> <span class="p">(</span><span class="kt">L8</span><span class="o">.</span><span class="n">pack</span> <span class="s">"P5"</span><span class="p">)</span> <span class="n">s</span> <span class="kr">of</span>
+    <span class="kt">Nothing</span> <span class="o">-&gt;</span> <span class="kt">Nothing</span>
+    <span class="kt">Just</span> <span class="n">s1</span> <span class="o">-&gt;</span>
+      <span class="kr">case</span> <span class="n">getNat</span> <span class="n">s1</span> <span class="kr">of</span>
+        <span class="kt">Nothing</span> <span class="o">-&gt;</span> <span class="kt">Nothing</span>
+        <span class="kt">Just</span> <span class="p">(</span><span class="n">width</span><span class="p">,</span> <span class="n">s2</span><span class="p">)</span> <span class="o">-&gt;</span>
+          <span class="kr">case</span> <span class="n">getNat</span> <span class="p">(</span><span class="kt">L8</span><span class="o">.</span><span class="n">dropWhile</span> <span class="n">isSpace</span> <span class="n">s2</span><span class="p">)</span> <span class="kr">of</span>
+            <span class="kt">Nothing</span> <span class="o">-&gt;</span> <span class="kt">Nothing</span>
+            <span class="kt">Just</span> <span class="p">(</span><span class="n">height</span><span class="p">,</span> <span class="n">s3</span><span class="p">)</span> <span class="o">-&gt;</span>
+              <span class="kr">case</span> <span class="n">getNat</span> <span class="p">(</span><span class="kt">L8</span><span class="o">.</span><span class="n">dropWhile</span> <span class="n">isSpace</span> <span class="n">s3</span><span class="p">)</span> <span class="kr">of</span>
+                <span class="kt">Nothing</span> <span class="o">-&gt;</span> <span class="kt">Nothing</span>
+                <span class="kt">Just</span> <span class="p">(</span><span class="n">maxGrey</span><span class="p">,</span> <span class="n">s4</span><span class="p">)</span>
+                  <span class="o">|</span> <span class="n">maxGrey</span> <span class="o">&gt;</span> <span class="mi">255</span> <span class="o">-&gt;</span> <span class="kt">Nothing</span>
+                  <span class="o">|</span> <span class="n">otherwise</span> <span class="o">-&gt;</span>
+                      <span class="kr">case</span> <span class="n">getBytes</span> <span class="mi">1</span> <span class="n">s4</span> <span class="kr">of</span>
+                        <span class="kt">Nothing</span> <span class="o">-&gt;</span> <span class="kt">Nothing</span>
+                        <span class="kt">Just</span> <span class="p">(</span><span class="kr">_</span><span class="p">,</span> <span class="n">s5</span><span class="p">)</span> <span class="o">-&gt;</span>
+                          <span class="kr">case</span> <span class="n">getBytes</span> <span class="p">(</span><span class="n">width</span> <span class="o">*</span> <span class="n">height</span><span class="p">)</span> <span class="n">s5</span> <span class="kr">of</span>
+                            <span class="kt">Nothing</span> <span class="o">-&gt;</span> <span class="kt">Nothing</span>
+                            <span class="kt">Just</span> <span class="p">(</span><span class="n">bitmap</span><span class="p">,</span> <span class="n">s6</span><span class="p">)</span> <span class="o">-&gt;</span>
+                              <span class="kt">Just</span> <span class="p">(</span><span class="kt">Greymap</span> <span class="n">width</span> <span class="n">height</span> <span class="n">maxGrey</span> <span class="n">bitmap</span><span class="p">,</span> <span class="n">s6</span><span class="p">)</span>
+</code></pre>
+</div>
+
+<p>书中源代码
+```haskell
+– file: ch10/PNM.hs
+matchHeader :: L.ByteString -&gt; L.ByteString -&gt; Maybe L.ByteString</p>
+
+<p>– “nat” here is short for “natural number”
+getNat :: L.ByteString -&gt; Maybe (Int, L.ByteString)</p>
+
+<p>getBytes :: Int -&gt; L.ByteString
+         -&gt; Maybe (L.ByteString, L.ByteString)</p>
+
+<p>parseP5 s =
+  case matchHeader (L8.pack “P5”) s of
+    Nothing -&gt; Nothing
+    Just s1 -&gt;
+      case getNat s1 of
+        Nothing -&gt; Nothing
+        Just (width, s2) -&gt;
+          case getNat (L8.dropWhile isSpace s2) of
+            Nothing -&gt; Nothing
+            Just (height, s3) -&gt;
+              case getNat (L8.dropWhile isSpace s3) of
+                Nothing -&gt; Nothing
+                Just (maxGrey, s4)
+                  | maxGrey &gt; 255 -&gt; Nothing
+                  | otherwise -&gt;
+                      case getBytes 1 s4 of
+                        Nothing -&gt; Nothing
+                        Just (_, s5) -&gt;
+                          case getBytes (width * height) s5 of
+                            Nothing -&gt; Nothing
+                            Just (bitmap, s6) -&gt;
+                              Just (Greymap width height maxGrey bitmap, s6)</p>
+
+<p>– file: ch10/PNM.hs
+(»?) :: Maybe a -&gt; (a -&gt; Maybe b) -&gt; Maybe b
+Nothing »? _ = Nothing
+Just v  »? f = f v</p>
+
+<p>– file: ch10/PNM.hs
+parseP5_take2 :: L.ByteString -&gt; Maybe (Greymap, L.ByteString)
+parseP5_take2 s =
+    matchHeader (L8.pack “P5”) s       »?
+    \s -&gt; skipSpace ((), s)           »?
+    (getNat . snd)                    »?
+    skipSpace                         »?
+    (width, s) -&gt;   getNat s         »?
+    skipSpace                         »?
+    (height, s) -&gt;  getNat s         »?
+    (maxGrey, s) -&gt; getBytes 1 s     »?
+    (getBytes (width * height) . snd) »?
+    (bitmap, s) -&gt; Just (Greymap width height maxGrey bitmap, s)</p>
+
+<p>skipSpace :: (a, L.ByteString) -&gt; Maybe (a, L.ByteString)
+skipSpace (a, s) = Just (a, L8.dropWhile isSpace s)
+```</p>
+
+<div class="language-haskell highlighter-rouge"><pre class="highlight"><code><span class="c1">-- file: ch10/PNM.hs</span>
+<span class="c1">-- L.ByteString -&gt; L.ByteString -&gt; Maybe L.ByteString</span>
+<span class="n">matchHeader</span> <span class="n">prefix</span> <span class="n">str</span>
+    <span class="o">|</span> <span class="n">prefix</span> <span class="p">`</span><span class="kt">L8</span><span class="o">.</span><span class="n">isPrefixOf</span><span class="p">`</span> <span class="n">str</span>
+        <span class="o">=</span> <span class="kt">Just</span> <span class="p">(</span><span class="kt">L8</span><span class="o">.</span><span class="n">dropWhile</span> <span class="n">isSpace</span> <span class="p">(</span><span class="kt">L</span><span class="o">.</span><span class="n">drop</span> <span class="p">(</span><span class="kt">L</span><span class="o">.</span><span class="n">length</span> <span class="n">prefix</span><span class="p">)</span> <span class="n">str</span><span class="p">))</span>
+    <span class="o">|</span> <span class="n">otherwise</span>
+        <span class="o">=</span> <span class="kt">Nothing</span>
+
+<span class="c1">-- L.ByteString -&gt; Maybe (Int, L.ByteString)</span>
+<span class="n">getNat</span> <span class="n">s</span> <span class="o">=</span> <span class="kr">case</span> <span class="kt">L8</span><span class="o">.</span><span class="n">readInt</span> <span class="n">s</span> <span class="kr">of</span>
+             <span class="kt">Nothing</span> <span class="o">-&gt;</span> <span class="kt">Nothing</span>
+             <span class="kt">Just</span> <span class="p">(</span><span class="n">num</span><span class="p">,</span><span class="n">rest</span><span class="p">)</span>
+                 <span class="o">|</span> <span class="n">num</span> <span class="o">&lt;=</span> <span class="mi">0</span>    <span class="o">-&gt;</span> <span class="kt">Nothing</span>
+                 <span class="o">|</span> <span class="n">otherwise</span> <span class="o">-&gt;</span> <span class="kt">Just</span> <span class="p">(</span><span class="n">fromIntegral</span> <span class="n">num</span><span class="p">,</span> <span class="n">rest</span><span class="p">)</span>
+
+<span class="c1">-- Int -&gt; L.ByteString -&gt; Maybe (L.ByteString, L.ByteString)</span>
+<span class="n">getBytes</span> <span class="n">n</span> <span class="n">str</span> <span class="o">=</span> <span class="kr">let</span> <span class="n">count</span>           <span class="o">=</span> <span class="n">fromIntegral</span> <span class="n">n</span>
+                     <span class="n">both</span><span class="o">@</span><span class="p">(</span><span class="n">prefix</span><span class="p">,</span><span class="kr">_</span><span class="p">)</span> <span class="o">=</span> <span class="kt">L</span><span class="o">.</span><span class="n">splitAt</span> <span class="n">count</span> <span class="n">str</span>
+                 <span class="kr">in</span> <span class="kr">if</span> <span class="kt">L</span><span class="o">.</span><span class="n">length</span> <span class="n">prefix</span> <span class="o">&lt;</span> <span class="n">count</span>
+                    <span class="kr">then</span> <span class="kt">Nothing</span>
+                    <span class="kr">else</span> <span class="kt">Just</span> <span class="n">both</span>
+</code></pre>
+</div>
+
+  </div>
+
+</article>
+
+      </div>
+    </div>
+
+    <footer class="site-footer">
+
+  <div class="wrapper">
+
+    <h2 class="footer-heading"></h2>
+
+    <div class="footer-col-wrapper">
+      <div class="footer-col footer-col-1">
+        <ul class="contact-list">
+          <li></li>
+          <li><a href="mailto:"></a></li>
+        </ul>
+      </div>
+
+      <div class="footer-col footer-col-2">
+        <ul class="social-media-list">
+          
+
+          
+        </ul>
+      </div>
+
+      <div class="footer-col footer-col-3">
+        <p></p>
+      </div>
+    </div>
+
+  </div>
+
+</footer>
+
+
+  </body>
+
+</html>

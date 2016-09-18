@@ -10,8 +10,8 @@
   <meta name="description" content="https://blog.jcoglan.com/2011/03/05/translation-from-haskell-to-javascript-of-selected-portions-of-the-best-introduction-to-monads-ive-ever-read/">
 
   <link rel="stylesheet" href="/css/main.css">
-  <link rel="canonical" href="http://yourdomain.com/fp/2016/09/02/haskell-monad.html">
-  <link rel="alternate" type="application/rss+xml" title="Dawny Wu's blog" href="http://yourdomain.com/feed.xml">
+  <link rel="canonical" href="/fp/2016/09/02/haskell-monad.html">
+  <link rel="alternate" type="application/rss+xml" title="" href="/feed.xml">
 </head>
 
 
@@ -21,7 +21,7 @@
 
   <div class="wrapper">
 
-    <a class="site-title" href="/">Dawny Wu's blog</a>
+    <a class="site-title" href="/"></a>
 
     <nav class="site-nav">
       <a href="#" class="menu-icon">
@@ -62,8 +62,11 @@
   </header>
 
   <div class="post-content" itemprop="articleBody">
-    <p><a href="https://blog.jcoglan.com/2011/03/05/translation-from-haskell-to-javascript-of-selected-portions-of-the-best-introduction-to-monads-ive-ever-read/">https://blog.jcoglan.com/2011/03/05/translation-from-haskell-to-javascript-of-selected-portions-of-the-best-introduction-to-monads-ive-ever-read/</a></p>
-<div class="highlight"><pre><code class="language-js" data-lang="js"><span class="kd">var</span> <span class="nx">sine</span> <span class="o">=</span> <span class="kd">function</span><span class="p">(</span><span class="nx">x</span><span class="p">)</span> <span class="p">{</span> <span class="k">return</span> <span class="nb">Math</span><span class="p">.</span><span class="nx">sin</span><span class="p">(</span><span class="nx">x</span><span class="p">)</span> <span class="p">};</span>
+    <p>https://blog.jcoglan.com/2011/03/05/translation-from-haskell-to-javascript-of-selected-portions-of-the-best-introduction-to-monads-ive-ever-read/</p>
+
+<p>http://adit.io/posts/2013-04-17-functors,_applicatives,_and_monads_in_pictures.html</p>
+
+<div class="language-js highlighter-rouge"><pre class="highlight"><code><span class="kd">var</span> <span class="nx">sine</span> <span class="o">=</span> <span class="kd">function</span><span class="p">(</span><span class="nx">x</span><span class="p">)</span> <span class="p">{</span> <span class="k">return</span> <span class="nb">Math</span><span class="p">.</span><span class="nx">sin</span><span class="p">(</span><span class="nx">x</span><span class="p">)</span> <span class="p">};</span>
 
 <span class="kd">var</span> <span class="nx">cube</span> <span class="o">=</span> <span class="kd">function</span><span class="p">(</span><span class="nx">x</span><span class="p">)</span> <span class="p">{</span> <span class="k">return</span> <span class="nx">x</span> <span class="o">*</span> <span class="nx">x</span> <span class="o">*</span> <span class="nx">x</span> <span class="p">};</span>
 
@@ -78,24 +81,33 @@
 
 <span class="kd">var</span> <span class="nx">sineOfCube</span> <span class="o">=</span> <span class="nx">compose</span><span class="p">(</span><span class="nx">sine</span><span class="p">,</span> <span class="nx">cube</span><span class="p">);</span>
 <span class="kd">var</span> <span class="nx">y</span> <span class="o">=</span> <span class="nx">sineOfCube</span><span class="p">(</span><span class="nx">x</span><span class="p">);</span>
-</code></pre></div>
+</code></pre>
+</div>
+
 <p>我现在要打出一些log信息来让我知道函数运行成功了,可是我是不能在函数中console.log的，会产生副作用，我只能把它当做函数结果返回</p>
-<div class="highlight"><pre><code class="language-js" data-lang="js"><span class="kd">var</span> <span class="nx">sine</span> <span class="o">=</span> <span class="kd">function</span><span class="p">(</span><span class="nx">x</span><span class="p">)</span> <span class="p">{</span>
+
+<div class="language-js highlighter-rouge"><pre class="highlight"><code><span class="kd">var</span> <span class="nx">sine</span> <span class="o">=</span> <span class="kd">function</span><span class="p">(</span><span class="nx">x</span><span class="p">)</span> <span class="p">{</span>
   <span class="k">return</span> <span class="p">[</span><span class="nb">Math</span><span class="p">.</span><span class="nx">sin</span><span class="p">(</span><span class="nx">x</span><span class="p">),</span> <span class="s1">'sine was called.'</span><span class="p">];</span>
 <span class="p">};</span>
 
 <span class="kd">var</span> <span class="nx">cube</span> <span class="o">=</span> <span class="kd">function</span><span class="p">(</span><span class="nx">x</span><span class="p">)</span> <span class="p">{</span>
   <span class="k">return</span> <span class="p">[</span><span class="nx">x</span> <span class="o">*</span> <span class="nx">x</span> <span class="o">*</span> <span class="nx">x</span><span class="p">,</span> <span class="s1">'cube was called.'</span><span class="p">];</span>
 <span class="p">};</span>
-</code></pre></div>
+</code></pre>
+</div>
+
 <p>可是我们发现sineOfCube不能再运行了,sine要int,得到的却是[int, string]</p>
 
 <p>我们希望的结果是这样的</p>
-<div class="highlight"><pre><code class="language-haskell" data-lang="haskell"><span class="n">compose</span><span class="p">(</span><span class="n">sine</span><span class="p">,</span> <span class="n">cube</span><span class="p">)(</span><span class="mi">3</span><span class="p">)</span>
+
+<div class="language-haskell highlighter-rouge"><pre class="highlight"><code><span class="n">compose</span><span class="p">(</span><span class="n">sine</span><span class="p">,</span> <span class="n">cube</span><span class="p">)(</span><span class="mi">3</span><span class="p">)</span>
 <span class="o">//</span> <span class="o">-&gt;</span> <span class="p">[</span><span class="mf">0.956</span><span class="p">,</span> <span class="sc">'c</span><span class="err">u</span><span class="n">be</span> <span class="n">was</span> <span class="n">called</span><span class="o">.</span><span class="n">sine</span> <span class="n">was</span> <span class="n">called</span><span class="o">.</span><span class="sc">']</span><span class="err">
-</span></code></pre></div>
+</span></code></pre>
+</div>
+
 <p>我们需要重新写一个compose</p>
-<div class="highlight"><pre><code class="language-js" data-lang="js"><span class="kd">var</span> <span class="nx">composeDebuggable</span> <span class="o">=</span> <span class="kd">function</span><span class="p">(</span><span class="nx">f</span><span class="p">,</span> <span class="nx">g</span><span class="p">)</span> <span class="p">{</span>
+
+<div class="language-js highlighter-rouge"><pre class="highlight"><code><span class="kd">var</span> <span class="nx">composeDebuggable</span> <span class="o">=</span> <span class="kd">function</span><span class="p">(</span><span class="nx">f</span><span class="p">,</span> <span class="nx">g</span><span class="p">)</span> <span class="p">{</span>
   <span class="k">return</span> <span class="kd">function</span><span class="p">(</span><span class="nx">x</span><span class="p">)</span> <span class="p">{</span>
     <span class="kd">var</span> <span class="nx">gx</span> <span class="o">=</span> <span class="nx">g</span><span class="p">(</span><span class="nx">x</span><span class="p">),</span>      <span class="c1">// e.g. cube(3) -&gt; [27, 'cube was called.']</span>
         <span class="nx">y</span>  <span class="o">=</span> <span class="nx">gx</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span>     <span class="c1">//                 27</span>
@@ -110,7 +122,10 @@
 
 <span class="nx">composeDebuggable</span><span class="p">(</span><span class="nx">sine</span><span class="p">,</span> <span class="nx">cube</span><span class="p">)(</span><span class="mi">3</span><span class="p">)</span>
 <span class="c1">// -&gt; [0.956, 'cube was called.sine was called.']</span>
-</code></pre></div><div class="highlight"><pre><code class="language-js" data-lang="js"><span class="kd">var</span> <span class="nx">bind</span> <span class="o">=</span> <span class="kd">function</span><span class="p">(</span><span class="nx">f</span><span class="p">)</span> <span class="p">{</span>
+</code></pre>
+</div>
+
+<div class="language-js highlighter-rouge"><pre class="highlight"><code><span class="kd">var</span> <span class="nx">bind</span> <span class="o">=</span> <span class="kd">function</span><span class="p">(</span><span class="nx">f</span><span class="p">)</span> <span class="p">{</span>
   <span class="k">return</span> <span class="kd">function</span><span class="p">(</span><span class="nx">tuple</span><span class="p">)</span> <span class="p">{</span>
     <span class="kd">var</span> <span class="nx">x</span>  <span class="o">=</span> <span class="nx">tuple</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span>
         <span class="nx">s</span>  <span class="o">=</span> <span class="nx">tuple</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span>
@@ -121,17 +136,20 @@
     <span class="k">return</span> <span class="p">[</span><span class="nx">y</span><span class="p">,</span> <span class="nx">s</span> <span class="o">+</span> <span class="nx">t</span><span class="p">];</span>
   <span class="p">};</span>
 <span class="p">};</span>
-</code></pre></div>
-<h3>lift bind unit</h3>
+</code></pre>
+</div>
+
+<h3 id="lift-bind-unit">lift bind unit</h3>
 
 <ul>
-<li><code>lift</code>, which converts a &#39;simple’ function into a debuggable function</li>
-<li><code>bind</code>, which converts a debuggable function into a composable form</li>
-<li><code>unit</code>, which converts a simple value into the format required for debugging, by placing it in a container</li>
+  <li><code class="highlighter-rouge">lift</code>, which converts a ‘simple’ function into a debuggable function</li>
+  <li><code class="highlighter-rouge">bind</code>, which converts a debuggable function into a composable form</li>
+  <li><code class="highlighter-rouge">unit</code>, which converts a simple value into the format required for debugging, by placing it in a container</li>
 </ul>
 
 <p><strong><em>unit</em></strong></p>
-<div class="highlight"><pre><code class="language-js" data-lang="js"><span class="c1">// unit :: Number -&gt; (Number,String)</span>
+
+<div class="language-js highlighter-rouge"><pre class="highlight"><code><span class="c1">// unit :: Number -&gt; (Number,String)</span>
 <span class="kd">var</span> <span class="nx">unit</span> <span class="o">=</span> <span class="kd">function</span><span class="p">(</span><span class="nx">x</span><span class="p">)</span> <span class="p">{</span> <span class="k">return</span> <span class="p">[</span><span class="nx">x</span><span class="p">,</span> <span class="s1">''</span><span class="p">]</span> <span class="p">};</span>
 
 <span class="kd">var</span> <span class="nx">f</span> <span class="o">=</span> <span class="nx">compose</span><span class="p">(</span><span class="nx">bind</span><span class="p">(</span><span class="nx">sine</span><span class="p">),</span> <span class="nx">bind</span><span class="p">(</span><span class="nx">cube</span><span class="p">));</span>
@@ -139,18 +157,24 @@
 
 <span class="c1">// or ...</span>
 <span class="nx">compose</span><span class="p">(</span><span class="nx">f</span><span class="p">,</span> <span class="nx">unit</span><span class="p">)(</span><span class="mi">3</span><span class="p">)</span> <span class="c1">// -&gt; [0.956, 'cube was called.sine was called.']</span>
-</code></pre></div>
+</code></pre>
+</div>
+
 <p><strong><em>lift</em></strong></p>
-<div class="highlight"><pre><code class="language-js" data-lang="js"><span class="c1">// round :: Number -&gt; Number</span>
+
+<div class="language-js highlighter-rouge"><pre class="highlight"><code><span class="c1">// round :: Number -&gt; Number</span>
 <span class="kd">var</span> <span class="nx">round</span> <span class="o">=</span> <span class="kd">function</span><span class="p">(</span><span class="nx">x</span><span class="p">)</span> <span class="p">{</span> <span class="k">return</span> <span class="nb">Math</span><span class="p">.</span><span class="nx">round</span><span class="p">(</span><span class="nx">x</span><span class="p">)</span> <span class="p">};</span>
 
 <span class="c1">// roundDebug :: Number -&gt; (Number,String)</span>
 <span class="kd">var</span> <span class="nx">roundDebug</span> <span class="o">=</span> <span class="kd">function</span><span class="p">(</span><span class="nx">x</span><span class="p">)</span> <span class="p">{</span> <span class="k">return</span> <span class="nx">unit</span><span class="p">(</span><span class="nx">round</span><span class="p">(</span><span class="nx">x</span><span class="p">))</span> <span class="p">};</span>
-</code></pre></div>
+</code></pre>
+</div>
+
 <p><strong><em>bind</em></strong></p>
 
-<p>bind, and its job is to take a <code>Number -&gt; (Number,String)</code> function and return a <code>(Number,String) -&gt; (Number,String)</code> function.</p>
-<div class="highlight"><pre><code class="language-js" data-lang="js"><span class="kd">var</span> <span class="nx">bind</span> <span class="o">=</span> <span class="kd">function</span><span class="p">(</span><span class="nx">f</span><span class="p">)</span> <span class="p">{</span>
+<p>bind, and its job is to take a <code class="highlighter-rouge">Number -&gt; (Number,String)</code> function and return a <code class="highlighter-rouge">(Number,String) -&gt; (Number,String)</code> function.</p>
+
+<div class="language-js highlighter-rouge"><pre class="highlight"><code><span class="kd">var</span> <span class="nx">bind</span> <span class="o">=</span> <span class="kd">function</span><span class="p">(</span><span class="nx">f</span><span class="p">)</span> <span class="p">{</span>
   <span class="k">return</span> <span class="kd">function</span><span class="p">(</span><span class="nx">tuple</span><span class="p">)</span> <span class="p">{</span>
     <span class="kd">var</span> <span class="nx">x</span>  <span class="o">=</span> <span class="nx">tuple</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span>
         <span class="nx">s</span>  <span class="o">=</span> <span class="nx">tuple</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span>
@@ -161,11 +185,14 @@
     <span class="k">return</span> <span class="p">[</span><span class="nx">y</span><span class="p">,</span> <span class="nx">s</span> <span class="o">+</span> <span class="nx">t</span><span class="p">];</span>
   <span class="p">};</span>
 <span class="p">};</span>
-</code></pre></div>
+</code></pre>
+</div>
+
 <p>这样之前的compose函数就可以接着用了</p>
 
-<h3>另一个例子</h3>
-<div class="highlight"><pre><code class="language-js" data-lang="js"><span class="c1">// children :: HTMLElement -&gt; [HTMLElement]</span>
+<h3 id="section">另一个例子</h3>
+
+<div class="language-js highlighter-rouge"><pre class="highlight"><code><span class="c1">// children :: HTMLElement -&gt; [HTMLElement]</span>
 <span class="kd">var</span> <span class="nx">children</span> <span class="o">=</span> <span class="kd">function</span><span class="p">(</span><span class="nx">node</span><span class="p">)</span> <span class="p">{</span>
   <span class="kd">var</span> <span class="nx">children</span> <span class="o">=</span> <span class="nx">node</span><span class="p">.</span><span class="nx">childNodes</span><span class="p">,</span> <span class="nx">ary</span> <span class="o">=</span> <span class="p">[];</span>
   <span class="k">for</span> <span class="p">(</span><span class="kd">var</span> <span class="nx">i</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span> <span class="nx">n</span> <span class="o">=</span> <span class="nx">children</span><span class="p">.</span><span class="nx">length</span><span class="p">;</span> <span class="nx">i</span> <span class="o">&lt;</span> <span class="nx">n</span><span class="p">;</span> <span class="nx">i</span><span class="o">++</span><span class="p">)</span> <span class="p">{</span>
@@ -181,15 +208,18 @@
 <span class="c1">//      "Translation from Haskell to JavaScript...",</span>
 <span class="c1">//      &lt;span class=​"edit"&gt;​…​&lt;/span&gt;​</span>
 <span class="c1">//    ]</span>
-</code></pre></div>
-<p>那么我们想<code>grandchildren</code>应该是这样的</p>
+</code></pre>
+</div>
 
-<p><code>var grandchildren = compose(children, children)</code></p>
+<p>那么我们想<code class="highlighter-rouge">grandchildren</code>应该是这样的</p>
 
-<p>可是<code>grandchildren</code>的输入输出是不同的，不是symmetric input out</p>
+<p><code class="highlighter-rouge">var grandchildren = compose(children, children)</code></p>
 
-<p>我们自己手写个<code>grandchildren</code></p>
-<div class="highlight"><pre><code class="language-js" data-lang="js"><span class="c1">// grandchildren :: HTMLElement -&gt; [HTMLElement]</span>
+<p>可是<code class="highlighter-rouge">grandchildren</code>的输入输出是不同的，不是symmetric input out</p>
+
+<p>我们自己手写个<code class="highlighter-rouge">grandchildren</code></p>
+
+<div class="language-js highlighter-rouge"><pre class="highlight"><code><span class="c1">// grandchildren :: HTMLElement -&gt; [HTMLElement]</span>
 <span class="kd">var</span> <span class="nx">grandchildren</span> <span class="o">=</span> <span class="kd">function</span><span class="p">(</span><span class="nx">node</span><span class="p">)</span> <span class="p">{</span>
   <span class="kd">var</span> <span class="nx">output</span> <span class="o">=</span> <span class="p">[],</span> <span class="nx">childs</span> <span class="o">=</span> <span class="nx">children</span><span class="p">(</span><span class="nx">node</span><span class="p">);</span>
   <span class="k">for</span> <span class="p">(</span><span class="kd">var</span> <span class="nx">i</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span> <span class="nx">n</span> <span class="o">=</span> <span class="nx">childs</span><span class="p">.</span><span class="nx">length</span><span class="p">;</span> <span class="nx">i</span> <span class="o">&lt;</span> <span class="nx">n</span><span class="p">;</span> <span class="nx">i</span><span class="o">++</span><span class="p">)</span> <span class="p">{</span>
@@ -197,7 +227,10 @@
   <span class="p">}</span>
   <span class="k">return</span> <span class="nx">output</span><span class="p">;</span>
 <span class="p">};</span>
-</code></pre></div><div class="highlight"><pre><code class="language-js" data-lang="js"><span class="c1">// unit :: a -&gt; [a]</span>
+</code></pre>
+</div>
+
+<div class="language-js highlighter-rouge"><pre class="highlight"><code><span class="c1">// unit :: a -&gt; [a]</span>
 <span class="kd">var</span> <span class="nx">unit</span> <span class="o">=</span> <span class="kd">function</span><span class="p">(</span><span class="nx">x</span><span class="p">)</span> <span class="p">{</span> <span class="k">return</span> <span class="p">[</span><span class="nx">x</span><span class="p">]</span> <span class="p">};</span>
 
 <span class="c1">// bind :: (a -&gt; [a]) -&gt; ([a] -&gt; [a])</span>
@@ -210,12 +243,166 @@
     <span class="k">return</span> <span class="nx">output</span><span class="p">;</span>
   <span class="p">};</span>
 <span class="p">};</span>
-</code></pre></div><div class="highlight"><pre><code class="language-js" data-lang="js"><span class="kd">var</span> <span class="nx">div</span> <span class="o">=</span> <span class="nb">document</span><span class="p">.</span><span class="nx">getElementsByTagName</span><span class="p">(</span><span class="s1">'div'</span><span class="p">)[</span><span class="mi">0</span><span class="p">];</span>
+</code></pre>
+</div>
+
+<div class="language-js highlighter-rouge"><pre class="highlight"><code><span class="kd">var</span> <span class="nx">div</span> <span class="o">=</span> <span class="nb">document</span><span class="p">.</span><span class="nx">getElementsByTagName</span><span class="p">(</span><span class="s1">'div'</span><span class="p">)[</span><span class="mi">0</span><span class="p">];</span>
 <span class="kd">var</span> <span class="nx">grandchildren</span> <span class="o">=</span> <span class="nx">compose</span><span class="p">(</span><span class="nx">bind</span><span class="p">(</span><span class="nx">children</span><span class="p">),</span> <span class="nx">bind</span><span class="p">(</span><span class="nx">children</span><span class="p">));</span>
 
 <span class="nx">grandchildren</span><span class="p">(</span><span class="nx">unit</span><span class="p">(</span><span class="nx">div</span><span class="p">))</span>
 <span class="c1">// -&gt; [&lt;h1&gt;…&lt;/h1&gt;, &lt;p&gt;…&lt;/p&gt;, ...]</span>
-</code></pre></div>
+</code></pre>
+</div>
+
+<h3 id="haskell">Haskell符号</h3>
+
+<p><strong><em>fmap</em></strong></p>
+
+<p>单纯的函数如+3是不能运用在Container中的data上的，用fmap就可以了</p>
+
+<p><code class="highlighter-rouge">fmap (+3) Just(2)</code></p>
+
+<p>符号如下</p>
+
+<div class="language-haskell highlighter-rouge"><pre class="highlight"><code><span class="n">getPostTitle</span> <span class="o">&lt;$&gt;</span> <span class="p">(</span><span class="n">findPost</span> <span class="mi">1</span><span class="p">)</span>
+</code></pre>
+</div>
+
+<p>fmap可以应用在两个函数上，作用是<code class="highlighter-rouge">function composition</code></p>
+
+<p><code class="highlighter-rouge">fmap (+3) (+1)</code></p>
+
+<p><strong><em>Applicatives</em></strong></p>
+
+<p>它把function也封在Container中,可以对封在Container中的data使用</p>
+
+<p>Applicative的符号是&lt;*&gt;</p>
+
+<p><code class="highlighter-rouge">Just (+3) &lt;*&gt; Just 2 == Just 5</code></p>
+
+<p>fmap可以做如下的事情</p>
+
+<div class="language-haskell highlighter-rouge"><pre class="highlight"><code><span class="c1">-- 相当于fmap (+3) (Just 5)</span>
+<span class="o">&gt;</span> <span class="p">(</span><span class="o">+</span><span class="p">)</span> <span class="o">&lt;$&gt;</span> <span class="p">(</span><span class="kt">Just</span> <span class="mi">5</span><span class="p">)</span>
+<span class="kt">Just</span> <span class="p">(</span><span class="o">+</span><span class="mi">5</span><span class="p">)</span>
+</code></pre>
+</div>
+
+<p>可是<code class="highlighter-rouge">fmap Just(+3) (Just 5)</code>这种就做不了了</p>
+
+<div class="language-haskell highlighter-rouge"><pre class="highlight"><code><span class="o">&gt;</span> <span class="kt">Just</span> <span class="p">(</span><span class="o">+</span><span class="mi">5</span><span class="p">)</span> <span class="o">&lt;$&gt;</span> <span class="p">(</span><span class="kt">Just</span> <span class="mi">4</span><span class="p">)</span>
+<span class="kt">ERROR</span> <span class="o">???</span> <span class="kt">WHAT</span> <span class="kt">DOES</span> <span class="kt">THIS</span> <span class="kt">EVEN</span> <span class="kt">MEAN</span> <span class="kt">WHY</span> <span class="kt">IS</span> <span class="kt">THE</span> <span class="kt">FUNCTION</span> <span class="kt">WRAPPED</span> <span class="kt">IN</span> <span class="kt">A</span> <span class="kt">JUST</span>
+</code></pre>
+</div>
+
+<p>这时候就需要Applicative</p>
+
+<div class="language-haskell highlighter-rouge"><pre class="highlight"><code><span class="o">&gt;</span> <span class="p">(</span><span class="o">+</span><span class="p">)</span> <span class="o">&lt;$&gt;</span> <span class="p">(</span><span class="kt">Just</span> <span class="mi">5</span><span class="p">)</span>
+<span class="kt">Just</span> <span class="p">(</span><span class="o">+</span><span class="mi">5</span><span class="p">)</span>
+<span class="o">&gt;</span> <span class="kt">Just</span> <span class="p">(</span><span class="o">+</span><span class="mi">5</span><span class="p">)</span> <span class="o">&lt;*&gt;</span> <span class="p">(</span><span class="kt">Just</span> <span class="mi">3</span><span class="p">)</span>
+<span class="kt">Just</span> <span class="mi">8</span>
+</code></pre>
+</div>
+
+<div class="language-haskell highlighter-rouge"><pre class="highlight"><code><span class="o">&gt;</span> <span class="p">(</span><span class="o">*</span><span class="p">)</span> <span class="o">&lt;$&gt;</span> <span class="kt">Just</span> <span class="mi">5</span> <span class="o">&lt;*&gt;</span> <span class="kt">Just</span> <span class="mi">3</span>
+<span class="kt">Just</span> <span class="mi">15</span>
+
+<span class="c1">-- 等价于这样</span>
+
+<span class="n">fmap</span> <span class="o">*</span> <span class="kt">Just</span><span class="p">(</span><span class="mi">5</span><span class="p">)</span> <span class="o">=&gt;</span> <span class="kt">Just</span><span class="p">(</span><span class="o">*</span><span class="mi">5</span><span class="p">)</span>
+
+<span class="kt">Just</span><span class="p">(</span><span class="o">*</span><span class="mi">5</span><span class="p">)</span> <span class="o">&lt;*&gt;</span> <span class="kt">Just</span> <span class="mi">3</span>  <span class="o">=&gt;</span> <span class="kt">Just</span><span class="p">(</span><span class="mi">15</span><span class="p">)</span>
+</code></pre>
+</div>
+
+<div class="language-haskell highlighter-rouge"><pre class="highlight"><code><span class="o">&gt;</span> <span class="n">liftA2</span> <span class="p">(</span><span class="o">*</span><span class="p">)</span> <span class="p">(</span><span class="kt">Just</span> <span class="mi">5</span><span class="p">)</span> <span class="p">(</span><span class="kt">Just</span> <span class="mi">3</span><span class="p">)</span>
+<span class="kt">Just</span> <span class="mi">15</span>
+</code></pre>
+</div>
+
+<p><strong><em>Monad</em></strong></p>
+
+<p><code class="highlighter-rouge">&gt;&gt;=</code>叫做<code class="highlighter-rouge">bind</code></p>
+
+<div class="language-haskell highlighter-rouge"><pre class="highlight"><code><span class="n">half</span> <span class="n">x</span> <span class="o">=</span> <span class="kr">if</span> <span class="n">even</span> <span class="n">x</span>
+           <span class="kr">then</span> <span class="kt">Just</span> <span class="p">(</span><span class="n">x</span> <span class="p">`</span><span class="n">div</span><span class="p">`</span> <span class="mi">2</span><span class="p">)</span>
+           <span class="kr">else</span> <span class="kt">Nothing</span>
+</code></pre>
+</div>
+
+<p><code class="highlighter-rouge">half</code>是一个函数，输入普通的值，输出<code class="highlighter-rouge">Container</code></p>
+
+<p>那要是输入<code class="highlighter-rouge">Container</code>呢？half函数肯定是不能处理的了</p>
+
+<p>这时候我们就需要<code class="highlighter-rouge">&gt;&gt;=</code> <code class="highlighter-rouge">bind</code></p>
+
+<div class="language-haskell highlighter-rouge"><pre class="highlight"><code><span class="o">&gt;</span> <span class="kt">Just</span> <span class="mi">3</span> <span class="o">&gt;&gt;=</span> <span class="n">half</span>
+<span class="kt">Nothing</span>
+<span class="o">&gt;</span> <span class="kt">Just</span> <span class="mi">4</span> <span class="o">&gt;&gt;=</span> <span class="n">half</span>
+<span class="kt">Just</span> <span class="mi">2</span>
+<span class="o">&gt;</span> <span class="kt">Nothing</span> <span class="o">&gt;&gt;=</span> <span class="n">half</span>
+<span class="kt">Nothing</span>
+</code></pre>
+</div>
+
+<div class="language-haskell highlighter-rouge"><pre class="highlight"><code><span class="o">&gt;</span> <span class="kt">Just</span> <span class="mi">20</span> <span class="o">&gt;&gt;=</span> <span class="n">half</span> <span class="o">&gt;&gt;=</span> <span class="n">half</span> <span class="o">&gt;&gt;=</span> <span class="n">half</span>
+<span class="kt">Nothing</span>
+</code></pre>
+</div>
+
+<h3 id="io-monad">IO monad</h3>
+
+<p>有三个函数</p>
+
+<div class="language-haskell highlighter-rouge"><pre class="highlight"><code><span class="n">getLine</span> <span class="o">::</span> <span class="kt">IO</span> <span class="kt">String</span>
+<span class="n">readFile</span> <span class="o">::</span> <span class="kt">FilePath</span> <span class="o">-&gt;</span> <span class="kt">IO</span> <span class="kt">String</span>
+<span class="n">putStrLn</span> <span class="o">::</span> <span class="kt">String</span> <span class="o">-&gt;</span> <span class="kt">IO</span> <span class="nb">()</span>
+</code></pre>
+</div>
+
+<p>他们都是输入普通数值，输出Container的,这样我们可以把它们串联在一起，用<code class="highlighter-rouge">&gt;&gt;=</code></p>
+
+<p>有语法糖可以用</p>
+
+<div class="language-haskell highlighter-rouge"><pre class="highlight"><code><span class="n">foo</span> <span class="o">=</span> <span class="kr">do</span>
+    <span class="n">filename</span> <span class="o">&lt;-</span> <span class="n">getLine</span>
+    <span class="n">contents</span> <span class="o">&lt;-</span> <span class="n">readFile</span> <span class="n">filename</span>
+    <span class="n">putStrLn</span> <span class="n">contents</span>
+</code></pre>
+</div>
+
+<p><code class="highlighter-rouge">functors</code>: you apply a function to a wrapped value using fmap or &lt;$&gt;</p>
+
+<p><code class="highlighter-rouge">applicatives</code>: you apply a wrapped function to a wrapped value using &lt;*&gt; or liftA</p>
+
+<p><code class="highlighter-rouge">monads</code>: you apply a function that returns a wrapped value, to a wrapped value using »= or liftM</p>
+
+<h3 id="tuple-list">Tuple List</h3>
+
+<p>A tuple is a fixed-size collection of values, where each value can have a different type.</p>
+
+<h3 id="record-syntax">Record Syntax</h3>
+
+<div class="language-haskell highlighter-rouge"><pre class="highlight"><code><span class="kr">data</span> <span class="kt">Customer</span> <span class="o">=</span> <span class="kt">Customer</span> <span class="p">{</span>
+      <span class="n">customerID</span>      <span class="o">::</span> <span class="kt">CustomerID</span>
+    <span class="p">,</span> <span class="n">customerName</span>    <span class="o">::</span> <span class="kt">String</span>
+    <span class="p">,</span> <span class="n">customerAddress</span> <span class="o">::</span> <span class="kt">Address</span>
+    <span class="p">}</span> <span class="kr">deriving</span> <span class="p">(</span><span class="kt">Show</span><span class="p">)</span>
+</code></pre>
+</div>
+
+<div class="language-haskell highlighter-rouge"><pre class="highlight"><code><span class="n">customerID</span> <span class="o">::</span> <span class="kt">Customer</span> <span class="o">-&gt;</span> <span class="kt">Int</span>
+<span class="n">customerID</span> <span class="p">(</span><span class="kt">Customer</span> <span class="n">id</span> <span class="kr">_</span> <span class="kr">_</span><span class="p">)</span> <span class="o">=</span> <span class="n">id</span>
+
+<span class="n">customerName</span> <span class="o">::</span> <span class="kt">Customer</span> <span class="o">-&gt;</span> <span class="kt">String</span>
+<span class="n">customerName</span> <span class="p">(</span><span class="kt">Customer</span> <span class="kr">_</span> <span class="n">name</span> <span class="kr">_</span><span class="p">)</span> <span class="o">=</span> <span class="n">name</span>
+
+<span class="n">customerAddress</span> <span class="o">::</span> <span class="kt">Customer</span> <span class="o">-&gt;</span> <span class="p">[</span><span class="kt">String</span><span class="p">]</span>
+<span class="n">customerAddress</span> <span class="p">(</span><span class="kt">Customer</span> <span class="kr">_</span> <span class="kr">_</span> <span class="n">address</span><span class="p">)</span> <span class="o">=</span> <span class="n">address</span>
+</code></pre>
+</div>
+
+
   </div>
 
 </article>
@@ -227,39 +414,26 @@
 
   <div class="wrapper">
 
-    <h2 class="footer-heading">Dawny Wu's blog</h2>
+    <h2 class="footer-heading"></h2>
 
     <div class="footer-col-wrapper">
       <div class="footer-col footer-col-1">
         <ul class="contact-list">
-          <li>Dawny Wu's blog</li>
-          <li><a href="mailto:nothing@gmail.com">nothing@gmail.com</a></li>
+          <li></li>
+          <li><a href="mailto:"></a></li>
         </ul>
       </div>
 
       <div class="footer-col footer-col-2">
         <ul class="social-media-list">
           
-          <li>
-            <a href="https://github.com/jekyll"><span class="icon icon--github"><svg viewBox="0 0 16 16"><path fill="#828282" d="M7.999,0.431c-4.285,0-7.76,3.474-7.76,7.761 c0,3.428,2.223,6.337,5.307,7.363c0.388,0.071,0.53-0.168,0.53-0.374c0-0.184-0.007-0.672-0.01-1.32 c-2.159,0.469-2.614-1.04-2.614-1.04c-0.353-0.896-0.862-1.135-0.862-1.135c-0.705-0.481,0.053-0.472,0.053-0.472 c0.779,0.055,1.189,0.8,1.189,0.8c0.692,1.186,1.816,0.843,2.258,0.645c0.071-0.502,0.271-0.843,0.493-1.037 C4.86,11.425,3.049,10.76,3.049,7.786c0-0.847,0.302-1.54,0.799-2.082C3.768,5.507,3.501,4.718,3.924,3.65 c0,0,0.652-0.209,2.134,0.796C6.677,4.273,7.34,4.187,8,4.184c0.659,0.003,1.323,0.089,1.943,0.261 c1.482-1.004,2.132-0.796,2.132-0.796c0.423,1.068,0.157,1.857,0.077,2.054c0.497,0.542,0.798,1.235,0.798,2.082 c0,2.981-1.814,3.637-3.543,3.829c0.279,0.24,0.527,0.713,0.527,1.437c0,1.037-0.01,1.874-0.01,2.129 c0,0.208,0.14,0.449,0.534,0.373c3.081-1.028,5.302-3.935,5.302-7.362C15.76,3.906,12.285,0.431,7.999,0.431z"/></svg>
-</span><span class="username">jekyll</span></a>
 
-          </li>
-          
-
-          
-          <li>
-            <a href="https://twitter.com/jekyllrb"><span class="icon icon--twitter"><svg viewBox="0 0 16 16"><path fill="#828282" d="M15.969,3.058c-0.586,0.26-1.217,0.436-1.878,0.515c0.675-0.405,1.194-1.045,1.438-1.809c-0.632,0.375-1.332,0.647-2.076,0.793c-0.596-0.636-1.446-1.033-2.387-1.033c-1.806,0-3.27,1.464-3.27,3.27 c0,0.256,0.029,0.506,0.085,0.745C5.163,5.404,2.753,4.102,1.14,2.124C0.859,2.607,0.698,3.168,0.698,3.767 c0,1.134,0.577,2.135,1.455,2.722C1.616,6.472,1.112,6.325,0.671,6.08c0,0.014,0,0.027,0,0.041c0,1.584,1.127,2.906,2.623,3.206 C3.02,9.402,2.731,9.442,2.433,9.442c-0.211,0-0.416-0.021-0.615-0.059c0.416,1.299,1.624,2.245,3.055,2.271 c-1.119,0.877-2.529,1.4-4.061,1.4c-0.264,0-0.524-0.015-0.78-0.046c1.447,0.928,3.166,1.469,5.013,1.469 c6.015,0,9.304-4.983,9.304-9.304c0-0.142-0.003-0.283-0.009-0.423C14.976,4.29,15.531,3.714,15.969,3.058z"/></svg>
-</span><span class="username">jekyllrb</span></a>
-
-          </li>
           
         </ul>
       </div>
 
       <div class="footer-col footer-col-3">
-        <p>Write an awesome description for your new site here. You can edit this line in _config.yml. It will appear in your document head meta (for Google search results) and in your feed.xml site description.
-</p>
+        <p></p>
       </div>
     </div>
 

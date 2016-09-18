@@ -1,0 +1,20 @@
+---
+layout: post
+title:  "Flex"
+date:   2016-09-02
+categories: css
+---
+
+### Flex: 1 1 0
+一个Container中的几个Item
+
+* 想要占据相同的空间，与内容无关`flex: 1 1 0`
+* 想要占据不同的空间，与内容有关`flex: 1 1 auto`
+
+### align-items 和 justify-content
+
+就拿`display: flex`的情况说，items默认水平放置
+
+`align-items`控制`items`都在水平中轴线上边放置，还是下边，还是中间
+
+`justify-content`控制`items`是都聚集在开头，结尾，中间，还是平均分布
