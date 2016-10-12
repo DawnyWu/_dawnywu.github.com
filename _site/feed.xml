@@ -5,9 +5,410 @@
     <description></description>
     <link>/</link>
     <atom:link href="/feed.xml" rel="self" type="application/rss+xml"/>
-    <pubDate>Sun, 18 Sep 2016 16:35:27 +0800</pubDate>
-    <lastBuildDate>Sun, 18 Sep 2016 16:35:27 +0800</lastBuildDate>
+    <pubDate>Wed, 28 Sep 2016 15:19:09 +0800</pubDate>
+    <lastBuildDate>Wed, 28 Sep 2016 15:19:09 +0800</lastBuildDate>
     <generator>Jekyll v3.1.6</generator>
+    
+      <item>
+        <title>Haskell Parse JSON</title>
+        <description>&lt;p&gt;JSON有四种基本类型：&lt;code class=&quot;highlighter-rouge&quot;&gt;String&lt;/code&gt;, &lt;code class=&quot;highlighter-rouge&quot;&gt;Number&lt;/code&gt;, &lt;code class=&quot;highlighter-rouge&quot;&gt;Boolean&lt;/code&gt;, &lt;code class=&quot;highlighter-rouge&quot;&gt;Null&lt;/code&gt;&lt;/p&gt;
+
+&lt;p&gt;两种组合的类型&lt;code class=&quot;highlighter-rouge&quot;&gt;Array&lt;/code&gt;, &lt;code class=&quot;highlighter-rouge&quot;&gt;Object&lt;/code&gt;, &lt;code class=&quot;highlighter-rouge&quot;&gt;Object&lt;/code&gt;的key永远是&lt;code class=&quot;highlighter-rouge&quot;&gt;string&lt;/code&gt;&lt;/p&gt;
+
+&lt;div class=&quot;language-haskell highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;kr&quot;&gt;data&lt;/span&gt; &lt;span class=&quot;kt&quot;&gt;JValue&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;kt&quot;&gt;JString&lt;/span&gt; &lt;span class=&quot;kt&quot;&gt;String&lt;/span&gt;
+            &lt;span class=&quot;o&quot;&gt;|&lt;/span&gt; &lt;span class=&quot;kt&quot;&gt;JNumber&lt;/span&gt; &lt;span class=&quot;kt&quot;&gt;Double&lt;/span&gt;
+            &lt;span class=&quot;o&quot;&gt;|&lt;/span&gt; &lt;span class=&quot;kt&quot;&gt;JBool&lt;/span&gt; &lt;span class=&quot;kt&quot;&gt;Bool&lt;/span&gt;
+            &lt;span class=&quot;o&quot;&gt;|&lt;/span&gt; &lt;span class=&quot;kt&quot;&gt;JNull&lt;/span&gt;
+            &lt;span class=&quot;o&quot;&gt;|&lt;/span&gt; &lt;span class=&quot;kt&quot;&gt;JObject&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;[(&lt;/span&gt;&lt;span class=&quot;kt&quot;&gt;String&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;kt&quot;&gt;JValue&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)]&lt;/span&gt;
+            &lt;span class=&quot;o&quot;&gt;|&lt;/span&gt; &lt;span class=&quot;kt&quot;&gt;JArray&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;kt&quot;&gt;JValue&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;]&lt;/span&gt;
+              &lt;span class=&quot;kr&quot;&gt;deriving&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;kt&quot;&gt;Eq&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;kt&quot;&gt;Ord&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;kt&quot;&gt;Show&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+
+&lt;p&gt;我们现在可以把普通的haskell值变成JValue&lt;/p&gt;
+
+&lt;p&gt;那么如何反过来呢？我们使用pattern matching&lt;/p&gt;
+
+&lt;div class=&quot;language-haskell highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;n&quot;&gt;getString&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;::&lt;/span&gt; &lt;span class=&quot;kt&quot;&gt;JValue&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;-&amp;gt;&lt;/span&gt; &lt;span class=&quot;kt&quot;&gt;Maybe&lt;/span&gt; &lt;span class=&quot;kt&quot;&gt;String&lt;/span&gt;
+&lt;span class=&quot;n&quot;&gt;getString&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;kt&quot;&gt;JString&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;s&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;kt&quot;&gt;Just&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;s&lt;/span&gt;
+&lt;span class=&quot;n&quot;&gt;getString&lt;/span&gt; &lt;span class=&quot;kr&quot;&gt;_&lt;/span&gt;           &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;kt&quot;&gt;Nothing&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+
+&lt;div class=&quot;language-shell highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;gp&quot;&gt;*Main&amp;gt; &lt;/span&gt;getString &lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;JString &lt;span class=&quot;s2&quot;&gt;&quot;hello&quot;&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;)&lt;/span&gt;
+Just &lt;span class=&quot;s2&quot;&gt;&quot;hello&quot;&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+
+&lt;p&gt;其他的get方法大同小异&lt;/p&gt;
+
+&lt;div class=&quot;language-haskell highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;n&quot;&gt;getInt&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;kt&quot;&gt;JNumber&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;n&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;kt&quot;&gt;Just&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;truncate&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;n&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
+&lt;span class=&quot;n&quot;&gt;getInt&lt;/span&gt; &lt;span class=&quot;kr&quot;&gt;_&lt;/span&gt;           &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;kt&quot;&gt;Nothing&lt;/span&gt;
+
+&lt;span class=&quot;n&quot;&gt;getDouble&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;kt&quot;&gt;JNumber&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;n&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;kt&quot;&gt;Just&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;n&lt;/span&gt;
+&lt;span class=&quot;n&quot;&gt;getDouble&lt;/span&gt; &lt;span class=&quot;kr&quot;&gt;_&lt;/span&gt;           &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;kt&quot;&gt;Nothing&lt;/span&gt;
+
+&lt;span class=&quot;n&quot;&gt;getBool&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;kt&quot;&gt;JBool&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;b&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;kt&quot;&gt;Just&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;b&lt;/span&gt;
+&lt;span class=&quot;n&quot;&gt;getBool&lt;/span&gt; &lt;span class=&quot;kr&quot;&gt;_&lt;/span&gt;         &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;kt&quot;&gt;Nothing&lt;/span&gt;
+
+&lt;span class=&quot;n&quot;&gt;getObject&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;kt&quot;&gt;JObject&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;o&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;kt&quot;&gt;Just&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;o&lt;/span&gt;
+&lt;span class=&quot;n&quot;&gt;getObject&lt;/span&gt; &lt;span class=&quot;kr&quot;&gt;_&lt;/span&gt;           &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;kt&quot;&gt;Nothing&lt;/span&gt;
+
+&lt;span class=&quot;n&quot;&gt;getArray&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;kt&quot;&gt;JArray&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;a&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;kt&quot;&gt;Just&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;a&lt;/span&gt;
+&lt;span class=&quot;n&quot;&gt;getArray&lt;/span&gt; &lt;span class=&quot;kr&quot;&gt;_&lt;/span&gt;          &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;kt&quot;&gt;Nothing&lt;/span&gt;
+
+&lt;span class=&quot;n&quot;&gt;isNull&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;v&lt;/span&gt;            &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;v&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;==&lt;/span&gt; &lt;span class=&quot;kt&quot;&gt;JNull&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+
+&lt;h3 id=&quot;printing-json-data&quot;&gt;Printing JSON data&lt;/h3&gt;
+
+&lt;div class=&quot;language-haskell highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;kr&quot;&gt;module&lt;/span&gt; &lt;span class=&quot;nn&quot;&gt;PutJSON&lt;/span&gt; &lt;span class=&quot;kr&quot;&gt;where&lt;/span&gt;
+
+&lt;span class=&quot;kr&quot;&gt;import&lt;/span&gt; &lt;span class=&quot;nn&quot;&gt;Data.List&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;nf&quot;&gt;intercalate&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
+&lt;span class=&quot;kr&quot;&gt;import&lt;/span&gt; &lt;span class=&quot;nn&quot;&gt;SimpleJSON&lt;/span&gt;
+
+&lt;span class=&quot;n&quot;&gt;renderJValue&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;::&lt;/span&gt; &lt;span class=&quot;kt&quot;&gt;JValue&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;-&amp;gt;&lt;/span&gt; &lt;span class=&quot;kt&quot;&gt;String&lt;/span&gt;
+
+&lt;span class=&quot;n&quot;&gt;renderJValue&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;kt&quot;&gt;JString&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;s&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;   &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;show&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;s&lt;/span&gt;
+&lt;span class=&quot;n&quot;&gt;renderJValue&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;kt&quot;&gt;JNumber&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;n&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;   &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;show&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;n&lt;/span&gt;
+&lt;span class=&quot;n&quot;&gt;renderJValue&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;kt&quot;&gt;JBool&lt;/span&gt; &lt;span class=&quot;kt&quot;&gt;True&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;  &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;&quot;true&quot;&lt;/span&gt;
+&lt;span class=&quot;n&quot;&gt;renderJValue&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;kt&quot;&gt;JBool&lt;/span&gt; &lt;span class=&quot;kt&quot;&gt;False&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;&quot;false&quot;&lt;/span&gt;
+&lt;span class=&quot;n&quot;&gt;renderJValue&lt;/span&gt; &lt;span class=&quot;kt&quot;&gt;JNull&lt;/span&gt;         &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;&quot;null&quot;&lt;/span&gt;
+
+&lt;span class=&quot;n&quot;&gt;renderJValue&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;kt&quot;&gt;JObject&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;o&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;&quot;{&quot;&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;++&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;pairs&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;o&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;++&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;&quot;}&quot;&lt;/span&gt;
+  &lt;span class=&quot;kr&quot;&gt;where&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;pairs&lt;/span&gt; &lt;span class=&quot;kt&quot;&gt;[]&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;&quot;&quot;&lt;/span&gt;
+        &lt;span class=&quot;n&quot;&gt;pairs&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;ps&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;intercalate&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;&quot;, &quot;&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;map&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;renderPair&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;ps&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
+        &lt;span class=&quot;n&quot;&gt;renderPair&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;k&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;v&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;   &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;show&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;k&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;++&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;&quot;: &quot;&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;++&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;renderJValue&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;v&lt;/span&gt;
+
+&lt;span class=&quot;n&quot;&gt;renderJValue&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;kt&quot;&gt;JArray&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;a&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;&quot;[&quot;&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;++&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;values&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;a&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;++&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;&quot;]&quot;&lt;/span&gt;
+  &lt;span class=&quot;kr&quot;&gt;where&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;values&lt;/span&gt; &lt;span class=&quot;kt&quot;&gt;[]&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;&quot;&quot;&lt;/span&gt;
+        &lt;span class=&quot;n&quot;&gt;values&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;vs&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;intercalate&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;&quot;, &quot;&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;map&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;renderJValue&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;vs&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+
+&lt;p&gt;&lt;code class=&quot;highlighter-rouge&quot;&gt;intercalate&lt;/code&gt;方法是把&lt;code class=&quot;highlighter-rouge&quot;&gt;list&lt;/code&gt;插入&lt;code class=&quot;highlighter-rouge&quot;&gt;[list]&lt;/code&gt;然后&lt;code class=&quot;highlighter-rouge&quot;&gt;flatten&lt;/code&gt;&lt;/p&gt;
+
+&lt;p&gt;上面还是没有把JValue打出来&lt;/p&gt;
+
+&lt;div class=&quot;language-haskell highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;n&quot;&gt;putJValue&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;::&lt;/span&gt; &lt;span class=&quot;kt&quot;&gt;JValue&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;-&amp;gt;&lt;/span&gt; &lt;span class=&quot;kt&quot;&gt;IO&lt;/span&gt; &lt;span class=&quot;nb&quot;&gt;()&lt;/span&gt;
+&lt;span class=&quot;n&quot;&gt;putJValue&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;v&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;putStrLn&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;renderJValue&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;v&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+
+&lt;h3 id=&quot;pretty-print&quot;&gt;pretty print&lt;/h3&gt;
+
+&lt;p&gt;&lt;code class=&quot;highlighter-rouge&quot;&gt;Doc type&lt;/code&gt;和&lt;code class=&quot;highlighter-rouge&quot;&gt;text&lt;/code&gt; &lt;code class=&quot;highlighter-rouge&quot;&gt;double&lt;/code&gt; &lt;code class=&quot;highlighter-rouge&quot;&gt;string&lt;/code&gt;方法我们定义在下边&lt;/p&gt;
+
+&lt;div class=&quot;language-haskell highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;n&quot;&gt;renderJValue&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;::&lt;/span&gt; &lt;span class=&quot;kt&quot;&gt;JValue&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;-&amp;gt;&lt;/span&gt; &lt;span class=&quot;kt&quot;&gt;Doc&lt;/span&gt;
+&lt;span class=&quot;n&quot;&gt;renderJValue&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;kt&quot;&gt;JBool&lt;/span&gt; &lt;span class=&quot;kt&quot;&gt;True&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;  &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;text&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;&quot;true&quot;&lt;/span&gt;
+&lt;span class=&quot;n&quot;&gt;renderJValue&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;kt&quot;&gt;JBool&lt;/span&gt; &lt;span class=&quot;kt&quot;&gt;False&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;text&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;&quot;false&quot;&lt;/span&gt;
+&lt;span class=&quot;n&quot;&gt;renderJValue&lt;/span&gt; &lt;span class=&quot;kt&quot;&gt;JNull&lt;/span&gt;         &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;text&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;&quot;null&quot;&lt;/span&gt;
+&lt;span class=&quot;n&quot;&gt;renderJValue&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;kt&quot;&gt;JNumber&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;num&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;double&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;num&lt;/span&gt;
+&lt;span class=&quot;n&quot;&gt;renderJValue&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;kt&quot;&gt;JString&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;str&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;string&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;str&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+
+&lt;p&gt;开发haskell的时候可以先用&lt;code class=&quot;highlighter-rouge&quot;&gt;stub&lt;/code&gt;,具体定义可以以后再说&lt;/p&gt;
+
+&lt;div class=&quot;language-haskell highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;kr&quot;&gt;import&lt;/span&gt; &lt;span class=&quot;nn&quot;&gt;SimpleJSON&lt;/span&gt;
+
+&lt;span class=&quot;kr&quot;&gt;data&lt;/span&gt; &lt;span class=&quot;kt&quot;&gt;Doc&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;kt&quot;&gt;ToBeDefined&lt;/span&gt;
+         &lt;span class=&quot;kr&quot;&gt;deriving&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;kt&quot;&gt;Show&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
+
+&lt;span class=&quot;n&quot;&gt;string&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;::&lt;/span&gt; &lt;span class=&quot;kt&quot;&gt;String&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;-&amp;gt;&lt;/span&gt; &lt;span class=&quot;kt&quot;&gt;Doc&lt;/span&gt;
+&lt;span class=&quot;n&quot;&gt;string&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;str&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;undefined&lt;/span&gt;
+
+&lt;span class=&quot;n&quot;&gt;text&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;::&lt;/span&gt; &lt;span class=&quot;kt&quot;&gt;String&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;-&amp;gt;&lt;/span&gt; &lt;span class=&quot;kt&quot;&gt;Doc&lt;/span&gt;
+&lt;span class=&quot;n&quot;&gt;text&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;str&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;undefined&lt;/span&gt;
+
+&lt;span class=&quot;n&quot;&gt;double&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;::&lt;/span&gt; &lt;span class=&quot;kt&quot;&gt;Double&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;-&amp;gt;&lt;/span&gt; &lt;span class=&quot;kt&quot;&gt;Doc&lt;/span&gt;
+&lt;span class=&quot;n&quot;&gt;double&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;num&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;undefined&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+
+&lt;p&gt;&lt;code class=&quot;highlighter-rouge&quot;&gt;undefined&lt;/code&gt;的&lt;code class=&quot;highlighter-rouge&quot;&gt;type&lt;/code&gt;是&lt;code class=&quot;highlighter-rouge&quot;&gt;a&lt;/code&gt;&lt;/p&gt;
+
+&lt;h3 id=&quot;pretty-printing-a-string&quot;&gt;Pretty printing a string&lt;/h3&gt;
+
+&lt;p&gt;point free style&lt;/p&gt;
+
+&lt;div class=&quot;language-haskell highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;n&quot;&gt;string&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;::&lt;/span&gt; &lt;span class=&quot;kt&quot;&gt;String&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;-&amp;gt;&lt;/span&gt; &lt;span class=&quot;kt&quot;&gt;Doc&lt;/span&gt;
+&lt;span class=&quot;n&quot;&gt;string&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;enclose&lt;/span&gt; &lt;span class=&quot;sc&quot;&gt;&#39;&quot;&#39;&lt;/span&gt; &lt;span class=&quot;sc&quot;&gt;&#39;&quot;&#39;&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;.&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;hcat&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;.&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;map&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;oneChar&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+
+&lt;p&gt;等于如下&lt;/p&gt;
+
+&lt;div class=&quot;language-haskell highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;n&quot;&gt;pointyString&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;::&lt;/span&gt; &lt;span class=&quot;kt&quot;&gt;String&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;-&amp;gt;&lt;/span&gt; &lt;span class=&quot;kt&quot;&gt;Doc&lt;/span&gt;
+&lt;span class=&quot;n&quot;&gt;pointyString&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;s&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;enclose&lt;/span&gt; &lt;span class=&quot;sc&quot;&gt;&#39;&quot;&#39;&lt;/span&gt; &lt;span class=&quot;sc&quot;&gt;&#39;&quot;&#39;&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;hcat&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;map&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;oneChar&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;s&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;))&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+
+&lt;p&gt;enclose, hcat, enclose方法都是我们下边定义的&lt;/p&gt;
+
+&lt;div class=&quot;language-haskell highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;c1&quot;&gt;-- 把两个Doc类型的拼在一起&lt;/span&gt;
+&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;&amp;lt;&amp;gt;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;::&lt;/span&gt; &lt;span class=&quot;kt&quot;&gt;Doc&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;-&amp;gt;&lt;/span&gt; &lt;span class=&quot;kt&quot;&gt;Doc&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;-&amp;gt;&lt;/span&gt; &lt;span class=&quot;kt&quot;&gt;Doc&lt;/span&gt;
+&lt;span class=&quot;n&quot;&gt;a&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;&amp;lt;&amp;gt;&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;b&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;undefined&lt;/span&gt;
+
+&lt;span class=&quot;n&quot;&gt;char&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;::&lt;/span&gt; &lt;span class=&quot;kt&quot;&gt;Char&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;-&amp;gt;&lt;/span&gt; &lt;span class=&quot;kt&quot;&gt;Doc&lt;/span&gt;
+&lt;span class=&quot;n&quot;&gt;char&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;c&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;undefined&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+
+&lt;div class=&quot;language-haskell highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;c1&quot;&gt;-- 用两个Char包裹住Doc&lt;/span&gt;
+&lt;span class=&quot;n&quot;&gt;enclose&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;::&lt;/span&gt; &lt;span class=&quot;kt&quot;&gt;Char&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;-&amp;gt;&lt;/span&gt; &lt;span class=&quot;kt&quot;&gt;Char&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;-&amp;gt;&lt;/span&gt; &lt;span class=&quot;kt&quot;&gt;Doc&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;-&amp;gt;&lt;/span&gt; &lt;span class=&quot;kt&quot;&gt;Doc&lt;/span&gt;
+&lt;span class=&quot;n&quot;&gt;enclose&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;left&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;right&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;x&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;char&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;left&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;&amp;lt;&amp;gt;&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;x&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;&amp;lt;&amp;gt;&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;char&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;right&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+
+&lt;div class=&quot;language-haskell highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;c1&quot;&gt;-- 把数组内地Doc连接成Doc&lt;/span&gt;
+&lt;span class=&quot;n&quot;&gt;hcat&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;::&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;kt&quot;&gt;Doc&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;]&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;-&amp;gt;&lt;/span&gt; &lt;span class=&quot;kt&quot;&gt;Doc&lt;/span&gt;
+&lt;span class=&quot;n&quot;&gt;hcat&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;xs&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;undefined&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+
+&lt;h3 id=&quot;arrays-and-objects-and-the-module-header&quot;&gt;Arrays and objects, and the module header&lt;/h3&gt;
+
+&lt;div class=&quot;language-haskell highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;n&quot;&gt;series&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;::&lt;/span&gt; &lt;span class=&quot;kt&quot;&gt;Char&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;-&amp;gt;&lt;/span&gt; &lt;span class=&quot;kt&quot;&gt;Char&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;-&amp;gt;&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;a&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;-&amp;gt;&lt;/span&gt; &lt;span class=&quot;kt&quot;&gt;Doc&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;-&amp;gt;&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;a&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;]&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;-&amp;gt;&lt;/span&gt; &lt;span class=&quot;kt&quot;&gt;Doc&lt;/span&gt;
+&lt;span class=&quot;n&quot;&gt;series&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;open&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;close&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;item&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;enclose&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;open&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;close&lt;/span&gt;
+                       &lt;span class=&quot;o&quot;&gt;.&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;fsep&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;.&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;punctuate&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;char&lt;/span&gt; &lt;span class=&quot;sc&quot;&gt;&#39;,&#39;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;.&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;map&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;item&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+
+&lt;p&gt;函数type定义了四个需要传入的参数，可是可以看到下边我们只传了3个&lt;/p&gt;
+
+</description>
+        <pubDate>Sat, 24 Sep 2016 00:00:00 +0800</pubDate>
+        <link>/haskell/2016/09/24/haskell-parse-json.html</link>
+        <guid isPermaLink="true">/haskell/2016/09/24/haskell-parse-json.html</guid>
+        
+        
+        <category>Haskell</category>
+        
+      </item>
+    
+      <item>
+        <title>Async Await</title>
+        <description>&lt;h3 id=&quot;block-means-pulling&quot;&gt;Block means pulling&lt;/h3&gt;
+
+&lt;div class=&quot;language-js highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;nx&quot;&gt;price&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;getStockPrice&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;Denim Inc&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+
+&lt;h3 id=&quot;waiting-means-pushing&quot;&gt;Waiting means pushing&lt;/h3&gt;
+
+&lt;div class=&quot;language-js highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;nx&quot;&gt;getStockPrice&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;Denim Inc&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;err&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;price&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&amp;gt;&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;{})&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+
+&lt;p&gt;解决办法可以是Promise,但是用promise写代码的方式和block情况下写代码的方式不太一样，我们希望有一种类似的方式&lt;/p&gt;
+
+&lt;h3 id=&quot;generator-function&quot;&gt;generator function&lt;/h3&gt;
+
+&lt;div class=&quot;language-js highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;kd&quot;&gt;function&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;*&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;getStockPrice&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;name&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;){&lt;/span&gt;
+  &lt;span class=&quot;kd&quot;&gt;var&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;symbol&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;yield&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;getStockSymbol&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;name&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;);&lt;/span&gt;
+  &lt;span class=&quot;kd&quot;&gt;var&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;price&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;yield&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;getSymbolPrice&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;symbol&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;);&lt;/span&gt;
+  &lt;span class=&quot;k&quot;&gt;return&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;price&lt;/span&gt;
+&lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+
+&lt;p&gt;这种写法和block情况下写法基本类似，而且不会block&lt;/p&gt;
+
+&lt;p&gt;更好的消息是我们可以在循环里使用&lt;/p&gt;
+
+&lt;h3 id=&quot;iteration&quot;&gt;iteration&lt;/h3&gt;
+
+&lt;p&gt;&lt;code class=&quot;highlighter-rouge&quot;&gt;iterator.next()&lt;/code&gt;是pulling,consumer 通过&lt;code class=&quot;highlighter-rouge&quot;&gt;.next&lt;/code&gt;拉取值&lt;/p&gt;
+
+&lt;p&gt;那么既然Generator生成Iterator,那它为什么叫Generator呢？不叫Iterator?&lt;/p&gt;
+
+&lt;p&gt;应为Generator不近包括Iterator,还包括Observer&lt;/p&gt;
+
+&lt;h3 id=&quot;async-iteration&quot;&gt;Async Iteration&lt;/h3&gt;
+
+&lt;div class=&quot;language-js highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;nx&quot;&gt;spawn&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;getStockPrice&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;Pfizer&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)).&lt;/span&gt;
+  &lt;span class=&quot;nx&quot;&gt;then&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;
+     &lt;span class=&quot;nx&quot;&gt;price&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&amp;gt;&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;console&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;log&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;price&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
+    &lt;span class=&quot;nx&quot;&gt;error&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&amp;gt;&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;console&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;log&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;error&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
+  &lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+
+</description>
+        <pubDate>Sat, 24 Sep 2016 00:00:00 +0800</pubDate>
+        <link>/javascript/2016/09/24/async-await.html</link>
+        <guid isPermaLink="true">/javascript/2016/09/24/async-await.html</guid>
+        
+        
+        <category>Javascript</category>
+        
+      </item>
+    
+      <item>
+        <title>normalize state</title>
+        <description>&lt;p&gt;&lt;a href=&quot;https://github.com/reactjs/redux/issues/994&quot;&gt;https://github.com/reactjs/redux/issues/994&lt;/a&gt;&lt;/p&gt;
+
+&lt;h3 id=&quot;section&quot;&gt;问题&lt;/h3&gt;
+
+&lt;div class=&quot;language-js highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;nx&quot;&gt;state&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;
+   &lt;span class=&quot;na&quot;&gt;plans&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;
+    &lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;&lt;span class=&quot;na&quot;&gt;title&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s1&quot;&gt;&#39;A&#39;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;na&quot;&gt;exercises&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;[{&lt;/span&gt;&lt;span class=&quot;na&quot;&gt;title&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s1&quot;&gt;&#39;exe1&#39;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;},&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;&lt;span class=&quot;na&quot;&gt;title&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s1&quot;&gt;&#39;exe2&#39;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;},{&lt;/span&gt;&lt;span class=&quot;na&quot;&gt;title&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s1&quot;&gt;&#39;exe3&#39;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;}]},&lt;/span&gt;
+    &lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;&lt;span class=&quot;na&quot;&gt;title&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s1&quot;&gt;&#39;B&#39;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;na&quot;&gt;exercises&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;[{&lt;/span&gt;&lt;span class=&quot;na&quot;&gt;title&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s1&quot;&gt;&#39;exe5&#39;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;},&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;&lt;span class=&quot;na&quot;&gt;title&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s1&quot;&gt;&#39;exe1&#39;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;},{&lt;/span&gt;&lt;span class=&quot;na&quot;&gt;title&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s1&quot;&gt;&#39;exe2&#39;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;}]}&lt;/span&gt;
+   &lt;span class=&quot;p&quot;&gt;]&lt;/span&gt;
+&lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+
+&lt;p&gt;想要update这个state,比如加一个空的exercise&lt;/p&gt;
+
+&lt;p&gt;&lt;code class=&quot;highlighter-rouge&quot;&gt;state.plans[planIdx].exercises.push({})&lt;/code&gt;&lt;/p&gt;
+
+&lt;p&gt;想要修改一个exercise&lt;/p&gt;
+
+&lt;p&gt;&lt;code class=&quot;highlighter-rouge&quot;&gt;state.plans[planIdx].exercises[exerciseIdx] = exercise&lt;/code&gt;&lt;/p&gt;
+
+&lt;p&gt;感觉有点麻烦&lt;/p&gt;
+
+&lt;h3 id=&quot;normalize&quot;&gt;使用Normalize&lt;/h3&gt;
+
+&lt;div class=&quot;language-js highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;
+  &lt;span class=&quot;nl&quot;&gt;entities&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;
+    &lt;span class=&quot;nl&quot;&gt;plans&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;
+      &lt;span class=&quot;mi&quot;&gt;1&lt;/span&gt;&lt;span class=&quot;err&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;&lt;span class=&quot;nl&quot;&gt;title&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s1&quot;&gt;&#39;A&#39;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;exercises&lt;/span&gt;&lt;span class=&quot;err&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;1&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;2&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;3&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;]},&lt;/span&gt;
+      &lt;span class=&quot;mi&quot;&gt;2&lt;/span&gt;&lt;span class=&quot;err&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;&lt;span class=&quot;nl&quot;&gt;title&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s1&quot;&gt;&#39;B&#39;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;exercises&lt;/span&gt;&lt;span class=&quot;err&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;5&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;1&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;2&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;]}&lt;/span&gt;
+     &lt;span class=&quot;p&quot;&gt;},&lt;/span&gt;
+    &lt;span class=&quot;nx&quot;&gt;exercises&lt;/span&gt;&lt;span class=&quot;err&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;
+      &lt;span class=&quot;mi&quot;&gt;1&lt;/span&gt;&lt;span class=&quot;err&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;&lt;span class=&quot;nl&quot;&gt;title&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s1&quot;&gt;&#39;exe1&#39;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;},&lt;/span&gt;
+      &lt;span class=&quot;mi&quot;&gt;2&lt;/span&gt;&lt;span class=&quot;err&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;&lt;span class=&quot;nl&quot;&gt;title&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s1&quot;&gt;&#39;exe2&#39;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;},&lt;/span&gt;
+      &lt;span class=&quot;mi&quot;&gt;3&lt;/span&gt;&lt;span class=&quot;err&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;&lt;span class=&quot;nl&quot;&gt;title&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s1&quot;&gt;&#39;exe3&#39;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;
+    &lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;
+  &lt;span class=&quot;p&quot;&gt;},&lt;/span&gt;
+  &lt;span class=&quot;nx&quot;&gt;currentPlans&lt;/span&gt;&lt;span class=&quot;err&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;1&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;2&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;]&lt;/span&gt;
+&lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+
+&lt;p&gt;reducer就变成这样&lt;/p&gt;
+
+&lt;div class=&quot;language-js highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;kr&quot;&gt;import&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;merge&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;from&lt;/span&gt; &lt;span class=&quot;s1&quot;&gt;&#39;lodash/object/merge&#39;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
+
+&lt;span class=&quot;kr&quot;&gt;const&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;exercises&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;state&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;{},&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;action&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&amp;gt;&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;
+  &lt;span class=&quot;k&quot;&gt;switch&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;action&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;type&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;
+  &lt;span class=&quot;k&quot;&gt;case&lt;/span&gt; &lt;span class=&quot;s1&quot;&gt;&#39;CREATE_EXERCISE&#39;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt;
+    &lt;span class=&quot;k&quot;&gt;return&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;
+      &lt;span class=&quot;p&quot;&gt;...&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;state&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;
+      &lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;action&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;id&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;]:&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;
+        &lt;span class=&quot;p&quot;&gt;...&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;action&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;exercise&lt;/span&gt;
+      &lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;
+    &lt;span class=&quot;p&quot;&gt;};&lt;/span&gt;
+  &lt;span class=&quot;k&quot;&gt;case&lt;/span&gt; &lt;span class=&quot;s1&quot;&gt;&#39;UPDATE_EXERCISE&#39;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt;
+    &lt;span class=&quot;k&quot;&gt;return&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;
+      &lt;span class=&quot;p&quot;&gt;...&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;state&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;
+      &lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;action&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;id&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;]:&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;
+        &lt;span class=&quot;p&quot;&gt;...&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;state&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;action&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;id&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;],&lt;/span&gt;
+        &lt;span class=&quot;p&quot;&gt;...&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;action&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;exercise&lt;/span&gt;
+      &lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;
+    &lt;span class=&quot;p&quot;&gt;};&lt;/span&gt;
+  &lt;span class=&quot;nl&quot;&gt;default&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt;
+    &lt;span class=&quot;k&quot;&gt;if&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;action&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;entities&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;&amp;amp;&amp;amp;&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;action&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;entities&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;exercises&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;
+      &lt;span class=&quot;k&quot;&gt;return&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;merge&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;({},&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;state&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;action&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;entities&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;exercises&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;);&lt;/span&gt;
+    &lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;
+    &lt;span class=&quot;k&quot;&gt;return&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;state&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
+  &lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;
+&lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;
+
+&lt;span class=&quot;kr&quot;&gt;const&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;plans&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;state&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;{},&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;action&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&amp;gt;&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;
+  &lt;span class=&quot;k&quot;&gt;switch&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;action&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;type&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;
+  &lt;span class=&quot;k&quot;&gt;case&lt;/span&gt; &lt;span class=&quot;s1&quot;&gt;&#39;CREATE_PLAN&#39;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt;
+    &lt;span class=&quot;k&quot;&gt;return&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;
+      &lt;span class=&quot;p&quot;&gt;...&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;state&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;
+      &lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;action&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;id&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;]:&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;
+        &lt;span class=&quot;p&quot;&gt;...&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;action&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;plan&lt;/span&gt;
+      &lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;
+    &lt;span class=&quot;p&quot;&gt;};&lt;/span&gt;
+  &lt;span class=&quot;k&quot;&gt;case&lt;/span&gt; &lt;span class=&quot;s1&quot;&gt;&#39;UPDATE_PLAN&#39;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt;
+    &lt;span class=&quot;k&quot;&gt;return&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;
+      &lt;span class=&quot;p&quot;&gt;...&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;state&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;
+      &lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;action&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;id&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;]:&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;
+        &lt;span class=&quot;p&quot;&gt;...&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;state&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;action&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;id&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;],&lt;/span&gt;
+        &lt;span class=&quot;p&quot;&gt;...&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;action&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;plan&lt;/span&gt;
+      &lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;
+    &lt;span class=&quot;p&quot;&gt;};&lt;/span&gt;
+  &lt;span class=&quot;nl&quot;&gt;default&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt;
+    &lt;span class=&quot;k&quot;&gt;if&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;action&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;entities&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;&amp;amp;&amp;amp;&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;action&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;entities&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;plans&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;
+      &lt;span class=&quot;k&quot;&gt;return&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;merge&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;({},&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;state&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;action&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;entities&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;plans&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;);&lt;/span&gt;
+    &lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;
+    &lt;span class=&quot;k&quot;&gt;return&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;state&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
+  &lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;
+&lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;
+
+&lt;span class=&quot;kr&quot;&gt;const&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;entities&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;combineReducers&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;({&lt;/span&gt;
+  &lt;span class=&quot;nx&quot;&gt;plans&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;
+  &lt;span class=&quot;nx&quot;&gt;exercises&lt;/span&gt;
+&lt;span class=&quot;p&quot;&gt;});&lt;/span&gt;
+
+&lt;span class=&quot;kr&quot;&gt;const&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;currentPlans&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;state&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;[],&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;action&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;
+  &lt;span class=&quot;k&quot;&gt;switch&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;action&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;type&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;
+  &lt;span class=&quot;k&quot;&gt;case&lt;/span&gt; &lt;span class=&quot;s1&quot;&gt;&#39;CREATE_PLAN&#39;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt;
+    &lt;span class=&quot;k&quot;&gt;return&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;[...&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;state&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;action&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;id&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;];&lt;/span&gt;
+  &lt;span class=&quot;nl&quot;&gt;default&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt;
+    &lt;span class=&quot;k&quot;&gt;return&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;state&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
+  &lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;
+&lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;
+
+&lt;span class=&quot;kr&quot;&gt;const&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;reducer&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;combineReducers&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;({&lt;/span&gt;
+  &lt;span class=&quot;nx&quot;&gt;entities&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;
+  &lt;span class=&quot;nx&quot;&gt;currentPlans&lt;/span&gt;
+&lt;span class=&quot;p&quot;&gt;});&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+
+</description>
+        <pubDate>Tue, 20 Sep 2016 00:00:00 +0800</pubDate>
+        <link>/react/redux/2016/09/20/normalize-redux-state.html</link>
+        <guid isPermaLink="true">/react/redux/2016/09/20/normalize-redux-state.html</guid>
+        
+        
+        <category>React</category>
+        
+        <category>Redux</category>
+        
+      </item>
+    
+      <item>
+        <title>Slide Tags Component</title>
+        <description>&lt;h3 id=&quot;absolute-&quot;&gt;absolute 绝对定位&lt;/h3&gt;
+
+&lt;p&gt;记住一个&lt;code class=&quot;highlighter-rouge&quot;&gt;“positioned”&lt;/code&gt;元素是指&lt;code class=&quot;highlighter-rouge&quot;&gt;position&lt;/code&gt;值不是&lt;code class=&quot;highlighter-rouge&quot;&gt;static&lt;/code&gt;的元素。&lt;/p&gt;
+
+&lt;p&gt;&lt;code class=&quot;highlighter-rouge&quot;&gt;absolute&lt;/code&gt;与&lt;code class=&quot;highlighter-rouge&quot;&gt;fixed&lt;/code&gt; 的表现类似，除了它不是相对于视窗而是相对于最近的&lt;code class=&quot;highlighter-rouge&quot;&gt;“positioned”&lt;/code&gt;祖先元素&lt;/p&gt;
+
+&lt;p&gt;如果绝对定位（position属性的值为absolute）的元素没有“positioned”祖先元素，那么它是相对于文档的 body 元素，并且它会随着页面滚动而移动。&lt;/p&gt;
+
+&lt;h3 id=&quot;offsettop&quot;&gt;offsetTop是什么？&lt;/h3&gt;
+
+</description>
+        <pubDate>Mon, 19 Sep 2016 00:00:00 +0800</pubDate>
+        <link>/react/2016/09/19/slideTagsComponent.html</link>
+        <guid isPermaLink="true">/react/2016/09/19/slideTagsComponent.html</guid>
+        
+        
+        <category>React</category>
+        
+      </item>
+    
+      <item>
+        <title>Slidetagscomponent</title>
+        <description>
+</description>
+        <pubDate>Mon, 19 Sep 2016 00:00:00 +0800</pubDate>
+        <link>/2016/09/19/slideTagsComponent.html</link>
+        <guid isPermaLink="true">/2016/09/19/slideTagsComponent.html</guid>
+        
+        
+      </item>
     
       <item>
         <title>Haskell Type</title>
@@ -718,8 +1119,10 @@ skipSpace (a, s) = Just (a, L8.dropWhile isSpace s)
       </item>
     
       <item>
-        <title>Haskell Moduel</title>
-        <description>&lt;p&gt;只import几个函数&lt;/p&gt;
+        <title>Haskell Moduel Import Export</title>
+        <description>&lt;h3 id=&quot;import&quot;&gt;Import&lt;/h3&gt;
+
+&lt;p&gt;只import几个函数&lt;/p&gt;
 
 &lt;div class=&quot;language-haskell highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;kr&quot;&gt;import&lt;/span&gt; &lt;span class=&quot;nn&quot;&gt;Data.List&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;nf&quot;&gt;nub&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;nf&quot;&gt;sort&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
 &lt;/code&gt;&lt;/pre&gt;
@@ -753,6 +1156,28 @@ skipSpace (a, s) = Just (a, L8.dropWhile isSpace s)
 &lt;/code&gt;&lt;/pre&gt;
 &lt;/div&gt;
 
+&lt;h3 id=&quot;export&quot;&gt;Export&lt;/h3&gt;
+
+&lt;div class=&quot;language-haskell highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;kr&quot;&gt;module&lt;/span&gt; &lt;span class=&quot;nn&quot;&gt;SimpleJSON&lt;/span&gt;
+    &lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;
+      &lt;span class=&quot;kt&quot;&gt;JValue&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;..&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
+    &lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;nf&quot;&gt;getString&lt;/span&gt;
+    &lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;nf&quot;&gt;getInt&lt;/span&gt;
+    &lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;nf&quot;&gt;getDouble&lt;/span&gt;
+    &lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;nf&quot;&gt;getBool&lt;/span&gt;
+    &lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;nf&quot;&gt;getObject&lt;/span&gt;
+    &lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;nf&quot;&gt;getArray&lt;/span&gt;
+    &lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;nf&quot;&gt;isNull&lt;/span&gt;
+    &lt;span class=&quot;p&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;kr&quot;&gt;where&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+
+&lt;p&gt;导出所有&lt;/p&gt;
+
+&lt;div class=&quot;language-haskell highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;kr&quot;&gt;module&lt;/span&gt; &lt;span class=&quot;nn&quot;&gt;ExportEverything&lt;/span&gt; &lt;span class=&quot;kr&quot;&gt;where&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+
 </description>
         <pubDate>Tue, 13 Sep 2016 00:00:00 +0800</pubDate>
         <link>/haskell/2016/09/13/haskell-module.html</link>
@@ -760,629 +1185,6 @@ skipSpace (a, s) = Just (a, L8.dropWhile isSpace s)
         
         
         <category>Haskell</category>
-        
-      </item>
-    
-      <item>
-        <title>Monad IO</title>
-        <description>&lt;div class=&quot;language-haskell highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;kr&quot;&gt;import&lt;/span&gt; &lt;span class=&quot;nn&quot;&gt;System.IO&lt;/span&gt;
-&lt;span class=&quot;kr&quot;&gt;import&lt;/span&gt; &lt;span class=&quot;nn&quot;&gt;Data.Char&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;toUpper&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
-
-&lt;span class=&quot;n&quot;&gt;main&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;::&lt;/span&gt; &lt;span class=&quot;kt&quot;&gt;IO&lt;/span&gt; &lt;span class=&quot;nb&quot;&gt;()&lt;/span&gt;
-&lt;span class=&quot;n&quot;&gt;main&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;kr&quot;&gt;do&lt;/span&gt; 
-       &lt;span class=&quot;n&quot;&gt;inh&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;&amp;lt;-&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;openFile&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;&quot;input.txt&quot;&lt;/span&gt; &lt;span class=&quot;kt&quot;&gt;ReadMode&lt;/span&gt;
-       &lt;span class=&quot;n&quot;&gt;outh&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;&amp;lt;-&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;openFile&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;&quot;output.txt&quot;&lt;/span&gt; &lt;span class=&quot;kt&quot;&gt;WriteMode&lt;/span&gt;
-       &lt;span class=&quot;n&quot;&gt;mainloop&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;inh&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;outh&lt;/span&gt;
-       &lt;span class=&quot;n&quot;&gt;hClose&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;inh&lt;/span&gt;
-       &lt;span class=&quot;n&quot;&gt;hClose&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;outh&lt;/span&gt;
-
-&lt;span class=&quot;n&quot;&gt;mainloop&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;::&lt;/span&gt; &lt;span class=&quot;kt&quot;&gt;Handle&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;-&amp;gt;&lt;/span&gt; &lt;span class=&quot;kt&quot;&gt;Handle&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;-&amp;gt;&lt;/span&gt; &lt;span class=&quot;kt&quot;&gt;IO&lt;/span&gt; &lt;span class=&quot;nb&quot;&gt;()&lt;/span&gt;
-&lt;span class=&quot;n&quot;&gt;mainloop&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;inh&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;outh&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; 
-    &lt;span class=&quot;kr&quot;&gt;do&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;ineof&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;&amp;lt;-&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;hIsEOF&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;inh&lt;/span&gt;
-       &lt;span class=&quot;kr&quot;&gt;if&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;ineof&lt;/span&gt;
-           &lt;span class=&quot;kr&quot;&gt;then&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;return&lt;/span&gt; &lt;span class=&quot;nb&quot;&gt;()&lt;/span&gt;
-           &lt;span class=&quot;kr&quot;&gt;else&lt;/span&gt; &lt;span class=&quot;kr&quot;&gt;do&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;inpStr&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;&amp;lt;-&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;hGetLine&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;inh&lt;/span&gt;
-                   &lt;span class=&quot;n&quot;&gt;hPutStrLn&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;outh&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;map&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;toUpper&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;inpStr&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
-                   &lt;span class=&quot;n&quot;&gt;mainloop&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;inh&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;outh&lt;/span&gt;
-&lt;/code&gt;&lt;/pre&gt;
-&lt;/div&gt;
-</description>
-        <pubDate>Fri, 02 Sep 2016 00:00:00 +0800</pubDate>
-        <link>/haskell/2016/09/02/monad-io.html</link>
-        <guid isPermaLink="true">/haskell/2016/09/02/monad-io.html</guid>
-        
-        
-        <category>Haskell</category>
-        
-      </item>
-    
-      <item>
-        <title>Flex</title>
-        <description>&lt;h3 id=&quot;flex-1-1-0&quot;&gt;Flex: 1 1 0&lt;/h3&gt;
-&lt;p&gt;一个Container中的几个Item&lt;/p&gt;
-
-&lt;ul&gt;
-  &lt;li&gt;想要占据相同的空间，与内容无关&lt;code class=&quot;highlighter-rouge&quot;&gt;flex: 1 1 0&lt;/code&gt;&lt;/li&gt;
-  &lt;li&gt;想要占据不同的空间，与内容有关&lt;code class=&quot;highlighter-rouge&quot;&gt;flex: 1 1 auto&lt;/code&gt;&lt;/li&gt;
-&lt;/ul&gt;
-
-&lt;h3 id=&quot;align-items--justify-content&quot;&gt;align-items 和 justify-content&lt;/h3&gt;
-
-&lt;p&gt;就拿&lt;code class=&quot;highlighter-rouge&quot;&gt;display: flex&lt;/code&gt;的情况说，items默认水平放置&lt;/p&gt;
-
-&lt;p&gt;&lt;code class=&quot;highlighter-rouge&quot;&gt;align-items&lt;/code&gt;控制&lt;code class=&quot;highlighter-rouge&quot;&gt;items&lt;/code&gt;都在水平中轴线上边放置，还是下边，还是中间&lt;/p&gt;
-
-&lt;p&gt;&lt;code class=&quot;highlighter-rouge&quot;&gt;justify-content&lt;/code&gt;控制&lt;code class=&quot;highlighter-rouge&quot;&gt;items&lt;/code&gt;是都聚集在开头，结尾，中间，还是平均分布&lt;/p&gt;
-</description>
-        <pubDate>Fri, 02 Sep 2016 00:00:00 +0800</pubDate>
-        <link>/css/2016/09/02/flex.html</link>
-        <guid isPermaLink="true">/css/2016/09/02/flex.html</guid>
-        
-        
-        <category>css</category>
-        
-      </item>
-    
-      <item>
-        <title>Haskell Monad</title>
-        <description>&lt;p&gt;https://blog.jcoglan.com/2011/03/05/translation-from-haskell-to-javascript-of-selected-portions-of-the-best-introduction-to-monads-ive-ever-read/&lt;/p&gt;
-
-&lt;p&gt;http://adit.io/posts/2013-04-17-functors,_applicatives,_and_monads_in_pictures.html&lt;/p&gt;
-
-&lt;div class=&quot;language-js highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;kd&quot;&gt;var&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;sine&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;kd&quot;&gt;function&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;x&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;{&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;return&lt;/span&gt; &lt;span class=&quot;nb&quot;&gt;Math&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;sin&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;x&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;};&lt;/span&gt;
-
-&lt;span class=&quot;kd&quot;&gt;var&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;cube&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;kd&quot;&gt;function&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;x&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;{&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;return&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;x&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;*&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;x&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;*&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;x&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;};&lt;/span&gt;
-
-&lt;span class=&quot;kd&quot;&gt;var&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;sineCubed&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;cube&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;sine&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;x&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;));&lt;/span&gt;
-
-&lt;span class=&quot;c1&quot;&gt;// compose 函数,先g后f&lt;/span&gt;
-&lt;span class=&quot;kd&quot;&gt;var&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;compose&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;kd&quot;&gt;function&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;f&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;g&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;
-  &lt;span class=&quot;k&quot;&gt;return&lt;/span&gt; &lt;span class=&quot;kd&quot;&gt;function&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;x&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;
-    &lt;span class=&quot;k&quot;&gt;return&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;f&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;g&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;x&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;));&lt;/span&gt;
-  &lt;span class=&quot;p&quot;&gt;};&lt;/span&gt;
-&lt;span class=&quot;p&quot;&gt;};&lt;/span&gt;
-
-&lt;span class=&quot;kd&quot;&gt;var&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;sineOfCube&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;compose&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;sine&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;cube&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;);&lt;/span&gt;
-&lt;span class=&quot;kd&quot;&gt;var&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;y&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;sineOfCube&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;x&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;);&lt;/span&gt;
-&lt;/code&gt;&lt;/pre&gt;
-&lt;/div&gt;
-
-&lt;p&gt;我现在要打出一些log信息来让我知道函数运行成功了,可是我是不能在函数中console.log的，会产生副作用，我只能把它当做函数结果返回&lt;/p&gt;
-
-&lt;div class=&quot;language-js highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;kd&quot;&gt;var&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;sine&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;kd&quot;&gt;function&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;x&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;
-  &lt;span class=&quot;k&quot;&gt;return&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;nb&quot;&gt;Math&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;sin&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;x&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;),&lt;/span&gt; &lt;span class=&quot;s1&quot;&gt;&#39;sine was called.&#39;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;];&lt;/span&gt;
-&lt;span class=&quot;p&quot;&gt;};&lt;/span&gt;
-
-&lt;span class=&quot;kd&quot;&gt;var&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;cube&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;kd&quot;&gt;function&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;x&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;
-  &lt;span class=&quot;k&quot;&gt;return&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;x&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;*&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;x&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;*&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;x&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;s1&quot;&gt;&#39;cube was called.&#39;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;];&lt;/span&gt;
-&lt;span class=&quot;p&quot;&gt;};&lt;/span&gt;
-&lt;/code&gt;&lt;/pre&gt;
-&lt;/div&gt;
-
-&lt;p&gt;可是我们发现sineOfCube不能再运行了,sine要int,得到的却是[int, string]&lt;/p&gt;
-
-&lt;p&gt;我们希望的结果是这样的&lt;/p&gt;
-
-&lt;div class=&quot;language-haskell highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;n&quot;&gt;compose&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;sine&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;cube&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)(&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;3&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
-&lt;span class=&quot;o&quot;&gt;//&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;-&amp;gt;&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;mf&quot;&gt;0.956&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;sc&quot;&gt;&#39;c&lt;/span&gt;&lt;span class=&quot;err&quot;&gt;u&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;be&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;was&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;called&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;sine&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;was&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;called&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;sc&quot;&gt;&#39;]&lt;/span&gt;&lt;span class=&quot;err&quot;&gt;
-&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;
-&lt;/div&gt;
-
-&lt;p&gt;我们需要重新写一个compose&lt;/p&gt;
-
-&lt;div class=&quot;language-js highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;kd&quot;&gt;var&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;composeDebuggable&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;kd&quot;&gt;function&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;f&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;g&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;
-  &lt;span class=&quot;k&quot;&gt;return&lt;/span&gt; &lt;span class=&quot;kd&quot;&gt;function&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;x&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;
-    &lt;span class=&quot;kd&quot;&gt;var&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;gx&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;g&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;x&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;),&lt;/span&gt;      &lt;span class=&quot;c1&quot;&gt;// e.g. cube(3) -&amp;gt; [27, &#39;cube was called.&#39;]&lt;/span&gt;
-        &lt;span class=&quot;nx&quot;&gt;y&lt;/span&gt;  &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;gx&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;0&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;],&lt;/span&gt;     &lt;span class=&quot;c1&quot;&gt;//                 27&lt;/span&gt;
-        &lt;span class=&quot;nx&quot;&gt;s&lt;/span&gt;  &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;gx&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;1&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;],&lt;/span&gt;     &lt;span class=&quot;c1&quot;&gt;//                 &#39;cube was called.&#39;&lt;/span&gt;
-        &lt;span class=&quot;nx&quot;&gt;fy&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;f&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;y&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;),&lt;/span&gt;      &lt;span class=&quot;c1&quot;&gt;//     sine(27) -&amp;gt; [0.956, &#39;sine was called.&#39;]&lt;/span&gt;
-        &lt;span class=&quot;nx&quot;&gt;z&lt;/span&gt;  &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;fy&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;0&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;],&lt;/span&gt;     &lt;span class=&quot;c1&quot;&gt;//                 0.956&lt;/span&gt;
-        &lt;span class=&quot;nx&quot;&gt;t&lt;/span&gt;  &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;fy&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;1&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;];&lt;/span&gt;     &lt;span class=&quot;c1&quot;&gt;//                 &#39;sine was called.&#39;&lt;/span&gt;
-
-    &lt;span class=&quot;k&quot;&gt;return&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;z&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;s&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;+&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;t&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;];&lt;/span&gt;
-  &lt;span class=&quot;p&quot;&gt;};&lt;/span&gt;
-&lt;span class=&quot;p&quot;&gt;};&lt;/span&gt;
-
-&lt;span class=&quot;nx&quot;&gt;composeDebuggable&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;sine&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;cube&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)(&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;3&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
-&lt;span class=&quot;c1&quot;&gt;// -&amp;gt; [0.956, &#39;cube was called.sine was called.&#39;]&lt;/span&gt;
-&lt;/code&gt;&lt;/pre&gt;
-&lt;/div&gt;
-
-&lt;div class=&quot;language-js highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;kd&quot;&gt;var&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;bind&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;kd&quot;&gt;function&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;f&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;
-  &lt;span class=&quot;k&quot;&gt;return&lt;/span&gt; &lt;span class=&quot;kd&quot;&gt;function&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;tuple&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;
-    &lt;span class=&quot;kd&quot;&gt;var&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;x&lt;/span&gt;  &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;tuple&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;0&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;],&lt;/span&gt;
-        &lt;span class=&quot;nx&quot;&gt;s&lt;/span&gt;  &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;tuple&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;1&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;],&lt;/span&gt;
-        &lt;span class=&quot;nx&quot;&gt;fx&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;f&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;x&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;),&lt;/span&gt;
-        &lt;span class=&quot;nx&quot;&gt;y&lt;/span&gt;  &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;fx&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;0&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;],&lt;/span&gt;
-        &lt;span class=&quot;nx&quot;&gt;t&lt;/span&gt;  &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;fx&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;1&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;];&lt;/span&gt;
-
-    &lt;span class=&quot;k&quot;&gt;return&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;y&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;s&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;+&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;t&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;];&lt;/span&gt;
-  &lt;span class=&quot;p&quot;&gt;};&lt;/span&gt;
-&lt;span class=&quot;p&quot;&gt;};&lt;/span&gt;
-&lt;/code&gt;&lt;/pre&gt;
-&lt;/div&gt;
-
-&lt;h3 id=&quot;lift-bind-unit&quot;&gt;lift bind unit&lt;/h3&gt;
-
-&lt;ul&gt;
-  &lt;li&gt;&lt;code class=&quot;highlighter-rouge&quot;&gt;lift&lt;/code&gt;, which converts a ‘simple’ function into a debuggable function&lt;/li&gt;
-  &lt;li&gt;&lt;code class=&quot;highlighter-rouge&quot;&gt;bind&lt;/code&gt;, which converts a debuggable function into a composable form&lt;/li&gt;
-  &lt;li&gt;&lt;code class=&quot;highlighter-rouge&quot;&gt;unit&lt;/code&gt;, which converts a simple value into the format required for debugging, by placing it in a container&lt;/li&gt;
-&lt;/ul&gt;
-
-&lt;p&gt;&lt;strong&gt;&lt;em&gt;unit&lt;/em&gt;&lt;/strong&gt;&lt;/p&gt;
-
-&lt;div class=&quot;language-js highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;c1&quot;&gt;// unit :: Number -&amp;gt; (Number,String)&lt;/span&gt;
-&lt;span class=&quot;kd&quot;&gt;var&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;unit&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;kd&quot;&gt;function&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;x&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;{&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;return&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;x&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;s1&quot;&gt;&#39;&#39;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;]&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;};&lt;/span&gt;
-
-&lt;span class=&quot;kd&quot;&gt;var&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;f&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;compose&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;bind&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;sine&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;),&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;bind&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;cube&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;));&lt;/span&gt;
-&lt;span class=&quot;nx&quot;&gt;f&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;unit&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;3&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;))&lt;/span&gt; &lt;span class=&quot;c1&quot;&gt;// -&amp;gt; [0.956, &#39;cube was called.sine was called.&#39;]&lt;/span&gt;
-
-&lt;span class=&quot;c1&quot;&gt;// or ...&lt;/span&gt;
-&lt;span class=&quot;nx&quot;&gt;compose&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;f&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;unit&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)(&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;3&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;c1&quot;&gt;// -&amp;gt; [0.956, &#39;cube was called.sine was called.&#39;]&lt;/span&gt;
-&lt;/code&gt;&lt;/pre&gt;
-&lt;/div&gt;
-
-&lt;p&gt;&lt;strong&gt;&lt;em&gt;lift&lt;/em&gt;&lt;/strong&gt;&lt;/p&gt;
-
-&lt;div class=&quot;language-js highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;c1&quot;&gt;// round :: Number -&amp;gt; Number&lt;/span&gt;
-&lt;span class=&quot;kd&quot;&gt;var&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;round&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;kd&quot;&gt;function&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;x&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;{&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;return&lt;/span&gt; &lt;span class=&quot;nb&quot;&gt;Math&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;round&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;x&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;};&lt;/span&gt;
-
-&lt;span class=&quot;c1&quot;&gt;// roundDebug :: Number -&amp;gt; (Number,String)&lt;/span&gt;
-&lt;span class=&quot;kd&quot;&gt;var&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;roundDebug&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;kd&quot;&gt;function&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;x&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;{&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;return&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;unit&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;round&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;x&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;))&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;};&lt;/span&gt;
-&lt;/code&gt;&lt;/pre&gt;
-&lt;/div&gt;
-
-&lt;p&gt;&lt;strong&gt;&lt;em&gt;bind&lt;/em&gt;&lt;/strong&gt;&lt;/p&gt;
-
-&lt;p&gt;bind, and its job is to take a &lt;code class=&quot;highlighter-rouge&quot;&gt;Number -&amp;gt; (Number,String)&lt;/code&gt; function and return a &lt;code class=&quot;highlighter-rouge&quot;&gt;(Number,String) -&amp;gt; (Number,String)&lt;/code&gt; function.&lt;/p&gt;
-
-&lt;div class=&quot;language-js highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;kd&quot;&gt;var&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;bind&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;kd&quot;&gt;function&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;f&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;
-  &lt;span class=&quot;k&quot;&gt;return&lt;/span&gt; &lt;span class=&quot;kd&quot;&gt;function&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;tuple&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;
-    &lt;span class=&quot;kd&quot;&gt;var&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;x&lt;/span&gt;  &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;tuple&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;0&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;],&lt;/span&gt;
-        &lt;span class=&quot;nx&quot;&gt;s&lt;/span&gt;  &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;tuple&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;1&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;],&lt;/span&gt;
-        &lt;span class=&quot;nx&quot;&gt;fx&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;f&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;x&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;),&lt;/span&gt;
-        &lt;span class=&quot;nx&quot;&gt;y&lt;/span&gt;  &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;fx&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;0&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;],&lt;/span&gt;
-        &lt;span class=&quot;nx&quot;&gt;t&lt;/span&gt;  &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;fx&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;1&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;];&lt;/span&gt;
-
-    &lt;span class=&quot;k&quot;&gt;return&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;y&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;s&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;+&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;t&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;];&lt;/span&gt;
-  &lt;span class=&quot;p&quot;&gt;};&lt;/span&gt;
-&lt;span class=&quot;p&quot;&gt;};&lt;/span&gt;
-&lt;/code&gt;&lt;/pre&gt;
-&lt;/div&gt;
-
-&lt;p&gt;这样之前的compose函数就可以接着用了&lt;/p&gt;
-
-&lt;h3 id=&quot;section&quot;&gt;另一个例子&lt;/h3&gt;
-
-&lt;div class=&quot;language-js highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;c1&quot;&gt;// children :: HTMLElement -&amp;gt; [HTMLElement]&lt;/span&gt;
-&lt;span class=&quot;kd&quot;&gt;var&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;children&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;kd&quot;&gt;function&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;node&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;
-  &lt;span class=&quot;kd&quot;&gt;var&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;children&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;node&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;childNodes&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;ary&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;[];&lt;/span&gt;
-  &lt;span class=&quot;k&quot;&gt;for&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;kd&quot;&gt;var&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;i&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;0&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;n&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;children&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;length&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;i&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;&amp;lt;&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;n&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;i&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;++&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;
-    &lt;span class=&quot;nx&quot;&gt;ary&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;i&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;]&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;children&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;i&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;];&lt;/span&gt;
-  &lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;
-  &lt;span class=&quot;k&quot;&gt;return&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;ary&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
-&lt;span class=&quot;p&quot;&gt;};&lt;/span&gt;
-
-&lt;span class=&quot;c1&quot;&gt;// e.g.&lt;/span&gt;
-&lt;span class=&quot;kd&quot;&gt;var&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;heading&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;nb&quot;&gt;document&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;getElementsByTagName&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;s1&quot;&gt;&#39;h3&#39;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)[&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;0&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;];&lt;/span&gt;
-&lt;span class=&quot;nx&quot;&gt;children&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;heading&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
-&lt;span class=&quot;c1&quot;&gt;// -&amp;gt; [&lt;/span&gt;
-&lt;span class=&quot;c1&quot;&gt;//      &quot;Translation from Haskell to JavaScript...&quot;,&lt;/span&gt;
-&lt;span class=&quot;c1&quot;&gt;//      &amp;lt;span class=​&quot;edit&quot;&amp;gt;​…​&amp;lt;/span&amp;gt;​&lt;/span&gt;
-&lt;span class=&quot;c1&quot;&gt;//    ]&lt;/span&gt;
-&lt;/code&gt;&lt;/pre&gt;
-&lt;/div&gt;
-
-&lt;p&gt;那么我们想&lt;code class=&quot;highlighter-rouge&quot;&gt;grandchildren&lt;/code&gt;应该是这样的&lt;/p&gt;
-
-&lt;p&gt;&lt;code class=&quot;highlighter-rouge&quot;&gt;var grandchildren = compose(children, children)&lt;/code&gt;&lt;/p&gt;
-
-&lt;p&gt;可是&lt;code class=&quot;highlighter-rouge&quot;&gt;grandchildren&lt;/code&gt;的输入输出是不同的，不是symmetric input out&lt;/p&gt;
-
-&lt;p&gt;我们自己手写个&lt;code class=&quot;highlighter-rouge&quot;&gt;grandchildren&lt;/code&gt;&lt;/p&gt;
-
-&lt;div class=&quot;language-js highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;c1&quot;&gt;// grandchildren :: HTMLElement -&amp;gt; [HTMLElement]&lt;/span&gt;
-&lt;span class=&quot;kd&quot;&gt;var&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;grandchildren&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;kd&quot;&gt;function&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;node&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;
-  &lt;span class=&quot;kd&quot;&gt;var&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;output&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;[],&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;childs&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;children&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;node&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;);&lt;/span&gt;
-  &lt;span class=&quot;k&quot;&gt;for&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;kd&quot;&gt;var&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;i&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;0&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;n&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;childs&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;length&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;i&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;&amp;lt;&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;n&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;i&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;++&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;
-    &lt;span class=&quot;nx&quot;&gt;output&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;output&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;concat&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;children&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;childs&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;i&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;]));&lt;/span&gt;
-  &lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;
-  &lt;span class=&quot;k&quot;&gt;return&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;output&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
-&lt;span class=&quot;p&quot;&gt;};&lt;/span&gt;
-&lt;/code&gt;&lt;/pre&gt;
-&lt;/div&gt;
-
-&lt;div class=&quot;language-js highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;c1&quot;&gt;// unit :: a -&amp;gt; [a]&lt;/span&gt;
-&lt;span class=&quot;kd&quot;&gt;var&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;unit&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;kd&quot;&gt;function&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;x&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;{&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;return&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;x&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;]&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;};&lt;/span&gt;
-
-&lt;span class=&quot;c1&quot;&gt;// bind :: (a -&amp;gt; [a]) -&amp;gt; ([a] -&amp;gt; [a])&lt;/span&gt;
-&lt;span class=&quot;kd&quot;&gt;var&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;bind&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;kd&quot;&gt;function&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;f&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;
-  &lt;span class=&quot;k&quot;&gt;return&lt;/span&gt; &lt;span class=&quot;kd&quot;&gt;function&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;list&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;
-    &lt;span class=&quot;kd&quot;&gt;var&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;output&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;[];&lt;/span&gt;
-    &lt;span class=&quot;k&quot;&gt;for&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;kd&quot;&gt;var&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;i&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;0&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;n&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;list&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;length&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;i&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;&amp;lt;&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;n&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;i&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;++&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;
-      &lt;span class=&quot;nx&quot;&gt;output&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;output&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;concat&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;f&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;list&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;i&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;]));&lt;/span&gt;
-    &lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;
-    &lt;span class=&quot;k&quot;&gt;return&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;output&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
-  &lt;span class=&quot;p&quot;&gt;};&lt;/span&gt;
-&lt;span class=&quot;p&quot;&gt;};&lt;/span&gt;
-&lt;/code&gt;&lt;/pre&gt;
-&lt;/div&gt;
-
-&lt;div class=&quot;language-js highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;kd&quot;&gt;var&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;div&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;nb&quot;&gt;document&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;getElementsByTagName&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;s1&quot;&gt;&#39;div&#39;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)[&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;0&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;];&lt;/span&gt;
-&lt;span class=&quot;kd&quot;&gt;var&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;grandchildren&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;compose&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;bind&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;children&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;),&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;bind&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;children&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;));&lt;/span&gt;
-
-&lt;span class=&quot;nx&quot;&gt;grandchildren&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;unit&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;div&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;))&lt;/span&gt;
-&lt;span class=&quot;c1&quot;&gt;// -&amp;gt; [&amp;lt;h1&amp;gt;…&amp;lt;/h1&amp;gt;, &amp;lt;p&amp;gt;…&amp;lt;/p&amp;gt;, ...]&lt;/span&gt;
-&lt;/code&gt;&lt;/pre&gt;
-&lt;/div&gt;
-
-&lt;h3 id=&quot;haskell&quot;&gt;Haskell符号&lt;/h3&gt;
-
-&lt;p&gt;&lt;strong&gt;&lt;em&gt;fmap&lt;/em&gt;&lt;/strong&gt;&lt;/p&gt;
-
-&lt;p&gt;单纯的函数如+3是不能运用在Container中的data上的，用fmap就可以了&lt;/p&gt;
-
-&lt;p&gt;&lt;code class=&quot;highlighter-rouge&quot;&gt;fmap (+3) Just(2)&lt;/code&gt;&lt;/p&gt;
-
-&lt;p&gt;符号如下&lt;/p&gt;
-
-&lt;div class=&quot;language-haskell highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;n&quot;&gt;getPostTitle&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;&amp;lt;$&amp;gt;&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;findPost&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;1&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
-&lt;/code&gt;&lt;/pre&gt;
-&lt;/div&gt;
-
-&lt;p&gt;fmap可以应用在两个函数上，作用是&lt;code class=&quot;highlighter-rouge&quot;&gt;function composition&lt;/code&gt;&lt;/p&gt;
-
-&lt;p&gt;&lt;code class=&quot;highlighter-rouge&quot;&gt;fmap (+3) (+1)&lt;/code&gt;&lt;/p&gt;
-
-&lt;p&gt;&lt;strong&gt;&lt;em&gt;Applicatives&lt;/em&gt;&lt;/strong&gt;&lt;/p&gt;
-
-&lt;p&gt;它把function也封在Container中,可以对封在Container中的data使用&lt;/p&gt;
-
-&lt;p&gt;Applicative的符号是&amp;lt;*&amp;gt;&lt;/p&gt;
-
-&lt;p&gt;&lt;code class=&quot;highlighter-rouge&quot;&gt;Just (+3) &amp;lt;*&amp;gt; Just 2 == Just 5&lt;/code&gt;&lt;/p&gt;
-
-&lt;p&gt;fmap可以做如下的事情&lt;/p&gt;
-
-&lt;div class=&quot;language-haskell highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;c1&quot;&gt;-- 相当于fmap (+3) (Just 5)&lt;/span&gt;
-&lt;span class=&quot;o&quot;&gt;&amp;gt;&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;+&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;&amp;lt;$&amp;gt;&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;kt&quot;&gt;Just&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;5&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
-&lt;span class=&quot;kt&quot;&gt;Just&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;+&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;5&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
-&lt;/code&gt;&lt;/pre&gt;
-&lt;/div&gt;
-
-&lt;p&gt;可是&lt;code class=&quot;highlighter-rouge&quot;&gt;fmap Just(+3) (Just 5)&lt;/code&gt;这种就做不了了&lt;/p&gt;
-
-&lt;div class=&quot;language-haskell highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;o&quot;&gt;&amp;gt;&lt;/span&gt; &lt;span class=&quot;kt&quot;&gt;Just&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;+&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;5&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;&amp;lt;$&amp;gt;&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;kt&quot;&gt;Just&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;4&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
-&lt;span class=&quot;kt&quot;&gt;ERROR&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;???&lt;/span&gt; &lt;span class=&quot;kt&quot;&gt;WHAT&lt;/span&gt; &lt;span class=&quot;kt&quot;&gt;DOES&lt;/span&gt; &lt;span class=&quot;kt&quot;&gt;THIS&lt;/span&gt; &lt;span class=&quot;kt&quot;&gt;EVEN&lt;/span&gt; &lt;span class=&quot;kt&quot;&gt;MEAN&lt;/span&gt; &lt;span class=&quot;kt&quot;&gt;WHY&lt;/span&gt; &lt;span class=&quot;kt&quot;&gt;IS&lt;/span&gt; &lt;span class=&quot;kt&quot;&gt;THE&lt;/span&gt; &lt;span class=&quot;kt&quot;&gt;FUNCTION&lt;/span&gt; &lt;span class=&quot;kt&quot;&gt;WRAPPED&lt;/span&gt; &lt;span class=&quot;kt&quot;&gt;IN&lt;/span&gt; &lt;span class=&quot;kt&quot;&gt;A&lt;/span&gt; &lt;span class=&quot;kt&quot;&gt;JUST&lt;/span&gt;
-&lt;/code&gt;&lt;/pre&gt;
-&lt;/div&gt;
-
-&lt;p&gt;这时候就需要Applicative&lt;/p&gt;
-
-&lt;div class=&quot;language-haskell highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;o&quot;&gt;&amp;gt;&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;+&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;&amp;lt;$&amp;gt;&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;kt&quot;&gt;Just&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;5&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
-&lt;span class=&quot;kt&quot;&gt;Just&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;+&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;5&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
-&lt;span class=&quot;o&quot;&gt;&amp;gt;&lt;/span&gt; &lt;span class=&quot;kt&quot;&gt;Just&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;+&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;5&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;&amp;lt;*&amp;gt;&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;kt&quot;&gt;Just&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;3&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
-&lt;span class=&quot;kt&quot;&gt;Just&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;8&lt;/span&gt;
-&lt;/code&gt;&lt;/pre&gt;
-&lt;/div&gt;
-
-&lt;div class=&quot;language-haskell highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;o&quot;&gt;&amp;gt;&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;*&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;&amp;lt;$&amp;gt;&lt;/span&gt; &lt;span class=&quot;kt&quot;&gt;Just&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;5&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;&amp;lt;*&amp;gt;&lt;/span&gt; &lt;span class=&quot;kt&quot;&gt;Just&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;3&lt;/span&gt;
-&lt;span class=&quot;kt&quot;&gt;Just&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;15&lt;/span&gt;
-
-&lt;span class=&quot;c1&quot;&gt;-- 等价于这样&lt;/span&gt;
-
-&lt;span class=&quot;n&quot;&gt;fmap&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;*&lt;/span&gt; &lt;span class=&quot;kt&quot;&gt;Just&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;5&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&amp;gt;&lt;/span&gt; &lt;span class=&quot;kt&quot;&gt;Just&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;*&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;5&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
-
-&lt;span class=&quot;kt&quot;&gt;Just&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;*&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;5&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;&amp;lt;*&amp;gt;&lt;/span&gt; &lt;span class=&quot;kt&quot;&gt;Just&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;3&lt;/span&gt;  &lt;span class=&quot;o&quot;&gt;=&amp;gt;&lt;/span&gt; &lt;span class=&quot;kt&quot;&gt;Just&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;15&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
-&lt;/code&gt;&lt;/pre&gt;
-&lt;/div&gt;
-
-&lt;div class=&quot;language-haskell highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;o&quot;&gt;&amp;gt;&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;liftA2&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;*&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;kt&quot;&gt;Just&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;5&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;kt&quot;&gt;Just&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;3&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
-&lt;span class=&quot;kt&quot;&gt;Just&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;15&lt;/span&gt;
-&lt;/code&gt;&lt;/pre&gt;
-&lt;/div&gt;
-
-&lt;p&gt;&lt;strong&gt;&lt;em&gt;Monad&lt;/em&gt;&lt;/strong&gt;&lt;/p&gt;
-
-&lt;p&gt;&lt;code class=&quot;highlighter-rouge&quot;&gt;&amp;gt;&amp;gt;=&lt;/code&gt;叫做&lt;code class=&quot;highlighter-rouge&quot;&gt;bind&lt;/code&gt;&lt;/p&gt;
-
-&lt;div class=&quot;language-haskell highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;n&quot;&gt;half&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;x&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;kr&quot;&gt;if&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;even&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;x&lt;/span&gt;
-           &lt;span class=&quot;kr&quot;&gt;then&lt;/span&gt; &lt;span class=&quot;kt&quot;&gt;Just&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;x&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;`&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;div&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;`&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;2&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
-           &lt;span class=&quot;kr&quot;&gt;else&lt;/span&gt; &lt;span class=&quot;kt&quot;&gt;Nothing&lt;/span&gt;
-&lt;/code&gt;&lt;/pre&gt;
-&lt;/div&gt;
-
-&lt;p&gt;&lt;code class=&quot;highlighter-rouge&quot;&gt;half&lt;/code&gt;是一个函数，输入普通的值，输出&lt;code class=&quot;highlighter-rouge&quot;&gt;Container&lt;/code&gt;&lt;/p&gt;
-
-&lt;p&gt;那要是输入&lt;code class=&quot;highlighter-rouge&quot;&gt;Container&lt;/code&gt;呢？half函数肯定是不能处理的了&lt;/p&gt;
-
-&lt;p&gt;这时候我们就需要&lt;code class=&quot;highlighter-rouge&quot;&gt;&amp;gt;&amp;gt;=&lt;/code&gt; &lt;code class=&quot;highlighter-rouge&quot;&gt;bind&lt;/code&gt;&lt;/p&gt;
-
-&lt;div class=&quot;language-haskell highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;o&quot;&gt;&amp;gt;&lt;/span&gt; &lt;span class=&quot;kt&quot;&gt;Just&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;3&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;&amp;gt;&amp;gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;half&lt;/span&gt;
-&lt;span class=&quot;kt&quot;&gt;Nothing&lt;/span&gt;
-&lt;span class=&quot;o&quot;&gt;&amp;gt;&lt;/span&gt; &lt;span class=&quot;kt&quot;&gt;Just&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;4&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;&amp;gt;&amp;gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;half&lt;/span&gt;
-&lt;span class=&quot;kt&quot;&gt;Just&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;2&lt;/span&gt;
-&lt;span class=&quot;o&quot;&gt;&amp;gt;&lt;/span&gt; &lt;span class=&quot;kt&quot;&gt;Nothing&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;&amp;gt;&amp;gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;half&lt;/span&gt;
-&lt;span class=&quot;kt&quot;&gt;Nothing&lt;/span&gt;
-&lt;/code&gt;&lt;/pre&gt;
-&lt;/div&gt;
-
-&lt;div class=&quot;language-haskell highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;o&quot;&gt;&amp;gt;&lt;/span&gt; &lt;span class=&quot;kt&quot;&gt;Just&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;20&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;&amp;gt;&amp;gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;half&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;&amp;gt;&amp;gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;half&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;&amp;gt;&amp;gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;half&lt;/span&gt;
-&lt;span class=&quot;kt&quot;&gt;Nothing&lt;/span&gt;
-&lt;/code&gt;&lt;/pre&gt;
-&lt;/div&gt;
-
-&lt;h3 id=&quot;io-monad&quot;&gt;IO monad&lt;/h3&gt;
-
-&lt;p&gt;有三个函数&lt;/p&gt;
-
-&lt;div class=&quot;language-haskell highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;n&quot;&gt;getLine&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;::&lt;/span&gt; &lt;span class=&quot;kt&quot;&gt;IO&lt;/span&gt; &lt;span class=&quot;kt&quot;&gt;String&lt;/span&gt;
-&lt;span class=&quot;n&quot;&gt;readFile&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;::&lt;/span&gt; &lt;span class=&quot;kt&quot;&gt;FilePath&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;-&amp;gt;&lt;/span&gt; &lt;span class=&quot;kt&quot;&gt;IO&lt;/span&gt; &lt;span class=&quot;kt&quot;&gt;String&lt;/span&gt;
-&lt;span class=&quot;n&quot;&gt;putStrLn&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;::&lt;/span&gt; &lt;span class=&quot;kt&quot;&gt;String&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;-&amp;gt;&lt;/span&gt; &lt;span class=&quot;kt&quot;&gt;IO&lt;/span&gt; &lt;span class=&quot;nb&quot;&gt;()&lt;/span&gt;
-&lt;/code&gt;&lt;/pre&gt;
-&lt;/div&gt;
-
-&lt;p&gt;他们都是输入普通数值，输出Container的,这样我们可以把它们串联在一起，用&lt;code class=&quot;highlighter-rouge&quot;&gt;&amp;gt;&amp;gt;=&lt;/code&gt;&lt;/p&gt;
-
-&lt;p&gt;有语法糖可以用&lt;/p&gt;
-
-&lt;div class=&quot;language-haskell highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;n&quot;&gt;foo&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;kr&quot;&gt;do&lt;/span&gt;
-    &lt;span class=&quot;n&quot;&gt;filename&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;&amp;lt;-&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;getLine&lt;/span&gt;
-    &lt;span class=&quot;n&quot;&gt;contents&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;&amp;lt;-&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;readFile&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;filename&lt;/span&gt;
-    &lt;span class=&quot;n&quot;&gt;putStrLn&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;contents&lt;/span&gt;
-&lt;/code&gt;&lt;/pre&gt;
-&lt;/div&gt;
-
-&lt;p&gt;&lt;code class=&quot;highlighter-rouge&quot;&gt;functors&lt;/code&gt;: you apply a function to a wrapped value using fmap or &amp;lt;$&amp;gt;&lt;/p&gt;
-
-&lt;p&gt;&lt;code class=&quot;highlighter-rouge&quot;&gt;applicatives&lt;/code&gt;: you apply a wrapped function to a wrapped value using &amp;lt;*&amp;gt; or liftA&lt;/p&gt;
-
-&lt;p&gt;&lt;code class=&quot;highlighter-rouge&quot;&gt;monads&lt;/code&gt;: you apply a function that returns a wrapped value, to a wrapped value using »= or liftM&lt;/p&gt;
-
-&lt;h3 id=&quot;tuple-list&quot;&gt;Tuple List&lt;/h3&gt;
-
-&lt;p&gt;A tuple is a fixed-size collection of values, where each value can have a different type.&lt;/p&gt;
-
-&lt;h3 id=&quot;record-syntax&quot;&gt;Record Syntax&lt;/h3&gt;
-
-&lt;div class=&quot;language-haskell highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;kr&quot;&gt;data&lt;/span&gt; &lt;span class=&quot;kt&quot;&gt;Customer&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;kt&quot;&gt;Customer&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;
-      &lt;span class=&quot;n&quot;&gt;customerID&lt;/span&gt;      &lt;span class=&quot;o&quot;&gt;::&lt;/span&gt; &lt;span class=&quot;kt&quot;&gt;CustomerID&lt;/span&gt;
-    &lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;customerName&lt;/span&gt;    &lt;span class=&quot;o&quot;&gt;::&lt;/span&gt; &lt;span class=&quot;kt&quot;&gt;String&lt;/span&gt;
-    &lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;customerAddress&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;::&lt;/span&gt; &lt;span class=&quot;kt&quot;&gt;Address&lt;/span&gt;
-    &lt;span class=&quot;p&quot;&gt;}&lt;/span&gt; &lt;span class=&quot;kr&quot;&gt;deriving&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;kt&quot;&gt;Show&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
-&lt;/code&gt;&lt;/pre&gt;
-&lt;/div&gt;
-
-&lt;div class=&quot;language-haskell highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;n&quot;&gt;customerID&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;::&lt;/span&gt; &lt;span class=&quot;kt&quot;&gt;Customer&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;-&amp;gt;&lt;/span&gt; &lt;span class=&quot;kt&quot;&gt;Int&lt;/span&gt;
-&lt;span class=&quot;n&quot;&gt;customerID&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;kt&quot;&gt;Customer&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;id&lt;/span&gt; &lt;span class=&quot;kr&quot;&gt;_&lt;/span&gt; &lt;span class=&quot;kr&quot;&gt;_&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;id&lt;/span&gt;
-
-&lt;span class=&quot;n&quot;&gt;customerName&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;::&lt;/span&gt; &lt;span class=&quot;kt&quot;&gt;Customer&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;-&amp;gt;&lt;/span&gt; &lt;span class=&quot;kt&quot;&gt;String&lt;/span&gt;
-&lt;span class=&quot;n&quot;&gt;customerName&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;kt&quot;&gt;Customer&lt;/span&gt; &lt;span class=&quot;kr&quot;&gt;_&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;name&lt;/span&gt; &lt;span class=&quot;kr&quot;&gt;_&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;name&lt;/span&gt;
-
-&lt;span class=&quot;n&quot;&gt;customerAddress&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;::&lt;/span&gt; &lt;span class=&quot;kt&quot;&gt;Customer&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;-&amp;gt;&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;kt&quot;&gt;String&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;]&lt;/span&gt;
-&lt;span class=&quot;n&quot;&gt;customerAddress&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;kt&quot;&gt;Customer&lt;/span&gt; &lt;span class=&quot;kr&quot;&gt;_&lt;/span&gt; &lt;span class=&quot;kr&quot;&gt;_&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;address&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;address&lt;/span&gt;
-&lt;/code&gt;&lt;/pre&gt;
-&lt;/div&gt;
-
-</description>
-        <pubDate>Fri, 02 Sep 2016 00:00:00 +0800</pubDate>
-        <link>/fp/2016/09/02/haskell-monad.html</link>
-        <guid isPermaLink="true">/fp/2016/09/02/haskell-monad.html</guid>
-        
-        
-        <category>fp</category>
-        
-      </item>
-    
-      <item>
-        <title>Haskell CIS 194</title>
-        <description>&lt;h3 id=&quot;section&quot;&gt;进度&lt;/h3&gt;
-
-&lt;p&gt;Week 7跳过&lt;/p&gt;
-
-&lt;h3 id=&quot;enumeration-types&quot;&gt;Enumeration types&lt;/h3&gt;
-
-&lt;div class=&quot;language-haskell highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;kr&quot;&gt;data&lt;/span&gt; &lt;span class=&quot;kt&quot;&gt;Thing&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;kt&quot;&gt;Shoe&lt;/span&gt; 
-           &lt;span class=&quot;o&quot;&gt;|&lt;/span&gt; &lt;span class=&quot;kt&quot;&gt;Ship&lt;/span&gt; 
-           &lt;span class=&quot;o&quot;&gt;|&lt;/span&gt; &lt;span class=&quot;kt&quot;&gt;SealingWax&lt;/span&gt; 
-           &lt;span class=&quot;o&quot;&gt;|&lt;/span&gt; &lt;span class=&quot;kt&quot;&gt;Cabbage&lt;/span&gt; 
-           &lt;span class=&quot;o&quot;&gt;|&lt;/span&gt; &lt;span class=&quot;kt&quot;&gt;King&lt;/span&gt;
-  &lt;span class=&quot;kr&quot;&gt;deriving&lt;/span&gt; &lt;span class=&quot;kt&quot;&gt;Show&lt;/span&gt;
-&lt;/code&gt;&lt;/pre&gt;
-&lt;/div&gt;
-
-&lt;p&gt;我们创建了一个新的type,我们可以为这种type定义方法&lt;/p&gt;
-
-&lt;div class=&quot;language-haskell highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;n&quot;&gt;isSmall&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;::&lt;/span&gt; &lt;span class=&quot;kt&quot;&gt;Thing&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;-&amp;gt;&lt;/span&gt; &lt;span class=&quot;kt&quot;&gt;Bool&lt;/span&gt;
-&lt;span class=&quot;n&quot;&gt;isSmall&lt;/span&gt; &lt;span class=&quot;kt&quot;&gt;Shoe&lt;/span&gt;       &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;kt&quot;&gt;True&lt;/span&gt;
-&lt;span class=&quot;n&quot;&gt;isSmall&lt;/span&gt; &lt;span class=&quot;kt&quot;&gt;Ship&lt;/span&gt;       &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;kt&quot;&gt;False&lt;/span&gt;
-&lt;span class=&quot;n&quot;&gt;isSmall&lt;/span&gt; &lt;span class=&quot;kt&quot;&gt;SealingWax&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;kt&quot;&gt;True&lt;/span&gt;
-&lt;span class=&quot;n&quot;&gt;isSmall&lt;/span&gt; &lt;span class=&quot;kt&quot;&gt;Cabbage&lt;/span&gt;    &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;kt&quot;&gt;True&lt;/span&gt;
-&lt;span class=&quot;n&quot;&gt;isSmall&lt;/span&gt; &lt;span class=&quot;kt&quot;&gt;King&lt;/span&gt;       &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;kt&quot;&gt;False&lt;/span&gt;
-&lt;/code&gt;&lt;/pre&gt;
-&lt;/div&gt;
-
-&lt;h3 id=&quot;beyond-enumerations&quot;&gt;Beyond enumerations&lt;/h3&gt;
-
-&lt;div class=&quot;language-haskell highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;kr&quot;&gt;data&lt;/span&gt; &lt;span class=&quot;kt&quot;&gt;FailableDouble&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;kt&quot;&gt;Failure&lt;/span&gt;
-                    &lt;span class=&quot;o&quot;&gt;|&lt;/span&gt; &lt;span class=&quot;kt&quot;&gt;OK&lt;/span&gt; &lt;span class=&quot;kt&quot;&gt;Double&lt;/span&gt;
-  &lt;span class=&quot;kr&quot;&gt;deriving&lt;/span&gt; &lt;span class=&quot;kt&quot;&gt;Show&lt;/span&gt;
-&lt;/code&gt;&lt;/pre&gt;
-&lt;/div&gt;
-
-&lt;p&gt;我们又定义了一种type.&lt;/p&gt;
-
-&lt;p&gt;&lt;code class=&quot;highlighter-rouge&quot;&gt;Failure&lt;/code&gt;和&lt;code class=&quot;highlighter-rouge&quot;&gt;OK Double&lt;/code&gt;叫做&lt;code class=&quot;highlighter-rouge&quot;&gt;data constructor&lt;/code&gt;&lt;/p&gt;
-
-&lt;p&gt;&lt;code class=&quot;highlighter-rouge&quot;&gt;Failure&lt;/code&gt;是type FailableDouble的一个值，而OK并不是, Ok加上一个Double的值才是type FailableDouble的一个值&lt;/p&gt;
-
-&lt;div class=&quot;language-haskell highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;c1&quot;&gt;-- Notice how the type constructor and data constructor are both named Person&lt;/span&gt;
-&lt;span class=&quot;kr&quot;&gt;data&lt;/span&gt; &lt;span class=&quot;kt&quot;&gt;Person&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;kt&quot;&gt;Person&lt;/span&gt; &lt;span class=&quot;kt&quot;&gt;String&lt;/span&gt; &lt;span class=&quot;kt&quot;&gt;Int&lt;/span&gt; &lt;span class=&quot;kt&quot;&gt;Thing&lt;/span&gt;
-  &lt;span class=&quot;kr&quot;&gt;deriving&lt;/span&gt; &lt;span class=&quot;kt&quot;&gt;Show&lt;/span&gt;
-
-&lt;span class=&quot;n&quot;&gt;brent&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;::&lt;/span&gt; &lt;span class=&quot;kt&quot;&gt;Person&lt;/span&gt;
-&lt;span class=&quot;n&quot;&gt;brent&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;kt&quot;&gt;Person&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;&quot;Brent&quot;&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;31&lt;/span&gt; &lt;span class=&quot;kt&quot;&gt;SealingWax&lt;/span&gt;
-
-&lt;span class=&quot;n&quot;&gt;stan&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;::&lt;/span&gt; &lt;span class=&quot;kt&quot;&gt;Person&lt;/span&gt;
-&lt;span class=&quot;n&quot;&gt;stan&lt;/span&gt;  &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;kt&quot;&gt;Person&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;&quot;Stan&quot;&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;94&lt;/span&gt; &lt;span class=&quot;kt&quot;&gt;Cabbage&lt;/span&gt;
-
-&lt;span class=&quot;n&quot;&gt;getAge&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;::&lt;/span&gt; &lt;span class=&quot;kt&quot;&gt;Person&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;-&amp;gt;&lt;/span&gt; &lt;span class=&quot;kt&quot;&gt;Int&lt;/span&gt;
-&lt;span class=&quot;n&quot;&gt;getAge&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;kt&quot;&gt;Person&lt;/span&gt; &lt;span class=&quot;kr&quot;&gt;_&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;a&lt;/span&gt; &lt;span class=&quot;kr&quot;&gt;_&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;a&lt;/span&gt;
-&lt;/code&gt;&lt;/pre&gt;
-&lt;/div&gt;
-
-&lt;h4 id=&quot;haskell-type-vs-data-constructor&quot;&gt;haskell-type-vs-data-constructor&lt;/h4&gt;
-
-&lt;p&gt;&lt;a href=&quot;http://stackoverflow.com/questions/18204308/haskell-type-vs-data-constructor&quot;&gt;http://stackoverflow.com/questions/18204308/haskell-type-vs-data-constructor&lt;/a&gt;&lt;/p&gt;
-
-&lt;p&gt;In a data declaration&lt;/p&gt;
-
-&lt;p&gt;a &lt;code class=&quot;highlighter-rouge&quot;&gt;type constructor&lt;/code&gt; is the thing on the left hand side of the equals sign.&lt;/p&gt;
-
-&lt;p&gt;The &lt;code class=&quot;highlighter-rouge&quot;&gt;data constructor(s)&lt;/code&gt; are the things on the right hand side of the equals sign.&lt;/p&gt;
-
-&lt;p&gt;You use &lt;code class=&quot;highlighter-rouge&quot;&gt;type constructors&lt;/code&gt; where a type is expected, and you use &lt;code class=&quot;highlighter-rouge&quot;&gt;data constructors&lt;/code&gt; where a value is expected.&lt;/p&gt;
-
-&lt;h3 id=&quot;polymorphism&quot;&gt;Polymorphism&lt;/h3&gt;
-
-&lt;p&gt;把只针对Int的List转换为多态&lt;/p&gt;
-
-&lt;div class=&quot;language-haskell highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;kr&quot;&gt;data&lt;/span&gt; &lt;span class=&quot;kt&quot;&gt;IntList&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;kt&quot;&gt;Empty&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;|&lt;/span&gt; &lt;span class=&quot;kt&quot;&gt;Cons&lt;/span&gt; &lt;span class=&quot;kt&quot;&gt;Int&lt;/span&gt; &lt;span class=&quot;kt&quot;&gt;IntList&lt;/span&gt;
-  &lt;span class=&quot;kr&quot;&gt;deriving&lt;/span&gt; &lt;span class=&quot;kt&quot;&gt;Show&lt;/span&gt;
-
-&lt;span class=&quot;c1&quot;&gt;-- Polymorphic&lt;/span&gt;
-&lt;span class=&quot;kr&quot;&gt;data&lt;/span&gt; &lt;span class=&quot;kt&quot;&gt;List&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;t&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;kt&quot;&gt;E&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;|&lt;/span&gt; &lt;span class=&quot;kt&quot;&gt;C&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;t&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;kt&quot;&gt;List&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;t&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
-&lt;/code&gt;&lt;/pre&gt;
-&lt;/div&gt;
-
-&lt;div class=&quot;language-haskell highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;n&quot;&gt;keepOnlyEven&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;::&lt;/span&gt; &lt;span class=&quot;kt&quot;&gt;IntList&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;-&amp;gt;&lt;/span&gt; &lt;span class=&quot;kt&quot;&gt;IntList&lt;/span&gt;
-&lt;span class=&quot;n&quot;&gt;keepOnlyEven&lt;/span&gt; &lt;span class=&quot;kt&quot;&gt;Empty&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;kt&quot;&gt;Empty&lt;/span&gt;
-&lt;span class=&quot;n&quot;&gt;keepOnlyEven&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;kt&quot;&gt;Cons&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;x&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;xs&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
-  &lt;span class=&quot;o&quot;&gt;|&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;even&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;x&lt;/span&gt;    &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;kt&quot;&gt;Cons&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;x&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;keepOnlyEven&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;xs&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
-  &lt;span class=&quot;o&quot;&gt;|&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;otherwise&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;keepOnlyEven&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;xs&lt;/span&gt;
-
-&lt;span class=&quot;c1&quot;&gt;-- Polymorphic&lt;/span&gt;
-&lt;span class=&quot;n&quot;&gt;filterList&lt;/span&gt; &lt;span class=&quot;kr&quot;&gt;_&lt;/span&gt; &lt;span class=&quot;kt&quot;&gt;E&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;kt&quot;&gt;E&lt;/span&gt;
-&lt;span class=&quot;n&quot;&gt;filterList&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;p&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;kt&quot;&gt;C&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;x&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;xs&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
-  &lt;span class=&quot;o&quot;&gt;|&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;p&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;x&lt;/span&gt;       &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;kt&quot;&gt;C&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;x&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;filterList&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;p&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;xs&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
-  &lt;span class=&quot;o&quot;&gt;|&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;otherwise&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;filterList&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;p&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;xs&lt;/span&gt;
-
-&lt;span class=&quot;n&quot;&gt;mapList&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;::&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;a&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;-&amp;gt;&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;b&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;-&amp;gt;&lt;/span&gt; &lt;span class=&quot;kt&quot;&gt;List&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;a&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;-&amp;gt;&lt;/span&gt; &lt;span class=&quot;kt&quot;&gt;List&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;b&lt;/span&gt;
-&lt;span class=&quot;n&quot;&gt;mapList&lt;/span&gt; &lt;span class=&quot;kr&quot;&gt;_&lt;/span&gt; &lt;span class=&quot;kt&quot;&gt;E&lt;/span&gt;        &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;kt&quot;&gt;E&lt;/span&gt;
-&lt;span class=&quot;n&quot;&gt;mapList&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;f&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;kt&quot;&gt;C&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;x&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;xs&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;kt&quot;&gt;C&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;f&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;x&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;mapList&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;f&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;xs&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
-&lt;/code&gt;&lt;/pre&gt;
-&lt;/div&gt;
-
-&lt;h3 id=&quot;io&quot;&gt;IO&lt;/h3&gt;
-
-&lt;p&gt;两种写法&lt;/p&gt;
-
-&lt;div class=&quot;language-haskell highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;c1&quot;&gt;-- 用了 &amp;gt;&amp;gt; 和 &amp;gt;&amp;gt;= 两个函数&lt;/span&gt;
-&lt;span class=&quot;n&quot;&gt;main&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;putStrLn&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;&quot;Please enter a number: &quot;&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;&amp;gt;&amp;gt;&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;readLn&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;&amp;gt;&amp;gt;=&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;nf&quot;&gt;\&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;n&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;-&amp;gt;&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;putStrLn&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;show&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;n&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;+&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;1&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;))))&lt;/span&gt;
-
-&lt;span class=&quot;n&quot;&gt;main&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;kr&quot;&gt;do&lt;/span&gt;
-       &lt;span class=&quot;n&quot;&gt;putStrLn&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;&quot;Greetings!  What is your name?&quot;&lt;/span&gt;
-       &lt;span class=&quot;n&quot;&gt;inpStr&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;&amp;lt;-&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;getLine&lt;/span&gt;
-       &lt;span class=&quot;n&quot;&gt;putStrLn&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;$&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;&quot;Welcome to Haskell, &quot;&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;++&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;inpStr&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;++&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;&quot;!&quot;&lt;/span&gt;
-&lt;/code&gt;&lt;/pre&gt;
-&lt;/div&gt;
-
-&lt;h3 id=&quot;functor&quot;&gt;Functor&lt;/h3&gt;
-
-&lt;div class=&quot;language-haskell highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;n&quot;&gt;map&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;::&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;a&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;-&amp;gt;&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;b&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;-&amp;gt;&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;a&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;]&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;-&amp;gt;&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;b&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;]&lt;/span&gt;
-
-&lt;span class=&quot;n&quot;&gt;treeMap&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;::&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;a&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;-&amp;gt;&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;b&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;-&amp;gt;&lt;/span&gt; &lt;span class=&quot;kt&quot;&gt;Tree&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;a&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;-&amp;gt;&lt;/span&gt; &lt;span class=&quot;kt&quot;&gt;Tree&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;b&lt;/span&gt;
-
-&lt;span class=&quot;n&quot;&gt;maybeEval&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;::&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;kt&quot;&gt;ExprT&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;-&amp;gt;&lt;/span&gt; &lt;span class=&quot;kt&quot;&gt;Int&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;-&amp;gt;&lt;/span&gt; &lt;span class=&quot;kt&quot;&gt;Maybe&lt;/span&gt; &lt;span class=&quot;kt&quot;&gt;ExprT&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;-&amp;gt;&lt;/span&gt; &lt;span class=&quot;kt&quot;&gt;Maybe&lt;/span&gt; &lt;span class=&quot;kt&quot;&gt;Int&lt;/span&gt;
-
-&lt;span class=&quot;n&quot;&gt;maybeMap&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;::&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;a&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;-&amp;gt;&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;b&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;-&amp;gt;&lt;/span&gt; &lt;span class=&quot;kt&quot;&gt;Maybe&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;a&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;-&amp;gt;&lt;/span&gt; &lt;span class=&quot;kt&quot;&gt;Maybe&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;b&lt;/span&gt;
-&lt;/code&gt;&lt;/pre&gt;
-&lt;/div&gt;
-
-&lt;p&gt;我们好像可以看出一些规律&lt;/p&gt;
-
-&lt;p&gt;&lt;code class=&quot;highlighter-rouge&quot;&gt;thingMap :: (a -&amp;gt; b) -&amp;gt; f a -&amp;gt; f b&lt;/code&gt;&lt;/p&gt;
-
-&lt;p&gt;有一种&lt;code class=&quot;highlighter-rouge&quot;&gt;f&lt;/code&gt;作为&lt;code class=&quot;highlighter-rouge&quot;&gt;Container&lt;/code&gt;,可以被一个函数&lt;code class=&quot;highlighter-rouge&quot;&gt;map over&lt;/code&gt;&lt;/p&gt;
-
-&lt;h3 id=&quot;kind&quot;&gt;Kind&lt;/h3&gt;
-
-&lt;div class=&quot;language-haskell highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;kt&quot;&gt;Prelude&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;&amp;gt;&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;:&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;k&lt;/span&gt; &lt;span class=&quot;kt&quot;&gt;Int&lt;/span&gt;
-&lt;span class=&quot;kt&quot;&gt;Int&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;::&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;*&lt;/span&gt;
-&lt;span class=&quot;kt&quot;&gt;Prelude&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;&amp;gt;&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;:&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;k&lt;/span&gt; &lt;span class=&quot;kt&quot;&gt;Bool&lt;/span&gt;
-&lt;span class=&quot;kt&quot;&gt;Bool&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;::&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;*&lt;/span&gt;
-&lt;span class=&quot;kt&quot;&gt;Prelude&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;&amp;gt;&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;:&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;k&lt;/span&gt; &lt;span class=&quot;kt&quot;&gt;Char&lt;/span&gt;
-&lt;span class=&quot;kt&quot;&gt;Char&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;::&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;*&lt;/span&gt;
-&lt;span class=&quot;kt&quot;&gt;Prelude&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;&amp;gt;&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;:&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;k&lt;/span&gt; &lt;span class=&quot;kt&quot;&gt;Maybe&lt;/span&gt; &lt;span class=&quot;kt&quot;&gt;Int&lt;/span&gt;
-&lt;span class=&quot;kt&quot;&gt;Maybe&lt;/span&gt; &lt;span class=&quot;kt&quot;&gt;Int&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;::&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;*&lt;/span&gt;
-
-&lt;span class=&quot;kt&quot;&gt;Prelude&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;&amp;gt;&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;:&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;k&lt;/span&gt; &lt;span class=&quot;kt&quot;&gt;Maybe&lt;/span&gt;
-&lt;span class=&quot;kt&quot;&gt;Maybe&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;::&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;*&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;-&amp;gt;&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;*&lt;/span&gt;
-&lt;span class=&quot;kt&quot;&gt;Prelude&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;&amp;gt;&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;:&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;k&lt;/span&gt; &lt;span class=&quot;kt&quot;&gt;[]&lt;/span&gt;
-&lt;span class=&quot;kt&quot;&gt;[]&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;::&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;*&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;-&amp;gt;&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;*&lt;/span&gt;
-&lt;span class=&quot;kt&quot;&gt;Prelude&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;:&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;k&lt;/span&gt; &lt;span class=&quot;kt&quot;&gt;[]&lt;/span&gt; &lt;span class=&quot;kt&quot;&gt;Int&lt;/span&gt;
-&lt;span class=&quot;kt&quot;&gt;[]&lt;/span&gt; &lt;span class=&quot;kt&quot;&gt;Int&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;::&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;*&lt;/span&gt;
-&lt;span class=&quot;kt&quot;&gt;Prelude&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;&amp;gt;&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;:&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;k&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;kt&quot;&gt;Int&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;]&lt;/span&gt;  &lt;span class=&quot;c1&quot;&gt;-- special syntax for [] Int&lt;/span&gt;
-&lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;kt&quot;&gt;Int&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;]&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;::&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;*&lt;/span&gt;
-&lt;span class=&quot;kt&quot;&gt;Prelude&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;&amp;gt;&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;:&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;k&lt;/span&gt; &lt;span class=&quot;kt&quot;&gt;Tree&lt;/span&gt;
-&lt;span class=&quot;kt&quot;&gt;Tree&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;::&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;*&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;-&amp;gt;&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;*&lt;/span&gt;
-&lt;/code&gt;&lt;/pre&gt;
-&lt;/div&gt;
-
-&lt;p&gt;&lt;code class=&quot;highlighter-rouge&quot;&gt;Maybe :: * -&amp;gt; *&lt;/code&gt;类似这样的叫做&lt;code class=&quot;highlighter-rouge&quot;&gt;type constructor&lt;/code&gt;, it can take as input &lt;code class=&quot;highlighter-rouge&quot;&gt;Int :: *&lt;/code&gt; and produce the new type &lt;code class=&quot;highlighter-rouge&quot;&gt;Maybe Int :: *&lt;/code&gt;&lt;/p&gt;
-
-&lt;div class=&quot;language-haskell highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;n&quot;&gt;first&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;fmap&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;+&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;kt&quot;&gt;Just&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;3&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
-&lt;span class=&quot;n&quot;&gt;second&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;fmap&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;first&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;kt&quot;&gt;Just&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;4&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
-&lt;/code&gt;&lt;/pre&gt;
-&lt;/div&gt;
-
-&lt;p&gt;有问题的。first已经成了一个包裹着（+3）的Container,不是一个函数了，下一句会有问题的&lt;/p&gt;
-
-&lt;p&gt;据说这样就可以了&lt;/p&gt;
-
-&lt;p&gt;&lt;code class=&quot;highlighter-rouge&quot;&gt;pure (+) &amp;lt;*&amp;gt; Just 3 &amp;lt;*&amp;gt; Just 4&lt;/code&gt;&lt;/p&gt;
-
-&lt;div class=&quot;language-haskell highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;kr&quot;&gt;class&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;kt&quot;&gt;Functor&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;f&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&amp;gt;&lt;/span&gt; &lt;span class=&quot;kt&quot;&gt;Applicative&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;f&lt;/span&gt; &lt;span class=&quot;kr&quot;&gt;where&lt;/span&gt;
-    &lt;span class=&quot;n&quot;&gt;pure&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;::&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;a&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;-&amp;gt;&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;f&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;a&lt;/span&gt;
-    &lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;&amp;lt;*&amp;gt;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;::&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;f&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;a&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;-&amp;gt;&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;b&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;-&amp;gt;&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;f&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;a&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;-&amp;gt;&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;f&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;b&lt;/span&gt;
-&lt;/code&gt;&lt;/pre&gt;
-&lt;/div&gt;
-
-&lt;h3 id=&quot;monad&quot;&gt;Monad&lt;/h3&gt;
-
-&lt;div class=&quot;language-haskell highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;kr&quot;&gt;do&lt;/span&gt;
-   &lt;span class=&quot;n&quot;&gt;putStrLn&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;&quot;What is your name?&quot;&lt;/span&gt;
-   &lt;span class=&quot;n&quot;&gt;name&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;&amp;lt;-&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;getLine&lt;/span&gt;
-   &lt;span class=&quot;n&quot;&gt;putStrLn&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&quot;Welcome, &quot;&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;++&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;name&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;++&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;&quot;!&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
-&lt;/code&gt;&lt;/pre&gt;
-&lt;/div&gt;
-
-&lt;div class=&quot;language-haskell highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;n&quot;&gt;putStrLn&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;&quot;What is your name?&quot;&lt;/span&gt;
-&lt;span class=&quot;o&quot;&gt;&amp;gt;&amp;gt;=&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;nf&quot;&gt;\&lt;/span&gt;&lt;span class=&quot;kr&quot;&gt;_&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;-&amp;gt;&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;getLine&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
-&lt;span class=&quot;o&quot;&gt;&amp;gt;&amp;gt;=&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;nf&quot;&gt;\&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;name&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;-&amp;gt;&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;putStrLn&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&quot;Welcome, &quot;&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;++&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;name&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;++&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;&quot;!&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;))&lt;/span&gt;
-&lt;/code&gt;&lt;/pre&gt;
-&lt;/div&gt;
-</description>
-        <pubDate>Fri, 02 Sep 2016 00:00:00 +0800</pubDate>
-        <link>/fp/2016/09/02/haskell-CIS-194.html</link>
-        <guid isPermaLink="true">/fp/2016/09/02/haskell-CIS-194.html</guid>
-        
-        
-        <category>fp</category>
-        
-      </item>
-    
-      <item>
-        <title>Webpack Fundamental</title>
-        <description>
-</description>
-        <pubDate>Tue, 30 Aug 2016 00:00:00 +0800</pubDate>
-        <link>/webpack/2016/08/30/webpack-element.html</link>
-        <guid isPermaLink="true">/webpack/2016/08/30/webpack-element.html</guid>
-        
-        
-        <category>webpack</category>
         
       </item>
     

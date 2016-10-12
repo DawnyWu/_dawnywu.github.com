@@ -1,0 +1,274 @@
+<!DOCTYPE html>
+<html>
+
+  <head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  <title>Haskell Parse JSON</title>
+  <meta name="description" content="JSON有四种基本类型：String, Number, Boolean, Null">
+
+  <link rel="stylesheet" href="/css/main.css">
+  <link rel="canonical" href="/haskell/2016/09/24/haskell-parse-json.html">
+  <link rel="alternate" type="application/rss+xml" title="" href="/feed.xml">
+</head>
+
+
+  <body>
+
+    <header class="site-header">
+
+  <div class="wrapper">
+
+    <a class="site-title" href="/"></a>
+
+    <nav class="site-nav">
+      <a href="#" class="menu-icon">
+        <svg viewBox="0 0 18 15">
+          <path fill="#424242" d="M18,1.484c0,0.82-0.665,1.484-1.484,1.484H1.484C0.665,2.969,0,2.304,0,1.484l0,0C0,0.665,0.665,0,1.484,0 h15.031C17.335,0,18,0.665,18,1.484L18,1.484z"/>
+          <path fill="#424242" d="M18,7.516C18,8.335,17.335,9,16.516,9H1.484C0.665,9,0,8.335,0,7.516l0,0c0-0.82,0.665-1.484,1.484-1.484 h15.031C17.335,6.031,18,6.696,18,7.516L18,7.516z"/>
+          <path fill="#424242" d="M18,13.516C18,14.335,17.335,15,16.516,15H1.484C0.665,15,0,14.335,0,13.516l0,0 c0-0.82,0.665-1.484,1.484-1.484h15.031C17.335,12.031,18,12.696,18,13.516L18,13.516z"/>
+        </svg>
+      </a>
+
+      <div class="trigger">
+        
+          
+          <a class="page-link" href="/about/">About</a>
+          
+        
+          
+        
+          
+        
+          
+        
+      </div>
+    </nav>
+
+  </div>
+
+</header>
+
+
+    <div class="page-content">
+      <div class="wrapper">
+        <article class="post" itemscope itemtype="http://schema.org/BlogPosting">
+
+  <header class="post-header">
+    <h1 class="post-title" itemprop="name headline">Haskell Parse JSON</h1>
+    <p class="post-meta"><time datetime="2016-09-24T00:00:00+08:00" itemprop="datePublished">Sep 24, 2016</time></p>
+  </header>
+
+  <div class="post-content" itemprop="articleBody">
+    <p>JSON有四种基本类型：<code class="highlighter-rouge">String</code>, <code class="highlighter-rouge">Number</code>, <code class="highlighter-rouge">Boolean</code>, <code class="highlighter-rouge">Null</code></p>
+
+<p>两种组合的类型<code class="highlighter-rouge">Array</code>, <code class="highlighter-rouge">Object</code>, <code class="highlighter-rouge">Object</code>的key永远是<code class="highlighter-rouge">string</code></p>
+
+<div class="language-haskell highlighter-rouge"><pre class="highlight"><code><span class="kr">data</span> <span class="kt">JValue</span> <span class="o">=</span> <span class="kt">JString</span> <span class="kt">String</span>
+            <span class="o">|</span> <span class="kt">JNumber</span> <span class="kt">Double</span>
+            <span class="o">|</span> <span class="kt">JBool</span> <span class="kt">Bool</span>
+            <span class="o">|</span> <span class="kt">JNull</span>
+            <span class="o">|</span> <span class="kt">JObject</span> <span class="p">[(</span><span class="kt">String</span><span class="p">,</span> <span class="kt">JValue</span><span class="p">)]</span>
+            <span class="o">|</span> <span class="kt">JArray</span> <span class="p">[</span><span class="kt">JValue</span><span class="p">]</span>
+              <span class="kr">deriving</span> <span class="p">(</span><span class="kt">Eq</span><span class="p">,</span> <span class="kt">Ord</span><span class="p">,</span> <span class="kt">Show</span><span class="p">)</span>
+</code></pre>
+</div>
+
+<p>我们现在可以把普通的haskell值变成JValue</p>
+
+<p>那么如何反过来呢？我们使用pattern matching</p>
+
+<div class="language-haskell highlighter-rouge"><pre class="highlight"><code><span class="n">getString</span> <span class="o">::</span> <span class="kt">JValue</span> <span class="o">-&gt;</span> <span class="kt">Maybe</span> <span class="kt">String</span>
+<span class="n">getString</span> <span class="p">(</span><span class="kt">JString</span> <span class="n">s</span><span class="p">)</span> <span class="o">=</span> <span class="kt">Just</span> <span class="n">s</span>
+<span class="n">getString</span> <span class="kr">_</span>           <span class="o">=</span> <span class="kt">Nothing</span>
+</code></pre>
+</div>
+
+<div class="language-shell highlighter-rouge"><pre class="highlight"><code><span class="gp">*Main&gt; </span>getString <span class="o">(</span>JString <span class="s2">"hello"</span><span class="o">)</span>
+Just <span class="s2">"hello"</span>
+</code></pre>
+</div>
+
+<p>其他的get方法大同小异</p>
+
+<div class="language-haskell highlighter-rouge"><pre class="highlight"><code><span class="n">getInt</span> <span class="p">(</span><span class="kt">JNumber</span> <span class="n">n</span><span class="p">)</span> <span class="o">=</span> <span class="kt">Just</span> <span class="p">(</span><span class="n">truncate</span> <span class="n">n</span><span class="p">)</span>
+<span class="n">getInt</span> <span class="kr">_</span>           <span class="o">=</span> <span class="kt">Nothing</span>
+
+<span class="n">getDouble</span> <span class="p">(</span><span class="kt">JNumber</span> <span class="n">n</span><span class="p">)</span> <span class="o">=</span> <span class="kt">Just</span> <span class="n">n</span>
+<span class="n">getDouble</span> <span class="kr">_</span>           <span class="o">=</span> <span class="kt">Nothing</span>
+
+<span class="n">getBool</span> <span class="p">(</span><span class="kt">JBool</span> <span class="n">b</span><span class="p">)</span> <span class="o">=</span> <span class="kt">Just</span> <span class="n">b</span>
+<span class="n">getBool</span> <span class="kr">_</span>         <span class="o">=</span> <span class="kt">Nothing</span>
+
+<span class="n">getObject</span> <span class="p">(</span><span class="kt">JObject</span> <span class="n">o</span><span class="p">)</span> <span class="o">=</span> <span class="kt">Just</span> <span class="n">o</span>
+<span class="n">getObject</span> <span class="kr">_</span>           <span class="o">=</span> <span class="kt">Nothing</span>
+
+<span class="n">getArray</span> <span class="p">(</span><span class="kt">JArray</span> <span class="n">a</span><span class="p">)</span> <span class="o">=</span> <span class="kt">Just</span> <span class="n">a</span>
+<span class="n">getArray</span> <span class="kr">_</span>          <span class="o">=</span> <span class="kt">Nothing</span>
+
+<span class="n">isNull</span> <span class="n">v</span>            <span class="o">=</span> <span class="n">v</span> <span class="o">==</span> <span class="kt">JNull</span>
+</code></pre>
+</div>
+
+<h3 id="printing-json-data">Printing JSON data</h3>
+
+<div class="language-haskell highlighter-rouge"><pre class="highlight"><code><span class="kr">module</span> <span class="nn">PutJSON</span> <span class="kr">where</span>
+
+<span class="kr">import</span> <span class="nn">Data.List</span> <span class="p">(</span><span class="nf">intercalate</span><span class="p">)</span>
+<span class="kr">import</span> <span class="nn">SimpleJSON</span>
+
+<span class="n">renderJValue</span> <span class="o">::</span> <span class="kt">JValue</span> <span class="o">-&gt;</span> <span class="kt">String</span>
+
+<span class="n">renderJValue</span> <span class="p">(</span><span class="kt">JString</span> <span class="n">s</span><span class="p">)</span>   <span class="o">=</span> <span class="n">show</span> <span class="n">s</span>
+<span class="n">renderJValue</span> <span class="p">(</span><span class="kt">JNumber</span> <span class="n">n</span><span class="p">)</span>   <span class="o">=</span> <span class="n">show</span> <span class="n">n</span>
+<span class="n">renderJValue</span> <span class="p">(</span><span class="kt">JBool</span> <span class="kt">True</span><span class="p">)</span>  <span class="o">=</span> <span class="s">"true"</span>
+<span class="n">renderJValue</span> <span class="p">(</span><span class="kt">JBool</span> <span class="kt">False</span><span class="p">)</span> <span class="o">=</span> <span class="s">"false"</span>
+<span class="n">renderJValue</span> <span class="kt">JNull</span>         <span class="o">=</span> <span class="s">"null"</span>
+
+<span class="n">renderJValue</span> <span class="p">(</span><span class="kt">JObject</span> <span class="n">o</span><span class="p">)</span> <span class="o">=</span> <span class="s">"{"</span> <span class="o">++</span> <span class="n">pairs</span> <span class="n">o</span> <span class="o">++</span> <span class="s">"}"</span>
+  <span class="kr">where</span> <span class="n">pairs</span> <span class="kt">[]</span> <span class="o">=</span> <span class="s">""</span>
+        <span class="n">pairs</span> <span class="n">ps</span> <span class="o">=</span> <span class="n">intercalate</span> <span class="s">", "</span> <span class="p">(</span><span class="n">map</span> <span class="n">renderPair</span> <span class="n">ps</span><span class="p">)</span>
+        <span class="n">renderPair</span> <span class="p">(</span><span class="n">k</span><span class="p">,</span><span class="n">v</span><span class="p">)</span>   <span class="o">=</span> <span class="n">show</span> <span class="n">k</span> <span class="o">++</span> <span class="s">": "</span> <span class="o">++</span> <span class="n">renderJValue</span> <span class="n">v</span>
+
+<span class="n">renderJValue</span> <span class="p">(</span><span class="kt">JArray</span> <span class="n">a</span><span class="p">)</span> <span class="o">=</span> <span class="s">"["</span> <span class="o">++</span> <span class="n">values</span> <span class="n">a</span> <span class="o">++</span> <span class="s">"]"</span>
+  <span class="kr">where</span> <span class="n">values</span> <span class="kt">[]</span> <span class="o">=</span> <span class="s">""</span>
+        <span class="n">values</span> <span class="n">vs</span> <span class="o">=</span> <span class="n">intercalate</span> <span class="s">", "</span> <span class="p">(</span><span class="n">map</span> <span class="n">renderJValue</span> <span class="n">vs</span><span class="p">)</span>
+</code></pre>
+</div>
+
+<p><code class="highlighter-rouge">intercalate</code>方法是把<code class="highlighter-rouge">list</code>插入<code class="highlighter-rouge">[list]</code>然后<code class="highlighter-rouge">flatten</code></p>
+
+<p>上面还是没有把JValue打出来</p>
+
+<div class="language-haskell highlighter-rouge"><pre class="highlight"><code><span class="n">putJValue</span> <span class="o">::</span> <span class="kt">JValue</span> <span class="o">-&gt;</span> <span class="kt">IO</span> <span class="nb">()</span>
+<span class="n">putJValue</span> <span class="n">v</span> <span class="o">=</span> <span class="n">putStrLn</span> <span class="p">(</span><span class="n">renderJValue</span> <span class="n">v</span><span class="p">)</span>
+</code></pre>
+</div>
+
+<h3 id="pretty-print">pretty print</h3>
+
+<p><code class="highlighter-rouge">Doc type</code>和<code class="highlighter-rouge">text</code> <code class="highlighter-rouge">double</code> <code class="highlighter-rouge">string</code>方法我们定义在下边</p>
+
+<div class="language-haskell highlighter-rouge"><pre class="highlight"><code><span class="n">renderJValue</span> <span class="o">::</span> <span class="kt">JValue</span> <span class="o">-&gt;</span> <span class="kt">Doc</span>
+<span class="n">renderJValue</span> <span class="p">(</span><span class="kt">JBool</span> <span class="kt">True</span><span class="p">)</span>  <span class="o">=</span> <span class="n">text</span> <span class="s">"true"</span>
+<span class="n">renderJValue</span> <span class="p">(</span><span class="kt">JBool</span> <span class="kt">False</span><span class="p">)</span> <span class="o">=</span> <span class="n">text</span> <span class="s">"false"</span>
+<span class="n">renderJValue</span> <span class="kt">JNull</span>         <span class="o">=</span> <span class="n">text</span> <span class="s">"null"</span>
+<span class="n">renderJValue</span> <span class="p">(</span><span class="kt">JNumber</span> <span class="n">num</span><span class="p">)</span> <span class="o">=</span> <span class="n">double</span> <span class="n">num</span>
+<span class="n">renderJValue</span> <span class="p">(</span><span class="kt">JString</span> <span class="n">str</span><span class="p">)</span> <span class="o">=</span> <span class="n">string</span> <span class="n">str</span>
+</code></pre>
+</div>
+
+<p>开发haskell的时候可以先用<code class="highlighter-rouge">stub</code>,具体定义可以以后再说</p>
+
+<div class="language-haskell highlighter-rouge"><pre class="highlight"><code><span class="kr">import</span> <span class="nn">SimpleJSON</span>
+
+<span class="kr">data</span> <span class="kt">Doc</span> <span class="o">=</span> <span class="kt">ToBeDefined</span>
+         <span class="kr">deriving</span> <span class="p">(</span><span class="kt">Show</span><span class="p">)</span>
+
+<span class="n">string</span> <span class="o">::</span> <span class="kt">String</span> <span class="o">-&gt;</span> <span class="kt">Doc</span>
+<span class="n">string</span> <span class="n">str</span> <span class="o">=</span> <span class="n">undefined</span>
+
+<span class="n">text</span> <span class="o">::</span> <span class="kt">String</span> <span class="o">-&gt;</span> <span class="kt">Doc</span>
+<span class="n">text</span> <span class="n">str</span> <span class="o">=</span> <span class="n">undefined</span>
+
+<span class="n">double</span> <span class="o">::</span> <span class="kt">Double</span> <span class="o">-&gt;</span> <span class="kt">Doc</span>
+<span class="n">double</span> <span class="n">num</span> <span class="o">=</span> <span class="n">undefined</span>
+</code></pre>
+</div>
+
+<p><code class="highlighter-rouge">undefined</code>的<code class="highlighter-rouge">type</code>是<code class="highlighter-rouge">a</code></p>
+
+<h3 id="pretty-printing-a-string">Pretty printing a string</h3>
+
+<p>point free style</p>
+
+<div class="language-haskell highlighter-rouge"><pre class="highlight"><code><span class="n">string</span> <span class="o">::</span> <span class="kt">String</span> <span class="o">-&gt;</span> <span class="kt">Doc</span>
+<span class="n">string</span> <span class="o">=</span> <span class="n">enclose</span> <span class="sc">'"'</span> <span class="sc">'"'</span> <span class="o">.</span> <span class="n">hcat</span> <span class="o">.</span> <span class="n">map</span> <span class="n">oneChar</span>
+</code></pre>
+</div>
+
+<p>等于如下</p>
+
+<div class="language-haskell highlighter-rouge"><pre class="highlight"><code><span class="n">pointyString</span> <span class="o">::</span> <span class="kt">String</span> <span class="o">-&gt;</span> <span class="kt">Doc</span>
+<span class="n">pointyString</span> <span class="n">s</span> <span class="o">=</span> <span class="n">enclose</span> <span class="sc">'"'</span> <span class="sc">'"'</span> <span class="p">(</span><span class="n">hcat</span> <span class="p">(</span><span class="n">map</span> <span class="n">oneChar</span> <span class="n">s</span><span class="p">))</span>
+</code></pre>
+</div>
+
+<p>enclose, hcat, enclose方法都是我们下边定义的</p>
+
+<div class="language-haskell highlighter-rouge"><pre class="highlight"><code><span class="c1">-- 把两个Doc类型的拼在一起</span>
+<span class="p">(</span><span class="o">&lt;&gt;</span><span class="p">)</span> <span class="o">::</span> <span class="kt">Doc</span> <span class="o">-&gt;</span> <span class="kt">Doc</span> <span class="o">-&gt;</span> <span class="kt">Doc</span>
+<span class="n">a</span> <span class="o">&lt;&gt;</span> <span class="n">b</span> <span class="o">=</span> <span class="n">undefined</span>
+
+<span class="n">char</span> <span class="o">::</span> <span class="kt">Char</span> <span class="o">-&gt;</span> <span class="kt">Doc</span>
+<span class="n">char</span> <span class="n">c</span> <span class="o">=</span> <span class="n">undefined</span>
+</code></pre>
+</div>
+
+<div class="language-haskell highlighter-rouge"><pre class="highlight"><code><span class="c1">-- 用两个Char包裹住Doc</span>
+<span class="n">enclose</span> <span class="o">::</span> <span class="kt">Char</span> <span class="o">-&gt;</span> <span class="kt">Char</span> <span class="o">-&gt;</span> <span class="kt">Doc</span> <span class="o">-&gt;</span> <span class="kt">Doc</span>
+<span class="n">enclose</span> <span class="n">left</span> <span class="n">right</span> <span class="n">x</span> <span class="o">=</span> <span class="n">char</span> <span class="n">left</span> <span class="o">&lt;&gt;</span> <span class="n">x</span> <span class="o">&lt;&gt;</span> <span class="n">char</span> <span class="n">right</span>
+</code></pre>
+</div>
+
+<div class="language-haskell highlighter-rouge"><pre class="highlight"><code><span class="c1">-- 把数组内地Doc连接成Doc</span>
+<span class="n">hcat</span> <span class="o">::</span> <span class="p">[</span><span class="kt">Doc</span><span class="p">]</span> <span class="o">-&gt;</span> <span class="kt">Doc</span>
+<span class="n">hcat</span> <span class="n">xs</span> <span class="o">=</span> <span class="n">undefined</span>
+</code></pre>
+</div>
+
+<h3 id="arrays-and-objects-and-the-module-header">Arrays and objects, and the module header</h3>
+
+<div class="language-haskell highlighter-rouge"><pre class="highlight"><code><span class="n">series</span> <span class="o">::</span> <span class="kt">Char</span> <span class="o">-&gt;</span> <span class="kt">Char</span> <span class="o">-&gt;</span> <span class="p">(</span><span class="n">a</span> <span class="o">-&gt;</span> <span class="kt">Doc</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="p">[</span><span class="n">a</span><span class="p">]</span> <span class="o">-&gt;</span> <span class="kt">Doc</span>
+<span class="n">series</span> <span class="n">open</span> <span class="n">close</span> <span class="n">item</span> <span class="o">=</span> <span class="n">enclose</span> <span class="n">open</span> <span class="n">close</span>
+                       <span class="o">.</span> <span class="n">fsep</span> <span class="o">.</span> <span class="n">punctuate</span> <span class="p">(</span><span class="n">char</span> <span class="sc">','</span><span class="p">)</span> <span class="o">.</span> <span class="n">map</span> <span class="n">item</span>
+</code></pre>
+</div>
+
+<p>函数type定义了四个需要传入的参数，可是可以看到下边我们只传了3个</p>
+
+
+  </div>
+
+</article>
+
+      </div>
+    </div>
+
+    <footer class="site-footer">
+
+  <div class="wrapper">
+
+    <h2 class="footer-heading"></h2>
+
+    <div class="footer-col-wrapper">
+      <div class="footer-col footer-col-1">
+        <ul class="contact-list">
+          <li></li>
+          <li><a href="mailto:"></a></li>
+        </ul>
+      </div>
+
+      <div class="footer-col footer-col-2">
+        <ul class="social-media-list">
+          
+
+          
+        </ul>
+      </div>
+
+      <div class="footer-col footer-col-3">
+        <p></p>
+      </div>
+    </div>
+
+  </div>
+
+</footer>
+
+
+  </body>
+
+</html>
