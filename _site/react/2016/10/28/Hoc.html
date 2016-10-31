@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html>
+
+  <head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  <title>Hoc</title>
+  <meta name="description" content="what pure component">
+
+  <link rel="stylesheet" href="/css/main.css">
+  <link rel="canonical" href="http://localhost:4000/react/2016/10/28/Hoc.html">
+  <link rel="alternate" type="application/rss+xml" title="" href="http://localhost:4000/feed.xml">
+</head>
+
+
+  <body>
+
+    <header class="site-header">
+
+  <div class="wrapper">
+
+    <a class="site-title" href="/"></a>
+
+    <nav class="site-nav">
+      <a href="#" class="menu-icon">
+        <svg viewBox="0 0 18 15">
+          <path fill="#424242" d="M18,1.484c0,0.82-0.665,1.484-1.484,1.484H1.484C0.665,2.969,0,2.304,0,1.484l0,0C0,0.665,0.665,0,1.484,0 h15.031C17.335,0,18,0.665,18,1.484L18,1.484z"/>
+          <path fill="#424242" d="M18,7.516C18,8.335,17.335,9,16.516,9H1.484C0.665,9,0,8.335,0,7.516l0,0c0-0.82,0.665-1.484,1.484-1.484 h15.031C17.335,6.031,18,6.696,18,7.516L18,7.516z"/>
+          <path fill="#424242" d="M18,13.516C18,14.335,17.335,15,16.516,15H1.484C0.665,15,0,14.335,0,13.516l0,0 c0-0.82,0.665-1.484,1.484-1.484h15.031C17.335,12.031,18,12.696,18,13.516L18,13.516z"/>
+        </svg>
+      </a>
+
+      <div class="trigger">
+        
+          
+          <a class="page-link" href="/about/">About</a>
+          
+        
+          
+        
+          
+        
+          
+        
+      </div>
+    </nav>
+
+  </div>
+
+</header>
+
+
+    <div class="page-content">
+      <div class="wrapper">
+        <article class="post" itemscope itemtype="http://schema.org/BlogPosting">
+
+  <header class="post-header">
+    <h1 class="post-title" itemprop="name headline">Hoc</h1>
+    <p class="post-meta"><time datetime="2016-10-28T00:00:00+08:00" itemprop="datePublished">Oct 28, 2016</time></p>
+  </header>
+
+  <div class="post-content" itemprop="articleBody">
+    <h3 id="what-pure-component">what pure component</h3>
+
+<ul>
+  <li>They do not have any state.</li>
+  <li>They do not use any React lifecycle methods (such as componentWillMount()).</li>
+  <li>They only define the render method and nothing more.</li>
+</ul>
+
+<div class="language-js highlighter-rouge"><pre class="highlight"><code><span class="kd">var</span> <span class="nx">App</span> <span class="o">=</span> <span class="nx">React</span><span class="p">.</span><span class="nx">createClass</span><span class="p">({</span>
+      <span class="na">render</span><span class="p">:</span> <span class="kd">function</span><span class="p">()</span> <span class="p">{</span>
+                <span class="k">return</span> <span class="o">&lt;</span><span class="nx">p</span><span class="o">&gt;</span><span class="nx">My</span> <span class="nx">name</span> <span class="nx">is</span> <span class="p">{</span> <span class="k">this</span><span class="p">.</span><span class="nx">props</span><span class="p">.</span><span class="nx">name</span> <span class="p">}</span><span class="o">&lt;</span><span class="sr">/p&gt;</span><span class="err">;
+</span>              <span class="p">}</span>
+<span class="p">});</span>
+<span class="c1">// 可以写成这样</span>
+<span class="kd">var</span> <span class="nx">App</span> <span class="o">=</span> <span class="kd">function</span><span class="p">(</span><span class="nx">props</span><span class="p">)</span> <span class="p">{</span>
+      <span class="k">return</span> <span class="o">&lt;</span><span class="nx">p</span><span class="o">&gt;</span><span class="nx">My</span> <span class="nx">name</span> <span class="nx">is</span> <span class="p">{</span><span class="o">&lt;</span><span class="nx">Plug</span><span class="o">&gt;</span><span class="nx">PeepOpenrops</span><span class="p">.</span><span class="nx">name</span> <span class="p">}</span><span class="o">&lt;</span><span class="sr">/p&gt;</span><span class="err">;
+</span><span class="p">}</span>
+</code></pre>
+</div>
+
+<p>一个简单的Hoc，可是有问题，它限制了可传递props</p>
+
+<div class="language-js highlighter-rouge"><pre class="highlight"><code><span class="kd">var</span> <span class="nx">AppLink</span> <span class="o">=</span> <span class="nx">React</span><span class="p">.</span><span class="nx">createClass</span><span class="p">({</span>  
+  <span class="na">render</span><span class="p">:</span> <span class="kd">function</span><span class="p">()</span> <span class="p">{</span>  
+      <span class="k">return</span> <span class="p">(</span>
+        <span class="o">&lt;</span><span class="nx">Link</span> <span class="nx">to</span><span class="o">=</span><span class="p">{</span><span class="k">this</span><span class="p">.</span><span class="nx">props</span><span class="p">.</span><span class="nx">to</span><span class="p">}</span> <span class="nx">activeClassName</span><span class="o">=</span><span class="s2">"active-link"</span><span class="o">&gt;</span>
+                <span class="p">{</span><span class="k">this</span><span class="p">.</span><span class="nx">props</span><span class="p">.</span><span class="nx">children</span><span class="p">}</span>
+        <span class="o">&lt;</span><span class="sr">/Link&gt;</span><span class="err">;
+</span>      <span class="p">);</span>
+  <span class="p">}</span>
+<span class="p">});</span>
+</code></pre>
+</div>
+
+<p>可以使用<code class="highlighter-rouge">...</code>props修改成下边的样子</p>
+
+<div class="language-js highlighter-rouge"><pre class="highlight"><code><span class="kd">var</span> <span class="nx">AppLink</span> <span class="o">=</span> <span class="kd">function</span><span class="p">(</span><span class="nx">props</span><span class="p">)</span> <span class="p">{</span>
+  <span class="k">return</span> <span class="o">&lt;</span><span class="nx">Link</span> <span class="p">{...</span><span class="nx">props</span><span class="p">}</span> <span class="nx">activeClassName</span><span class="o">=</span><span class="s2">"active-link"</span> <span class="o">/&gt;</span><span class="p">;</span>
+<span class="p">}</span>
+</code></pre>
+</div>
+
+<p>这样写还是有点问题，我们不能覆盖掉 activeClassName</p>
+
+<div class="language-js highlighter-rouge"><pre class="highlight"><code><span class="k">return</span> <span class="o">&lt;</span><span class="nx">Link</span> <span class="nx">activeClassName</span><span class="o">=</span><span class="s2">"active-link"</span> <span class="p">{...</span><span class="nx">props</span><span class="p">}</span> <span class="sr">/&gt;</span><span class="err">;
+</span></code></pre>
+</div>
+
+<p>这样就可以了</p>
+
+<h3 id="function-as-child-components">Function as Child Components</h3>
+
+<div class="language-js highlighter-rouge"><pre class="highlight"><code><span class="kr">class</span> <span class="nx">MyComponent</span> <span class="kr">extends</span> <span class="nx">React</span><span class="p">.</span><span class="nx">Component</span> <span class="p">{</span> 
+  <span class="nx">render</span><span class="p">()</span> <span class="p">{</span>
+    <span class="k">return</span> <span class="p">(</span>
+      <span class="o">&lt;</span><span class="nx">div</span><span class="o">&gt;</span>
+        <span class="p">{</span><span class="k">this</span><span class="p">.</span><span class="nx">props</span><span class="p">.</span><span class="nx">children</span><span class="p">(</span><span class="s1">'Scuba Steve'</span><span class="p">)}</span>
+      <span class="o">&lt;</span><span class="sr">/div</span><span class="err">&gt;
+</span>    <span class="p">);</span>
+  <span class="p">}</span>
+<span class="p">}</span>
+<span class="nx">MyComponent</span><span class="p">.</span><span class="nx">propTypes</span> <span class="o">=</span> <span class="p">{</span>
+      <span class="na">children</span><span class="p">:</span> <span class="nx">React</span><span class="p">.</span><span class="nx">PropTypes</span><span class="p">.</span><span class="nx">func</span><span class="p">.</span><span class="nx">isRequired</span><span class="p">,</span>
+<span class="p">};</span>
+</code></pre>
+</div>
+
+<p>使用组件的时候就可以写成这个样子,传入的是func</p>
+
+<div class="language-js highlighter-rouge"><pre class="highlight"><code><span class="o">&lt;</span><span class="nx">MyComponent</span><span class="o">&gt;</span>
+  <span class="p">{(</span><span class="nx">name</span><span class="p">)</span> <span class="o">=&gt;</span> <span class="p">(</span>
+      <span class="o">&lt;</span><span class="nx">div</span><span class="o">&gt;</span><span class="p">{</span><span class="nx">name</span><span class="p">}</span><span class="o">&lt;</span><span class="sr">/div</span><span class="err">&gt;
+</span>   <span class="p">)}</span>
+<span class="o">&lt;</span><span class="sr">/MyComponent</span><span class="err">&gt;
+</span>
+<span class="o">&lt;</span><span class="nx">MyComponent</span><span class="o">&gt;</span>
+  <span class="p">{(</span><span class="nx">name</span><span class="p">)</span> <span class="o">=&gt;</span> <span class="p">(</span>
+    <span class="o">&lt;</span><span class="nx">img</span> <span class="nx">src</span><span class="o">=</span><span class="err">’</span><span class="o">/</span><span class="nx">scuba</span><span class="o">-</span><span class="nx">steves</span><span class="o">-</span><span class="nx">picture</span><span class="p">.</span><span class="nx">jpg</span><span class="err">’</span> <span class="nx">alt</span><span class="o">=</span><span class="p">{</span><span class="nx">name</span><span class="p">}</span> <span class="sr">/</span><span class="err">&gt;
+</span>  <span class="p">)}</span>
+<span class="o">&lt;</span><span class="sr">/MyComponent</span><span class="err">&gt;
+</span></code></pre>
+</div>
+
+  </div>
+
+</article>
+
+      </div>
+    </div>
+
+    <footer class="site-footer">
+
+  <div class="wrapper">
+
+    <h2 class="footer-heading"></h2>
+
+    <div class="footer-col-wrapper">
+      <div class="footer-col footer-col-1">
+        <ul class="contact-list">
+          <li></li>
+          <li><a href="mailto:"></a></li>
+        </ul>
+      </div>
+
+      <div class="footer-col footer-col-2">
+        <ul class="social-media-list">
+          
+
+          
+        </ul>
+      </div>
+
+      <div class="footer-col footer-col-3">
+        <p></p>
+      </div>
+    </div>
+
+  </div>
+
+</footer>
+
+
+  </body>
+
+</html>

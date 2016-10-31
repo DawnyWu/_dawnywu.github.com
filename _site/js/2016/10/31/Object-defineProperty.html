@@ -1,0 +1,251 @@
+<!DOCTYPE html>
+<html>
+
+  <head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  <title>Object.defineProperty</title>
+  <meta name="description" content="writable">
+
+  <link rel="stylesheet" href="/css/main.css">
+  <link rel="canonical" href="http://localhost:4000/js/2016/10/31/Object-defineProperty.html">
+  <link rel="alternate" type="application/rss+xml" title="" href="http://localhost:4000/feed.xml">
+</head>
+
+
+  <body>
+
+    <header class="site-header">
+
+  <div class="wrapper">
+
+    <a class="site-title" href="/"></a>
+
+    <nav class="site-nav">
+      <a href="#" class="menu-icon">
+        <svg viewBox="0 0 18 15">
+          <path fill="#424242" d="M18,1.484c0,0.82-0.665,1.484-1.484,1.484H1.484C0.665,2.969,0,2.304,0,1.484l0,0C0,0.665,0.665,0,1.484,0 h15.031C17.335,0,18,0.665,18,1.484L18,1.484z"/>
+          <path fill="#424242" d="M18,7.516C18,8.335,17.335,9,16.516,9H1.484C0.665,9,0,8.335,0,7.516l0,0c0-0.82,0.665-1.484,1.484-1.484 h15.031C17.335,6.031,18,6.696,18,7.516L18,7.516z"/>
+          <path fill="#424242" d="M18,13.516C18,14.335,17.335,15,16.516,15H1.484C0.665,15,0,14.335,0,13.516l0,0 c0-0.82,0.665-1.484,1.484-1.484h15.031C17.335,12.031,18,12.696,18,13.516L18,13.516z"/>
+        </svg>
+      </a>
+
+      <div class="trigger">
+        
+          
+          <a class="page-link" href="/about/">About</a>
+          
+        
+          
+        
+          
+        
+          
+        
+      </div>
+    </nav>
+
+  </div>
+
+</header>
+
+
+    <div class="page-content">
+      <div class="wrapper">
+        <article class="post" itemscope itemtype="http://schema.org/BlogPosting">
+
+  <header class="post-header">
+    <h1 class="post-title" itemprop="name headline">Object.defineProperty</h1>
+    <p class="post-meta"><time datetime="2016-10-31T00:00:00+08:00" itemprop="datePublished">Oct 31, 2016</time></p>
+  </header>
+
+  <div class="post-content" itemprop="articleBody">
+    <h3 id="writable">writable</h3>
+
+<p>比如说用普通的方法创建一个obj, obj={a: 2}, 用obj.a= XX的方法是可以修改a的值的</p>
+
+<div class="language-js highlighter-rouge"><pre class="highlight"><code><span class="nx">obj</span> <span class="o">=</span> <span class="p">{</span><span class="na">a</span><span class="p">:</span> <span class="mi">2</span><span class="p">}</span>
+<span class="nx">obj</span><span class="p">.</span><span class="nx">a</span> <span class="o">=</span> <span class="mi">3</span>
+<span class="nx">obj</span><span class="p">.</span><span class="nx">a</span> <span class="c1">// =&gt; 3</span>
+</code></pre>
+</div>
+
+<p>而用defineProperty定义，默认不可以修改</p>
+
+<div class="language-js highlighter-rouge"><pre class="highlight"><code><span class="nb">Object</span><span class="p">.</span><span class="nx">defineProperty</span><span class="p">(</span><span class="nx">a</span><span class="p">,</span> <span class="s2">"property"</span><span class="p">,</span> <span class="p">{</span><span class="na">value</span><span class="p">:</span> <span class="s1">'Property Value'</span><span class="p">})</span>
+<span class="nx">a</span><span class="p">.</span><span class="nx">property</span> <span class="o">=</span> <span class="s2">"hello"</span>
+<span class="nx">a</span> <span class="c1">// =&gt; Object {a: 1, property: "Property Value"}</span>
+</code></pre>
+</div>
+
+<p>要加上<code class="highlighter-rouge">writable: false</code>才可以</p>
+
+<h3 id="enumerable">enumerable</h3>
+
+<p>普通方法定义的obj,key都是可以enumerable的</p>
+
+<div class="language-js highlighter-rouge"><pre class="highlight"><code><span class="nx">b</span> <span class="o">=</span> <span class="p">{</span><span class="na">a</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span> <span class="na">b</span><span class="p">:</span> <span class="mi">3</span><span class="p">,</span> <span class="na">c</span><span class="p">:</span> <span class="mi">6</span><span class="p">}</span>
+
+<span class="k">for</span> <span class="p">(</span><span class="kd">var</span> <span class="nx">key</span> <span class="k">in</span> <span class="nx">b</span><span class="p">){</span><span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="nx">key</span><span class="p">)}</span> <span class="c1">// =&gt; a,b,c</span>
+</code></pre>
+</div>
+
+<p>用defineProperty定义的obj, key都是不能enumerable的, 在chrome console中显示是半透明的</p>
+
+<div class="language-js highlighter-rouge"><pre class="highlight"><code><span class="nx">lala</span> <span class="o">=</span> <span class="p">{}</span>
+<span class="nb">Object</span><span class="p">.</span><span class="nx">defineProperty</span><span class="p">(</span> <span class="nx">lala</span><span class="p">,</span> <span class="s2">"hideme"</span><span class="p">,</span> <span class="p">{</span><span class="na">value</span><span class="p">:</span> <span class="s1">'shit'</span><span class="p">})</span>
+
+<span class="k">for</span> <span class="p">(</span><span class="kd">var</span> <span class="nx">key</span> <span class="k">in</span> <span class="nx">lala</span><span class="p">){</span><span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="nx">key</span><span class="p">)}</span> <span class="c1">// =&gt; undefined</span>
+</code></pre>
+</div>
+
+<p>想要enumerable,需要加上<code class="highlighter-rouge">enumerable: true</code></p>
+
+<div class="language-js highlighter-rouge"><pre class="highlight"><code><span class="nb">Object</span><span class="p">.</span><span class="nx">defineProperty</span><span class="p">(</span><span class="nx">obj</span><span class="p">,</span> <span class="s2">"hideme"</span><span class="p">,</span> <span class="p">{</span><span class="na">enumerable</span><span class="p">:</span> <span class="kc">true</span><span class="p">});</span>
+</code></pre>
+</div>
+
+<h3 id="configurable">configurable</h3>
+
+<p>之前用<code class="highlighter-rouge">defineProperty</code>创建的<code class="highlighter-rouge">obj</code>可以被后来的<code class="highlighter-rouge">defineProperty</code>重新定义而被修改掉</p>
+
+<div class="language-js highlighter-rouge"><pre class="highlight"><code><span class="kd">var</span> <span class="nx">obj</span> <span class="o">=</span> <span class="p">{};</span>
+<span class="nb">Object</span><span class="p">.</span><span class="nx">defineProperty</span><span class="p">(</span><span class="nx">obj</span><span class="p">,</span> <span class="s2">"const"</span><span class="p">,</span> <span class="p">{</span>
+  <span class="na">value</span><span class="p">:</span> <span class="s2">"const val"</span><span class="p">,</span> <span class="na">writable</span><span class="p">:</span> <span class="kc">false</span><span class="p">,</span> <span class="na">configurable</span><span class="p">:</span> <span class="kc">true</span><span class="p">}</span>
+<span class="p">);</span>
+
+<span class="c1">// 修改不了</span>
+<span class="nx">obj</span><span class="p">.</span><span class="kr">const</span> <span class="o">=</span> <span class="s2">"new val"</span><span class="p">;</span>
+<span class="nx">alert</span><span class="p">(</span><span class="nx">obj</span><span class="p">.</span><span class="kr">const</span><span class="p">);</span> <span class="c1">// "const val"</span>
+
+<span class="c1">// 这里重新定义 `key const` 为 `writable:true`</span>
+<span class="nb">Object</span><span class="p">.</span><span class="nx">defineProperty</span><span class="p">(</span><span class="nx">obj</span><span class="p">,</span> <span class="s2">"const"</span><span class="p">,</span> <span class="p">{</span><span class="na">writable</span><span class="p">:</span> <span class="kc">true</span><span class="p">});</span>
+
+<span class="c1">// 那么这个key就可以修改了</span>
+<span class="nx">obj</span><span class="p">.</span><span class="kr">const</span> <span class="o">=</span> <span class="s2">"overridden value"</span><span class="p">;</span>
+<span class="nx">alert</span><span class="p">(</span><span class="nx">obj</span><span class="p">.</span><span class="kr">const</span><span class="p">);</span> <span class="c1">// "overridden value"</span>
+</code></pre>
+</div>
+
+<div class="language-js highlighter-rouge"><pre class="highlight"><code><span class="kd">var</span> <span class="nx">obj</span> <span class="o">=</span> <span class="p">{};</span>
+<span class="nb">Object</span><span class="p">.</span><span class="nx">defineProperty</span><span class="p">(</span><span class="nx">obj</span><span class="p">,</span> <span class="s2">"const"</span><span class="p">,</span> 
+  <span class="p">{</span><span class="na">value</span><span class="p">:</span> <span class="s2">"const val"</span><span class="p">,</span> <span class="na">writable</span><span class="p">:</span> <span class="kc">false</span><span class="p">,</span> <span class="na">configurable</span><span class="p">:</span> <span class="kc">false</span><span class="p">}</span>
+<span class="p">);</span>
+
+<span class="nx">obj</span><span class="p">.</span><span class="kr">const</span> <span class="o">=</span> <span class="s2">"new val"</span><span class="p">;</span>
+<span class="nx">alert</span><span class="p">(</span><span class="nx">obj</span><span class="p">.</span><span class="kr">const</span><span class="p">);</span> <span class="c1">// "const val"</span>
+ 
+<span class="k">try</span> <span class="p">{</span>
+  <span class="nb">Object</span><span class="p">.</span><span class="nx">defineProperty</span><span class="p">(</span><span class="nx">obj</span><span class="p">,</span> <span class="s2">"const"</span><span class="p">,</span> <span class="p">{</span><span class="na">writable</span><span class="p">:</span> <span class="kc">true</span><span class="p">});</span> <span class="c1">// CANNOT BE RE-DEFINED!</span>
+<span class="p">}</span> <span class="k">catch</span> <span class="p">(</span><span class="nx">e</span><span class="p">)</span> <span class="p">{</span>
+  <span class="nx">alert</span><span class="p">(</span><span class="nx">e</span><span class="p">);</span>
+<span class="p">}</span>
+<span class="nx">obj</span><span class="p">.</span><span class="kr">const</span> <span class="o">=</span> <span class="s2">"overridden value"</span><span class="p">;</span>
+<span class="nx">alert</span><span class="p">(</span><span class="nx">obj</span><span class="p">.</span><span class="kr">const</span><span class="p">);</span> <span class="c1">// "const val"</span>
+</code></pre>
+</div>
+
+<h3 id="definepropertykey">用defineProperty重新定义key</h3>
+
+<div class="language-js highlighter-rouge"><pre class="highlight"><code><span class="nx">a</span> <span class="o">=</span> <span class="p">{</span><span class="na">b</span><span class="p">:</span> <span class="mi">1</span><span class="p">}</span> <span class="c1">// a.b=XXX是可以修改的b的值的</span>
+
+<span class="c1">// 可以重新定义key b的值</span>
+<span class="c1">// 并且不会像使用`defineProperty`新创建的key那样，不能修改，不能a.b = XXX</span>
+<span class="nb">Object</span><span class="p">.</span><span class="nx">defineProperty</span><span class="p">(</span><span class="nx">a</span><span class="p">,</span> <span class="s2">"b"</span><span class="p">,</span> <span class="p">{</span><span class="na">value</span><span class="p">:</span> <span class="s2">"shit"</span><span class="p">})</span> 
+
+<span class="nx">a</span><span class="p">.</span><span class="nx">b</span> <span class="c1">// =&gt; shit</span>
+
+<span class="nx">a</span><span class="p">.</span><span class="nx">b</span> <span class="o">=</span> <span class="s2">"lala"</span>
+<span class="nx">a</span><span class="p">.</span><span class="nx">b</span> <span class="c1">// =&gt; "lala"</span>
+</code></pre>
+</div>
+
+<h3 id="property-accessors">Property Accessors</h3>
+
+<div class="language-js highlighter-rouge"><pre class="highlight"><code><span class="kd">var</span> <span class="nx">obj</span> <span class="o">=</span> <span class="p">{};</span>
+<span class="nb">Object</span><span class="p">.</span><span class="nx">defineProperty</span><span class="p">(</span><span class="nx">obj</span><span class="p">,</span> <span class="s2">"property"</span><span class="p">,</span> 
+    <span class="p">{</span>
+      <span class="na">get</span><span class="p">:</span><span class="kd">function</span><span class="p">()</span> <span class="p">{</span> <span class="nx">alert</span><span class="p">(</span><span class="s1">'get value'</span><span class="p">);</span> <span class="p">},</span> 
+      <span class="na">set</span><span class="p">:</span><span class="kd">function</span><span class="p">(</span><span class="nx">val</span><span class="p">)</span> <span class="p">{</span> <span class="nx">alert</span><span class="p">(</span><span class="s1">'set value'</span><span class="p">);</span> <span class="p">}</span>
+    <span class="p">});</span>
+<span class="kd">var</span> <span class="nx">temp</span> <span class="o">=</span> <span class="nx">obj</span><span class="p">.</span><span class="nx">property</span><span class="p">;</span> <span class="c1">// alerts "get value"</span>
+<span class="nx">obj</span><span class="p">.</span><span class="nx">property</span> <span class="o">=</span> <span class="s2">""</span><span class="p">;</span> <span class="c1">// alerts "set value"</span>
+</code></pre>
+</div>
+
+<h3 id="objobjkey">obj中定义一个方法，想调用方法却不想写成<code class="highlighter-rouge">obj.key()</code>，因为不想要<code class="highlighter-rouge">()</code>怎么办？</h3>
+
+<div class="language-js highlighter-rouge"><pre class="highlight"><code><span class="c1">// original object</span>
+<span class="kd">var</span> <span class="nx">player</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="na">displayText</span><span class="p">:</span> <span class="s2">"&lt;span&gt;you&lt;/span&gt;"</span><span class="p">,</span>
+    <span class="na">currentPosition</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span>
+    <span class="na">level</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span>
+    <span class="c1">// health: function() { return 10 + (this.level * 15) },</span>
+    <span class="na">strength</span><span class="p">:</span> <span class="kd">function</span><span class="p">()</span> <span class="p">{</span> <span class="k">return</span> <span class="k">this</span><span class="p">.</span><span class="nx">level</span> <span class="o">*</span> <span class="mi">5</span> <span class="p">},</span>
+    <span class="na">hitRating</span><span class="p">:</span> <span class="mi">4</span>
+<span class="p">}</span>
+</code></pre>
+</div>
+
+<p>在object中定义一个value是function的话，调用需要object.key(),加括号才可以调用。</p>
+
+<p>如果就是不想加括号</p>
+
+<div class="highlighter-rouge"><pre class="highlight"><code>// create property with accessor method
+Object.defineProperty(player, "health", {
+    get: function () {
+        return 10 + (player.level * 15)
+    }
+})
+
+// call the property
+alert(player.health);  // 25
+player.level++;
+alert(player.health);  // 40
+</code></pre>
+</div>
+
+  </div>
+
+</article>
+
+      </div>
+    </div>
+
+    <footer class="site-footer">
+
+  <div class="wrapper">
+
+    <h2 class="footer-heading"></h2>
+
+    <div class="footer-col-wrapper">
+      <div class="footer-col footer-col-1">
+        <ul class="contact-list">
+          <li></li>
+          <li><a href="mailto:"></a></li>
+        </ul>
+      </div>
+
+      <div class="footer-col footer-col-2">
+        <ul class="social-media-list">
+          
+
+          
+        </ul>
+      </div>
+
+      <div class="footer-col footer-col-3">
+        <p></p>
+      </div>
+    </div>
+
+  </div>
+
+</footer>
+
+
+  </body>
+
+</html>

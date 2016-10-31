@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html>
+
+  <head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  <title>Set Up project</title>
+  <meta name="description" content="Jest">
+
+  <link rel="stylesheet" href="/css/main.css">
+  <link rel="canonical" href="http://localhost:4000/project/2016/10/25/setup-project.html">
+  <link rel="alternate" type="application/rss+xml" title="" href="http://localhost:4000/feed.xml">
+</head>
+
+
+  <body>
+
+    <header class="site-header">
+
+  <div class="wrapper">
+
+    <a class="site-title" href="/"></a>
+
+    <nav class="site-nav">
+      <a href="#" class="menu-icon">
+        <svg viewBox="0 0 18 15">
+          <path fill="#424242" d="M18,1.484c0,0.82-0.665,1.484-1.484,1.484H1.484C0.665,2.969,0,2.304,0,1.484l0,0C0,0.665,0.665,0,1.484,0 h15.031C17.335,0,18,0.665,18,1.484L18,1.484z"/>
+          <path fill="#424242" d="M18,7.516C18,8.335,17.335,9,16.516,9H1.484C0.665,9,0,8.335,0,7.516l0,0c0-0.82,0.665-1.484,1.484-1.484 h15.031C17.335,6.031,18,6.696,18,7.516L18,7.516z"/>
+          <path fill="#424242" d="M18,13.516C18,14.335,17.335,15,16.516,15H1.484C0.665,15,0,14.335,0,13.516l0,0 c0-0.82,0.665-1.484,1.484-1.484h15.031C17.335,12.031,18,12.696,18,13.516L18,13.516z"/>
+        </svg>
+      </a>
+
+      <div class="trigger">
+        
+          
+          <a class="page-link" href="/about/">About</a>
+          
+        
+          
+        
+          
+        
+          
+        
+      </div>
+    </nav>
+
+  </div>
+
+</header>
+
+
+    <div class="page-content">
+      <div class="wrapper">
+        <article class="post" itemscope itemtype="http://schema.org/BlogPosting">
+
+  <header class="post-header">
+    <h1 class="post-title" itemprop="name headline">Set Up project</h1>
+    <p class="post-meta"><time datetime="2016-10-25T00:00:00+08:00" itemprop="datePublished">Oct 25, 2016</time></p>
+  </header>
+
+  <div class="post-content" itemprop="articleBody">
+    <h3 id="jest">Jest</h3>
+
+<p>想要用jest，可是遇到不知道怎么解决的问题</p>
+
+<p>测试文件中引入想要测试的函数</p>
+
+<p>import isEqual from “../../../common/src/libs/util”</p>
+
+<p>而util.js文件中有这样一句，<code class="highlighter-rouge">import zhilinUpload from 'pajk-zhilin/libs/upload';</code></p>
+
+<p>然后就报了zhilin相关的错误</p>
+
+<div class="language-shell highlighter-rouge"><pre class="highlight"><code>/Users/wu/dev/ping_an/overwatch/node_modules/pajk-zhilin/libs/upload.js:3
+<span class="nb">export </span>default <span class="k">function</span><span class="o">(</span>fileSelect, fileElem, success, url<span class="o">)</span> <span class="o">{</span>
+^^^^^^
+SyntaxError: Unexpected token <span class="nb">export</span>
+</code></pre>
+</div>
+
+<p>测试文件中引入想要测试的函数</p>
+
+<div class="language-js highlighter-rouge"><pre class="highlight"><code><span class="kr">import</span> <span class="p">{</span> <span class="nx">posto</span><span class="p">,</span> <span class="nx">get</span><span class="p">,</span> <span class="nx">jsonp</span><span class="p">,</span> <span class="nx">call</span> <span class="p">}</span> <span class="nx">from</span> <span class="s2">"../../../common/src/libs/api"</span>
+</code></pre>
+</div>
+
+<p>而api.js文件中有这样一句，<code class="highlighter-rouge">import { Message } from 'antd';</code>引入了antd</p>
+
+<p>然后就报了antd相关的错误</p>
+
+<div class="language-shell highlighter-rouge"><pre class="highlight"><code>/Users/wu/dev/ping_an/overwatch/node_modules/antd/lib/style/index.less:1
+    <span class="o">({</span><span class="s2">"Object.&lt;anonymous&gt;"</span>:function<span class="o">(</span>module,exports,require,__dirname,__filename,global,jest<span class="o">){</span>@import <span class="s2">"./themes/default"</span>;
+</code></pre>
+</div>
+
+<p>不认识less中的@符号</p>
+
+<p>import</p>
+
+<h3 id="yarn">yarn</h3>
+
+<div class="language-shell highlighter-rouge"><pre class="highlight"><code>yarn add babel-jest --dev
+
+yarn remove jest
+</code></pre>
+</div>
+
+<h3 id="webpack-dashboard">webpack-dashboard</h3>
+
+<p>webpack.js</p>
+
+<div class="language-json highlighter-rouge"><pre class="highlight"><code><span class="err">var</span><span class="w"> </span><span class="err">DashboardPlugin</span><span class="w"> </span><span class="err">=</span><span class="w"> </span><span class="err">require('webpack-dashboard/plugin');</span><span class="w">
+
+  </span><span class="err">plugins:</span><span class="w"> </span><span class="p">[</span><span class="w">
+    </span><span class="err">new</span><span class="w"> </span><span class="err">DashboardPlugin()</span><span class="p">,</span><span class="w">
+  </span><span class="p">]</span><span class="w">
+</span></code></pre>
+</div>
+
+<div class="language-json highlighter-rouge"><pre class="highlight"><code><span class="s2">"start"</span><span class="err">:</span><span class="w"> </span><span class="s2">"webpack-dashboard -- ./node_modules/webpack/bin/webpack.js -w --progress --e dev"</span><span class="err">,</span><span class="w">
+</span><span class="s2">"start:serv"</span><span class="err">:</span><span class="w"> </span><span class="s2">"webpack-dashboard -- webpack-dev-server --hot --progress"</span><span class="err">,</span><span class="w">
+</span></code></pre>
+</div>
+
+  </div>
+
+</article>
+
+      </div>
+    </div>
+
+    <footer class="site-footer">
+
+  <div class="wrapper">
+
+    <h2 class="footer-heading"></h2>
+
+    <div class="footer-col-wrapper">
+      <div class="footer-col footer-col-1">
+        <ul class="contact-list">
+          <li></li>
+          <li><a href="mailto:"></a></li>
+        </ul>
+      </div>
+
+      <div class="footer-col footer-col-2">
+        <ul class="social-media-list">
+          
+
+          
+        </ul>
+      </div>
+
+      <div class="footer-col footer-col-3">
+        <p></p>
+      </div>
+    </div>
+
+  </div>
+
+</footer>
+
+
+  </body>
+
+</html>
