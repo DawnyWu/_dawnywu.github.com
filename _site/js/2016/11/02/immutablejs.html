@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html>
+
+  <head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  <title>immutablejs</title>
+  <meta name="description" content="fromJS 和 Map() 的区别">
+
+  <link rel="stylesheet" href="/css/main.css">
+  <link rel="canonical" href="http://localhost:4000/js/2016/11/02/immutablejs.html">
+  <link rel="alternate" type="application/rss+xml" title="" href="http://localhost:4000/feed.xml">
+</head>
+
+
+  <body>
+
+    <header class="site-header">
+
+  <div class="wrapper">
+
+    <a class="site-title" href="/"></a>
+
+    <nav class="site-nav">
+      <a href="#" class="menu-icon">
+        <svg viewBox="0 0 18 15">
+          <path fill="#424242" d="M18,1.484c0,0.82-0.665,1.484-1.484,1.484H1.484C0.665,2.969,0,2.304,0,1.484l0,0C0,0.665,0.665,0,1.484,0 h15.031C17.335,0,18,0.665,18,1.484L18,1.484z"/>
+          <path fill="#424242" d="M18,7.516C18,8.335,17.335,9,16.516,9H1.484C0.665,9,0,8.335,0,7.516l0,0c0-0.82,0.665-1.484,1.484-1.484 h15.031C17.335,6.031,18,6.696,18,7.516L18,7.516z"/>
+          <path fill="#424242" d="M18,13.516C18,14.335,17.335,15,16.516,15H1.484C0.665,15,0,14.335,0,13.516l0,0 c0-0.82,0.665-1.484,1.484-1.484h15.031C17.335,12.031,18,12.696,18,13.516L18,13.516z"/>
+        </svg>
+      </a>
+
+      <div class="trigger">
+        
+          
+          <a class="page-link" href="/about/">About</a>
+          
+        
+          
+        
+          
+        
+          
+        
+      </div>
+    </nav>
+
+  </div>
+
+</header>
+
+
+    <div class="page-content">
+      <div class="wrapper">
+        <article class="post" itemscope itemtype="http://schema.org/BlogPosting">
+
+  <header class="post-header">
+    <h1 class="post-title" itemprop="name headline">immutablejs</h1>
+    <p class="post-meta"><time datetime="2016-11-02T00:00:00+08:00" itemprop="datePublished">Nov 2, 2016</time></p>
+  </header>
+
+  <div class="post-content" itemprop="articleBody">
+    <h3 id="fromjs--map-">fromJS 和 Map() 的区别</h3>
+
+<p><code class="highlighter-rouge">fromJS()</code> 会把所有层的内容都变为immutable</p>
+
+<p><code class="highlighter-rouge">Map()</code>只一层</p>
+
+<div class="language-js highlighter-rouge"><pre class="highlight"><code><span class="kd">var</span> <span class="nx">a</span> <span class="o">=</span> <span class="p">{</span><span class="na">address</span><span class="p">:</span> <span class="p">{</span><span class="na">postcode</span><span class="p">:</span> <span class="mi">5085</span><span class="p">}}</span>
+<span class="kd">var</span> <span class="nx">d</span> <span class="o">=</span> <span class="nx">Immutable</span><span class="p">.</span><span class="nx">Map</span><span class="p">(</span><span class="nx">a</span><span class="p">);</span>
+</code></pre>
+</div>
+
+<p>这里用<code class="highlighter-rouge">Map()</code>, <code class="highlighter-rouge">d.get('address')</code> is immutable, 想要改变<code class="highlighter-rouge">key address</code>的值，只能使用Immutable.Map.set()方法。</p>
+
+<p>可是key postcode是可以改变的，<code class="highlighter-rouge">d.get('address').postcode=6000</code>就可以改变了</p>
+
+<div class="language-js highlighter-rouge"><pre class="highlight"><code><span class="kd">var</span> <span class="nx">a</span> <span class="o">=</span> <span class="p">{</span><span class="na">address</span><span class="p">:</span> <span class="p">{</span><span class="na">postcode</span><span class="p">:</span> <span class="mi">5085</span><span class="p">}}</span>
+<span class="kd">var</span> <span class="nx">b</span> <span class="o">=</span> <span class="nx">Immutable</span><span class="p">.</span><span class="nx">fromJS</span><span class="p">(</span><span class="nx">a</span><span class="p">);</span>
+<span class="nx">b</span><span class="p">.</span><span class="nx">get</span><span class="p">(</span><span class="s1">'address'</span><span class="p">).</span><span class="nx">postcode</span><span class="o">=</span><span class="mi">6000</span><span class="p">;</span>
+<span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="nx">JSON</span><span class="p">.</span><span class="nx">stringify</span><span class="p">(</span><span class="nx">b</span><span class="p">));</span>   <span class="c1">//Outputs {"address":{"postcode":5085}}</span>
+</code></pre>
+</div>
+
+<p>而用<code class="highlighter-rouge">fromJS</code>创建的<code class="highlighter-rouge">obj</code>是改不了的</p>
+
+<p>###</p>
+
+<p>var grid = {
+    editable: false,
+    widgets: [{
+        name: ‘Some widget’,
+        type: ‘List’,
+        defaultDataSource: ‘daily’,
+        dataSources: {}
+    }, {
+        name: ‘Some widget1’,
+        type: ‘List’,
+        defaultDataSource: ‘daily’,
+        dataSources: {}
+    }]
+};</p>
+
+<p>var state = Immutable.fromJS(grid);</p>
+
+<p>var newState = state.updateIn([‘widgets’], function (list) {
+    return list.push(Immutable.Map({
+        name: ‘Some widget2’,
+        type: ‘List’,
+        defaultDataSource: ‘daily’,
+        dataSources: {}
+    }));
+});</p>
+
+<p>var newState1 = state.updateIn([‘widgets’], function (list) {
+    return list.push(Immutable.Map({
+        name: ‘Some widget2’,
+        type: ‘List’,
+        defaultDataSource: ‘daily’,
+        dataSources: {}
+    }));
+});</p>
+
+<p>console.log(state.toJS(), newState.toJS(), newState1.toJS());</p>
+
+<p>console.log(newState.equals(newState1)); //false</p>
+
+<h3 id="objimmutable-obj">普通obj可以嵌套immutable obj么？</h3>
+
+  </div>
+
+</article>
+
+      </div>
+    </div>
+
+    <footer class="site-footer">
+
+  <div class="wrapper">
+
+    <h2 class="footer-heading"></h2>
+
+    <div class="footer-col-wrapper">
+      <div class="footer-col footer-col-1">
+        <ul class="contact-list">
+          <li></li>
+          <li><a href="mailto:"></a></li>
+        </ul>
+      </div>
+
+      <div class="footer-col footer-col-2">
+        <ul class="social-media-list">
+          
+
+          
+        </ul>
+      </div>
+
+      <div class="footer-col footer-col-3">
+        <p></p>
+      </div>
+    </div>
+
+  </div>
+
+</footer>
+
+
+  </body>
+
+</html>

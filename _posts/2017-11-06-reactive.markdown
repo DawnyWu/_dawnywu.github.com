@@ -1,0 +1,56 @@
+---
+layout: post
+title:  "reactive programming"
+date:   2016-11-07
+categories: js
+---
+
+
+```js
+var requestStream = Rx.Observable.just('https://api.github.com/users');
+```
+
+```js
+requestStream.subscribe(function(requestUrl) {
+  // execute the request
+  var responseStream = Rx.Observable.create(function (observer) {
+    jQuery.getJSON(requestUrl)
+    .done(function(response) { observer.onNext(response); })
+    .fail(function(jqXHR, status, error) { observer.onError(error); })
+    .always(function() { observer.onCompleted(); });
+  });
+
+  responseStream.subscribe(function(response) {
+    // do something with the response
+  });
+}
+```
+
+```js
+var responseMetastream = requestStream
+  .map(function(requestUrl) {
+    return Rx.Observable.fromPromise(jQuery.getJSON(requestUrl));
+  });
+```
+
+```js
+var responseStream = requestStream
+  .flatMap(function(requestUrl) {
+    return Rx.Observable.fromPromise(jQuery.getJSON(requestUrl));
+  });
+```
+
+now
+
+```js
+var requestStream = Rx.Observable.just('https://api.github.com/users');
+
+var responseStream = requestStream
+  .flatMap(function(requestUrl) {
+    return Rx.Observable.fromPromise(jQuery.getJSON(requestUrl));
+  });
+
+responseStream.subscribe(function(response) {
+  // render `response` to the DOM however you wish
+});
+```

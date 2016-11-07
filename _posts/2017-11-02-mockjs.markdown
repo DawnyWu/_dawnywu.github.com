@@ -1,0 +1,6 @@
+---
+layout: post
+title:  "mockjs的使用"
+date:   2016-11-02
+categories: js
+---

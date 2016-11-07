@@ -1,0 +1,80 @@
+---
+layout: post
+title:  "300ms delay"
+date:   2016-11-03
+categories: mobile
+---
+
+http://developer.telerik.com/featured/300-ms-click-delay-ios-8/
+
+### 原因
+
+原因是为了侦测double click事件
+
+### android 解决办法
+
+
+***CHROME AND FIREFOX***
+
+在你设置了viewport之后，不会有300ms的延迟的
+
+在chrome v36和firefox v29后，同下边的IE解决办法一样， 也都支持了touch-action属性，所以IE的解决办法同样适用
+
+***INTERNET EXPLORER***
+
+为点击的element添加touch-action属性
+
+```html
+<style>
+  html { touch-action: manipulation; }
+</style>
+```
+
+### iOS 解决办法
+
+`tap`分为`fast tap`和`slow tap`
+
+#### 什么是fast tap slow tap
+
+determined by how long your finger is on the screen, or more specifically, the difference between the touchstart and touchend events.
+
+Taps where your finger is on the screen for `< ~125 milliseconds` are considered `fast`, and the delay is maintained;
+
+tap很快的时候，300ms是存在的，因为很可能是double click
+
+taps where your finger is on the screen for `> ~125 milliseconds` are considered `slow`, and the delay is removed.
+
+tap 很慢的时候，没有300ms，认为是单独的click
+
+#### The UIWebView caveat
+
+ the new iOS 8 heuristics are only present in iOS 8 Safari and iOS’s new WKWebView class. The heuristics are not present in the legacy UIWebView class, and they’re also not present for apps running as home screen web apps.
+
+
+#### 不行就用库。。。
+
+Kendo UI Mobile, FastClick, or Tappy
+
+### react解决办法
+
+https://github.com/zilverline/react-tap-event-plugin
+
+### 查看延迟时间代码
+
+```js
+<button>Click</button>
+<p>Delay was <span></span> milliseconds.</p>
+<script>
+    var button = document.querySelector( "button" ),
+        span = document.querySelector( "span" ),
+        delay;
+    // 点后触发touchend
+    button.addEventListener( "touchend", function() {
+        delay = Date.now();
+    });
+    // 过了一段时间，触发click
+    button.addEventListener( "click", function() {
+        span.innerHTML = Date.now() - delay;
+    });
+</script>
+```

@@ -27,8 +27,8 @@ export function fetchPosts(subreddit) {
   }
 }
 
- ###
- 
+###
+
 import fetch from 'isomorphic-fetch'
 
 export const REQUEST_POSTS = 'REQUEST_POSTS'
@@ -87,4 +87,3 @@ export function fetchPostsIfNeeded(subreddit) {
     }
   }
 }
-```
