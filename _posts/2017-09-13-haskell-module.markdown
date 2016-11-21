@@ -1,9 +1,11 @@
 ---
 layout: post
-title:  "Haskell Moduel"
+title:  "Haskell Moduel Import Export"
 date:   2016-09-13
 categories: Haskell
 ---
+
+### Import
 
 只import几个函数
 
@@ -38,6 +40,30 @@ import qualified Data.ByteString.Lazy.Char8 as L8
 import qualified Data.ByteString.Lazy as L
 import Data.Char (isSpace)
 ```
+
+### Export
+
+```haskell
+module SimpleJSON
+    (
+      JValue(..)
+    , getString
+    , getInt
+    , getDouble
+    , getBool
+    , getObject
+    , getArray
+    , isNull
+    ) where
+```
+
+导出所有
+
+```haskell
+module ExportEverything where
+```
+
+
 
 
 

@@ -1,0 +1,14 @@
+---
+layout: post
+title:  "Haskell $"
+date:   2016-10-19
+categories: haskell
+---
+
+### Haskell中的 `$` 是做什么的？
+
+It's useful for avoiding extra parentheses: 
+
+```haskell
+f (g x) == f $ g x
+```

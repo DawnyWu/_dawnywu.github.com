@@ -1,0 +1,240 @@
+<!DOCTYPE html>
+<html>
+
+  <head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  <title>Programming in Haskell</title>
+  <meta name="description" content="Type">
+
+  <link rel="stylesheet" href="/css/main.css">
+  <link rel="canonical" href="http://localhost:4000/haskell/2016/10/20/programming-in-haskell.html">
+  <link rel="alternate" type="application/rss+xml" title="" href="http://localhost:4000/feed.xml">
+</head>
+
+
+  <body>
+
+    <header class="site-header">
+
+  <div class="wrapper">
+
+    <a class="site-title" href="/"></a>
+
+    <nav class="site-nav">
+      <a href="#" class="menu-icon">
+        <svg viewBox="0 0 18 15">
+          <path fill="#424242" d="M18,1.484c0,0.82-0.665,1.484-1.484,1.484H1.484C0.665,2.969,0,2.304,0,1.484l0,0C0,0.665,0.665,0,1.484,0 h15.031C17.335,0,18,0.665,18,1.484L18,1.484z"/>
+          <path fill="#424242" d="M18,7.516C18,8.335,17.335,9,16.516,9H1.484C0.665,9,0,8.335,0,7.516l0,0c0-0.82,0.665-1.484,1.484-1.484 h15.031C17.335,6.031,18,6.696,18,7.516L18,7.516z"/>
+          <path fill="#424242" d="M18,13.516C18,14.335,17.335,15,16.516,15H1.484C0.665,15,0,14.335,0,13.516l0,0 c0-0.82,0.665-1.484,1.484-1.484h15.031C17.335,12.031,18,12.696,18,13.516L18,13.516z"/>
+        </svg>
+      </a>
+
+      <div class="trigger">
+        
+          
+          <a class="page-link" href="/about/">About</a>
+          
+        
+          
+        
+          
+        
+          
+        
+      </div>
+    </nav>
+
+  </div>
+
+</header>
+
+
+    <div class="page-content">
+      <div class="wrapper">
+        <article class="post" itemscope itemtype="http://schema.org/BlogPosting">
+
+  <header class="post-header">
+    <h1 class="post-title" itemprop="name headline">Programming in Haskell</h1>
+    <p class="post-meta"><time datetime="2016-10-20T00:00:00+08:00" itemprop="datePublished">Oct 20, 2016</time></p>
+  </header>
+
+  <div class="post-content" itemprop="articleBody">
+    <h3 id="type">Type</h3>
+
+<p>a type is a collection of related values.</p>
+
+<h3 id="class">Class</h3>
+
+<p>a class is a collection of types that support certain overloaded operations called methods.</p>
+
+<h3 id="the-difference-between-normal-functions-and-constructor-functions-is">The difference between normal functions and constructor functions is</h3>
+
+<p>is that the latter have no defining equations, and exist solely for the purpose of building piecesofdata.</p>
+
+<p>For example,whereas the expression <code class="highlighter-rouge">negate 1.0</code> can be evaluated to <code class="highlighter-rouge">−1.0</code> by applying the definition of negate, the expression <code class="highlighter-rouge">Circle 1.0</code> is already fully evaluated, and hence cannot be further simplified, because there are no defining equations for Circle. Rather, the expression <code class="highlighter-rouge">Circle 1.0</code> is just a piece of data, in the same way that <code class="highlighter-rouge">1.0</code> itself is just data.</p>
+
+<h3 id="functions">Functions</h3>
+
+<h4 id="section">普通定义</h4>
+
+<div class="language-haskell highlighter-rouge"><pre class="highlight"><code><span class="n">even</span> <span class="o">::</span> <span class="kt">Integral</span> <span class="n">a</span> <span class="err">⇒</span> <span class="n">a</span> <span class="err">→</span> <span class="kt">Bool</span>
+<span class="n">evenn</span> <span class="o">=</span> <span class="n">n</span><span class="err">‘</span><span class="n">mod</span><span class="err">‘</span><span class="mi">2</span><span class="o">==</span><span class="mi">0</span>
+</code></pre>
+</div>
+<p>#### Conditional expressions</p>
+
+<div class="language-haskell highlighter-rouge"><pre class="highlight"><code><span class="n">signum</span> <span class="o">::</span> <span class="kt">Int</span> <span class="err">→</span> <span class="kt">Int</span>
+<span class="n">signum</span> <span class="n">n</span> <span class="o">=</span> <span class="kr">if</span> <span class="n">n</span> <span class="o">&lt;</span><span class="mi">0</span> <span class="kr">then</span><span class="err">−</span><span class="mi">1</span> <span class="kr">else</span>
+             <span class="kr">if</span> <span class="n">n</span> <span class="o">==</span> <span class="mi">0</span> <span class="kr">then</span> <span class="mi">0</span> <span class="kr">else</span> <span class="mi">1</span>
+</code></pre>
+</div>
+
+<h4 id="guarded-equations">Guarded equations</h4>
+
+<div class="language-haskell highlighter-rouge"><pre class="highlight"><code><span class="n">signum</span> <span class="n">n</span> <span class="o">|</span> <span class="n">n</span><span class="o">&lt;</span><span class="mi">0</span>  <span class="o">=</span> <span class="err">−</span><span class="mi">1</span> 
+         <span class="o">|</span> <span class="n">n</span><span class="o">==</span><span class="mi">0</span> <span class="o">=</span> <span class="mi">0</span>
+         <span class="o">|</span> <span class="n">otherwise</span> <span class="o">=</span> <span class="mi">1</span>
+</code></pre>
+</div>
+
+<h3 id="pattern-matching">Pattern matching</h3>
+
+<div class="language-haskell highlighter-rouge"><pre class="highlight"><code><span class="err">¬</span> <span class="o">::</span> <span class="kt">Bool</span> <span class="err">→</span> <span class="kt">Bool</span> 
+<span class="err">¬</span> <span class="kt">False</span> <span class="o">=</span> <span class="kt">True</span>
+<span class="err">¬</span> <span class="kt">True</span> <span class="o">=</span> <span class="kt">False</span>
+
+<span class="p">(</span><span class="err">∧</span><span class="p">)</span> <span class="o">::</span> <span class="kt">Bool</span> <span class="err">→</span> <span class="kt">Bool</span> <span class="err">→</span> <span class="kt">Bool</span>
+<span class="kt">True</span>  <span class="err">∧</span> <span class="kt">True</span>  <span class="o">=</span> <span class="kt">True</span> 
+<span class="kt">True</span>  <span class="err">∧</span> <span class="kt">False</span> <span class="o">=</span> <span class="kt">False</span> 
+<span class="kt">False</span> <span class="err">∧</span> <span class="kt">True</span>  <span class="o">=</span> <span class="kt">False</span> 
+<span class="kt">False</span> <span class="err">∧</span> <span class="kt">False</span> <span class="o">=</span> <span class="kt">False</span>
+</code></pre>
+</div>
+
+<h3 id="lambda-expressions">LAMBDA EXPRESSIONS</h3>
+
+<p>直接把参数写在后边就相当于给函数传递参数。。。</p>
+
+<div class="language-haskell highlighter-rouge"><pre class="highlight"><code><span class="p">(</span><span class="err">λ</span><span class="n">x</span><span class="err">→</span><span class="n">x</span><span class="o">+</span><span class="n">x</span><span class="p">)</span><span class="mi">2</span>
+</code></pre>
+</div>
+
+<h4 id="section-1">作用</h4>
+
+<ol>
+  <li>they can be used to formalise the meaning of curried function definitions.</li>
+</ol>
+
+<div class="language-haskell highlighter-rouge"><pre class="highlight"><code><span class="n">add</span> <span class="n">x</span> <span class="n">y</span> <span class="o">=</span> <span class="n">x</span> <span class="o">+</span> <span class="n">y</span>
+<span class="n">add</span> <span class="o">=</span> <span class="err">λ</span><span class="n">x</span> <span class="err">→</span> <span class="p">(</span> <span class="err">λ</span><span class="n">y</span> <span class="err">→</span> <span class="n">x</span> <span class="o">+</span> <span class="n">y</span> <span class="p">)</span>
+</code></pre>
+</div>
+
+<ol>
+  <li>使得函数的定义更加明确</li>
+</ol>
+
+<p>const 函数: 你传入一个a,返回一个函数，这个函数的返回值永远是a, 可是看函数定义并不是很明确</p>
+
+<div class="language-haskell highlighter-rouge"><pre class="highlight"><code><span class="n">const</span> <span class="o">::</span> <span class="n">a</span><span class="err">→</span><span class="n">b</span><span class="err">→</span><span class="n">a</span> 
+<span class="n">const</span> <span class="n">x</span> <span class="o">=</span> <span class="n">x</span>
+</code></pre>
+</div>
+
+<div class="language-haskell highlighter-rouge"><pre class="highlight"><code><span class="n">const</span> <span class="o">::</span> <span class="n">a</span> <span class="err">→</span> <span class="p">(</span><span class="n">b</span> <span class="err">→</span> <span class="n">a</span><span class="p">)</span>
+<span class="n">const</span> <span class="n">x</span> <span class="o">=</span> <span class="err">λ</span><span class="kr">_</span> <span class="err">→</span> <span class="n">x</span>
+</code></pre>
+</div>
+
+<ol>
+  <li>就是省去起名字。。。</li>
+</ol>
+
+<h3 id="section-2">Section</h3>
+
+<p>Functions such as <code class="highlighter-rouge">+</code> that are written between their two arguments are called <code class="highlighter-rouge">operators</code>.</p>
+
+<p>In particular, any operator can be converted into a curried function that is written before its arguments by enclosing the name of the operator in parentheses, as in <code class="highlighter-rouge">(+) 1 2</code>.</p>
+
+<p>this convention also allows one of the arguments to be included in the parentheses if desired, as in <code class="highlighter-rouge">(1+) 2</code> and <code class="highlighter-rouge">(+2) 1</code></p>
+
+<div class="language-haskell highlighter-rouge"><pre class="highlight"><code><span class="n">div</span> <span class="mi">7</span> <span class="mi">2</span>
+</code></pre>
+</div>
+
+<p>可以写成</p>
+
+<div class="language-haskell highlighter-rouge"><pre class="highlight"><code><span class="mi">7</span> <span class="sc">'d</span><span class="err">i</span><span class="n">v'</span> <span class="mi">2</span>
+</code></pre>
+</div>
+
+<div class="language-haskell highlighter-rouge"><pre class="highlight"><code><span class="p">(</span><span class="err">⊕</span><span class="p">)</span>   <span class="o">=</span> <span class="err">λ</span><span class="n">x</span> <span class="o">-&gt;</span> <span class="p">(</span><span class="err">λ</span><span class="n">y</span> <span class="o">-&gt;</span> <span class="n">x</span><span class="err">⊕</span><span class="n">y</span><span class="p">)</span> 
+<span class="p">(</span><span class="n">x</span> <span class="err">⊕</span><span class="p">)</span> <span class="o">=</span> <span class="err">λ</span><span class="n">y</span> <span class="o">-&gt;</span> <span class="n">x</span> <span class="err">⊕</span> <span class="n">y</span>
+<span class="p">(</span><span class="err">⊕</span><span class="n">y</span><span class="p">)</span>  <span class="o">=</span> <span class="err">λ</span><span class="n">x</span> <span class="o">-&gt;</span> <span class="n">x</span> <span class="err">⊕</span> <span class="n">y</span>
+</code></pre>
+</div>
+
+<h3 id="functional-parsers">Functional parsers</h3>
+
+<p>type Parser a = String → [(a, String)]</p>
+
+<div class="language-haskell highlighter-rouge"><pre class="highlight"><code><span class="n">return</span> <span class="o">::</span> <span class="n">a</span> <span class="err">→</span> <span class="kt">Parser</span> <span class="n">a</span>
+<span class="n">return</span> <span class="n">v</span> <span class="o">=</span> <span class="err">λ</span><span class="n">inp</span> <span class="err">→</span> <span class="p">[(</span><span class="n">v</span><span class="p">,</span><span class="n">inp</span><span class="p">)]</span>
+<span class="c1">-- 和下边效果一样的</span>
+<span class="n">result</span> <span class="n">v</span> <span class="n">inp</span> <span class="o">=</span> <span class="p">[(</span><span class="n">v</span><span class="p">,</span> <span class="n">inp</span><span class="p">)]</span>
+
+<span class="n">failure</span> <span class="o">::</span> <span class="kt">Parser</span> <span class="n">a</span>
+<span class="n">failure</span> <span class="o">=</span> <span class="err">λ</span><span class="n">inp</span> <span class="err">→</span> <span class="kt">[]</span>
+
+<span class="n">item</span> <span class="o">::</span> <span class="kt">Parser</span> <span class="kt">Char</span>
+<span class="n">item</span> <span class="o">=</span> <span class="err">λ</span><span class="n">inp</span> <span class="err">→</span> <span class="kr">case</span> <span class="n">inp</span> <span class="kr">of</span>
+                    <span class="kt">[]</span><span class="err">→</span><span class="kt">[]</span>
+                    <span class="p">(</span><span class="n">x</span> <span class="o">:</span> <span class="n">xs</span><span class="p">)</span> <span class="err">→</span> <span class="p">[(</span><span class="n">x</span> <span class="p">,</span> <span class="n">xs</span><span class="p">)]</span>
+</code></pre>
+</div>
+
+  </div>
+
+</article>
+
+      </div>
+    </div>
+
+    <footer class="site-footer">
+
+  <div class="wrapper">
+
+    <h2 class="footer-heading"></h2>
+
+    <div class="footer-col-wrapper">
+      <div class="footer-col footer-col-1">
+        <ul class="contact-list">
+          <li></li>
+          <li><a href="mailto:"></a></li>
+        </ul>
+      </div>
+
+      <div class="footer-col footer-col-2">
+        <ul class="social-media-list">
+          
+
+          
+        </ul>
+      </div>
+
+      <div class="footer-col footer-col-3">
+        <p></p>
+      </div>
+    </div>
+
+  </div>
+
+</footer>
+
+
+  </body>
+
+</html>

@@ -1,0 +1,220 @@
+---
+layout: post
+title:  "Haskell Parsec"
+date:   2016-10-19
+categories: haskell
+---
+
+### Parsec 全称
+
+Parser Combinators
+
+### 在GHCI中使用Parsec
+
+
+
+### CSV Parser
+
+```haskell
+-- file: ch16/csv1.hs
+import Text.ParserCombinators.Parsec
+
+{- A CSV file contains 0 or more lines, each of which is terminated
+   by the end-of-line character (eol). -}
+csvFile :: GenParser Char st [[String]]
+csvFile = 
+    do result <- many line
+       eof
+       return result
+
+-- Each line contains 1 or more cells, separated by a comma
+line :: GenParser Char st [String]
+line = 
+    do result <- cells
+       eol                       -- end of line
+       return result
+       
+-- Build up a list of cells.  Try to parse the first cell, then figure out 
+-- what ends the cell.
+cells :: GenParser Char st [String]
+cells = 
+    do first <- cellContent
+       next <- remainingCells
+       return (first : next)
+
+-- The cell either ends with a comma, indicating that 1 or more cells follow,
+-- or it doesn't, indicating that we're at the end of the cells for this line
+remainingCells :: GenParser Char st [String]
+remainingCells =
+    (char ',' >> cells)            -- Found comma?  More cells coming
+    <|> (return [])                -- No comma?  Return [], no more cells
+
+-- Each cell contains 0 or more characters, which must not be a comma or
+-- EOL
+cellContent :: GenParser Char st String
+cellContent = 
+    many (noneOf ",\n")
+       
+
+-- The end of line character is \n
+eol :: GenParser Char st Char
+eol = char '\n'
+
+parseCSV :: String -> Either ParseError [[String]]
+parseCSV input = parse csvFile "(unknown)" input
+```
+
+### The sepBy and endBy Combinators
+
+可以用`sepBy`和`endBy`来改进
+
+```haskell
+-- file: ch16/csv2.hs
+import Text.ParserCombinators.Parsec
+
+csvFile = endBy line eol
+line = sepBy cell (char ',')
+cell = many (noneOf ",\n")
+eol = char '\n'
+
+parseCSV :: String -> Either ParseError [[String]]
+parseCSV input = parse csvFile "(unknown)" input
+```
+
+* A CSV file contains 0 or more lines, each of which is terminated by the end-of-line character.
+
+* A line contains 1 or more cells, separated by a comma.
+
+* A cell contains 0 or more characters, which must be neither the comma nor the end-of-line character. 
+
+* The end-of-line character is the newline, \n. 
+
+### Choices and Errors
+
+* Unix/Linux systems, plus Windows in text mode, use simply "\n". 
+
+* DOS and Windows systems use "\r\n"
+
+* Macs traditionally used "\r". 
+
+* We could add in support for "\n\r"
+ 
+我们先修改成这样
+
+```haskell
+-- file: ch16/csv3.hs
+-- This function is not correct!
+eol = string "\n" <|> string "\n\r"
+```
+
+
+
+### Lookahead
+
+try takes one function, a parser. It applies that parser. If the parser doesn't succeed, try behaves as if it hadn't consumed any input at all. 
+
+```haskell
+-- file: ch16/csv6.hs
+import Text.ParserCombinators.Parsec
+
+csvFile = endBy line eol
+line = sepBy cell (char ',')
+cell = many (noneOf ",\n\r")
+
+eol =   try (string "\n\r")
+    <|> try (string "\r\n")
+    <|> string "\n"
+    <|> string "\r"
+
+parseCSV :: String -> Either ParseError [[String]]
+parseCSV input = parse csvFile "(unknown)" input
+```
+
+### ERROR
+
+```haskell
+eol =   try (string "\n\r")
+    <|> try (string "\r\n")
+    <|> string "\n"
+    <|> string "\r"
+    <|> fail "Couldn't find EOL"
+```
+
+错误的时候fail的语句会出现在最后
+
+```haskell
+ghci> parseCSV "line1"
+Loading package parsec-2.1.0.0 ... linking ... done.
+Left "(unknown)" (line 1, column 6):
+unexpected end of input
+expecting ",", "\n\r", "\r\n", "\n" or "\r"
+Couldn't find EOL
+```
+
+可是还是打出了`expecting ",", "\n\r", "\r\n", "\n" or "\r"`,因为遇到错误后还在尝试后边的parser,可以这样解决
+
+```haskell
+-- file: ch16/csv8.hs
+eol =   try (string "\n\r")
+    <|> try (string "\r\n")
+    <|> string "\n"
+    <|> string "\r"
+    <?> "end of line"
+```
+
+### Extended Example: Full CSV Parser
+
+```haskell
+-- file: ch16/csv9.hs
+import Text.ParserCombinators.Parsec
+
+csvFile = endBy line eol
+line = sepBy cell (char ',')
+-- First, a cell may now be either a bare cell or a "quoted" cell.
+cell = quotedCell <|> many (noneOf ",\n\r")
+
+quotedCell = 
+    do char '"'
+       content <- many quotedChar
+       char '"' <?> "quote at end of cell"
+       return content
+
+quotedChar =
+        noneOf "\""
+    <|> try (string "\"\"" >> return '"')
+
+eol =   try (string "\n\r")
+    <|> try (string "\r\n")
+    <|> string "\n"
+    <|> string "\r"
+    <?> "end of line"
+
+parseCSV :: String -> Either ParseError [[String]]
+parseCSV input = parse csvFile "(unknown)" input
+
+main =
+    do c <- getContents
+       case parse csvFile "(stdin)" c of
+            Left e -> do putStrLn "Error parsing input:"
+                         print e
+            Right r -> mapM_ print r
+```            
+
+### liftM2
+
+```haskell
+-- file: ch16/FormParse.hs
+p_pair :: CharParser () (String, Maybe String)
+p_pair = do
+  name <- many1 p_char
+  value <- optionMaybe (char '=' >> many p_char)
+  return (name, value)
+```
+
+可以写成如下样子
+
+```haskell
+-- file: ch16/FormParse.hs
+p_pair_app1 =
+    liftM2 (,) (many1 p_char) (optionMaybe (char '=' >> many p_char))
+```
