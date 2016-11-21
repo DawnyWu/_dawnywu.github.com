@@ -1,0 +1,84 @@
+---
+layout: post
+title:  "weak map"
+date:   2016-11-11
+categories: js
+---
+
+
+### use case
+
+***cache result**
+
+```js
+const cache = new WeakMap();
+
+function countOwnKeys(obj) {
+    if (cache.has(obj)) {
+        console.log('Cached');
+        return cache.get(obj);
+    } else {
+        console.log('Computed');
+        const count = Object.keys(obj).length;
+        cache.set(obj, count);
+        return count;
+    }
+}
+```
+
+***Managing listeners***
+
+为一个obj添加listeners,建一个weakMap，obj是key,value是包含listener的Set
+
+trigger listeners的时候，从weakMap obj key对应的value set中，执行所有的listeners
+
+The advantage of using a WeakMap here is that, once an object is garbage-collected, its listeners will be garbage-collected, too. In other words: there won’t be any memory leaks.
+
+```js
+const obj = {};
+addListener(obj, () => console.log('hello'));
+addListener(obj, () => console.log('world'));
+
+const _objToListeners = new WeakMap();
+
+
+function addListener(obj, listener) {
+    if (! _objToListeners.has(obj)) {
+        _objToListeners.set(obj, new Set());
+    }
+    _objToListeners.get(obj).add(listener);
+}
+
+function triggerListeners(obj) {
+    const listeners = _objToListeners.get(obj);
+    if (listeners) {
+        for (const listener of listeners) {
+            listener();
+        }
+    }
+}
+```
+
+***Keeping private data***
+
+```js
+const _counter = new WeakMap();
+const _action = new WeakMap();
+
+class Countdown {
+    constructor(counter, action) {
+        _counter.set(this, counter);
+        _action.set(this, action);
+    }
+    dec() {
+        let counter = _counter.get(this);
+        if (counter < 1) return;
+        counter--;
+        _counter.set(this, counter);
+        if (counter === 0) {
+            _action.get(this)();
+        }
+    }
+}
+```
+

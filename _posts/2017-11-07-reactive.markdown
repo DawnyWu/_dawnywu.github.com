@@ -1,0 +1,155 @@
+---
+layout: post
+title:  "reactive programming"
+date:   2016-11-08
+categories: js
+---
+
+
+```js
+var requestStream = Rx.Observable.just('https://api.github.com/users');
+```
+
+```js
+requestStream.subscribe(function(requestUrl) {
+  // execute the request
+  var responseStream = Rx.Observable.create(function (observer) {
+    jQuery.getJSON(requestUrl)
+    .done(function(response) { observer.onNext(response); })
+    .fail(function(jqXHR, status, error) { observer.onError(error); })
+    .always(function() { observer.onCompleted(); });
+  });
+
+  responseStream.subscribe(function(response) {
+    // do something with the response
+  });
+}
+```
+
+```js
+var responseMetastream = requestStream
+  .map(function(requestUrl) {
+    return Rx.Observable.fromPromise(jQuery.getJSON(requestUrl));
+  });
+```
+
+```js
+var responseStream = requestStream
+  .flatMap(function(requestUrl) {
+    return Rx.Observable.fromPromise(jQuery.getJSON(requestUrl));
+  });
+```
+
+now
+
+```js
+var requestStream = Rx.Observable.just('https://api.github.com/users');
+
+var responseStream = requestStream
+  .flatMap(function(requestUrl) {
+    return Rx.Observable.fromPromise(jQuery.getJSON(requestUrl));
+  });
+
+responseStream.subscribe(function(response) {
+  // render `response` to the DOM however you wish
+});
+```
+
+上边是发送请求返回数据相对应的stream
+
+### The refresh button
+
+创建了一个refresh button 的 click stream
+
+```js
+var refreshButton = document.querySelector('.refresh');
+var refreshClickStream = Rx.Observable.fromEvent(refreshButton, 'click');
+```
+
+click stream本身不发请求，下边由click stream创建request stream
+
+```js
+var requestOnRefreshStream = refreshClickStream
+  .map(function() {
+    var randomOffset = Math.floor(Math.random()*500);
+    return 'https://api.github.com/users?since=' + randomOffset;
+  });
+```
+
+现在我们有两个stream
+
+一个是开始的时候产生一次request,抽象为一个request stream
+
+一个是每次按refresh button产生一个request,抽象为一个request stream
+
+
+```js
+var requestOnRefreshStream = refreshClickStream
+  .map(function() {
+    var randomOffset = Math.floor(Math.random()*500);
+    return 'https://api.github.com/users?since=' + randomOffset;
+  });
+
+var startupRequestStream = Rx.Observable.just('https://api.github.com/users');
+```
+
+我们可以merge它们。。。。
+
+```js
+var requestStream = Rx.Observable.merge(
+  requestOnRefreshStream, startupRequestStream
+);
+```
+
+### Modelling the 3 suggestions with streams
+
+```js
+var suggestion1Stream = responseStream
+  .map(function(listUsers) {
+    // get one random user from the list
+    return listUsers[Math.floor(Math.random()*listUsers.length)];
+  });
+```
+
+### Closing a suggestion and using cached responses
+
+```js
+var close1Button = document.querySelector('.close1');
+var close1ClickStream = Rx.Observable.fromEvent(close1Button, 'click');
+// and the same for close2Button and close3Button
+
+var requestStream = refreshClickStream.startWith('startup click')
+  .merge(close1ClickStream) // we added this
+  .map(function() {
+    var randomOffset = Math.floor(Math.random()*500);
+    return 'https://api.github.com/users?since=' + randomOffset;
+  });
+```
+
+把 refresh event 和 click close button 都映射成了调用接口, 可是click close button只是换一个推荐用户而已，其实不需要调用接口这么大的动作
+
+```js
+var suggestion1Stream = close1ClickStream
+  .combineLatest(responseStream,             
+    function(click, listUsers) {
+      return listUsers[Math.floor(Math.random()*listUsers.length)];
+    }
+  )
+  .merge(
+    refreshClickStream.map(function(){ return null; })
+  )
+  .startWith(null);
+```
+
+```js
+var suggestion1Stream = close1ClickStream.startWith('startup click') // we added this
+  .combineLatest(responseStream,             
+    function(click, listUsers) {l
+      return listUsers[Math.floor(Math.random()*listUsers.length)];
+    }
+  )
+  .merge(
+    refreshClickStream.map(function(){ return null; })
+  )
+  .startWith(null);
+```

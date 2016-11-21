@@ -51,13 +51,16 @@ $(window).scrollTop() + $(window).height() = $(document).height()
 $(window).scrollTop() + $(window).height() + XXX = $(document).height()
 ```
 
-### clientHeight
-
-一个div出现滚动条后，你能看到的区域高度就是clientHeight,是框住部分的高度，和浏览器的window.height()有点像
-
 ### offsetHeight
 
-是出现滚动条后，框的高度，不包括margin的，总之就是肉眼能看到的框的高度
+是出现滚动条后，框的高度(content,border)，不包括margin的，和滚动条没有关系，总之就是肉眼能看到的框的高度
+
+
+### clientHeight
+
+是上边的高度减去border
+
+一个div出现滚动条后，你能看到的区域高度就是clientHeight,是框住部分的高度，和浏览器的window.height()有点像
 
 ### scrollHeight
 

@@ -1,0 +1,886 @@
+<!DOCTYPE html>
+<html>
+
+  <head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  <title>generator</title>
+  <meta name="description" content="what generator">
+
+  <link rel="stylesheet" href="/css/main.css">
+  <link rel="canonical" href="http://localhost:4000/js/2016/11/10/generator.html">
+  <link rel="alternate" type="application/rss+xml" title="" href="http://localhost:4000/feed.xml">
+</head>
+
+
+  <body>
+
+    <header class="site-header">
+
+  <div class="wrapper">
+
+    <a class="site-title" href="/"></a>
+
+    <nav class="site-nav">
+      <a href="#" class="menu-icon">
+        <svg viewBox="0 0 18 15">
+          <path fill="#424242" d="M18,1.484c0,0.82-0.665,1.484-1.484,1.484H1.484C0.665,2.969,0,2.304,0,1.484l0,0C0,0.665,0.665,0,1.484,0 h15.031C17.335,0,18,0.665,18,1.484L18,1.484z"/>
+          <path fill="#424242" d="M18,7.516C18,8.335,17.335,9,16.516,9H1.484C0.665,9,0,8.335,0,7.516l0,0c0-0.82,0.665-1.484,1.484-1.484 h15.031C17.335,6.031,18,6.696,18,7.516L18,7.516z"/>
+          <path fill="#424242" d="M18,13.516C18,14.335,17.335,15,16.516,15H1.484C0.665,15,0,14.335,0,13.516l0,0 c0-0.82,0.665-1.484,1.484-1.484h15.031C17.335,12.031,18,12.696,18,13.516L18,13.516z"/>
+        </svg>
+      </a>
+
+      <div class="trigger">
+        
+          
+          <a class="page-link" href="/about/">About</a>
+          
+        
+          
+        
+          
+        
+          
+        
+      </div>
+    </nav>
+
+  </div>
+
+</header>
+
+
+    <div class="page-content">
+      <div class="wrapper">
+        <article class="post" itemscope itemtype="http://schema.org/BlogPosting">
+
+  <header class="post-header">
+    <h1 class="post-title" itemprop="name headline">generator</h1>
+    <p class="post-meta"><time datetime="2016-11-10T00:00:00+08:00" itemprop="datePublished">Nov 10, 2016</time></p>
+  </header>
+
+  <div class="post-content" itemprop="articleBody">
+    <h3 id="what-generator">what generator</h3>
+
+<p>Generators are functions that can be paused and resumed</p>
+
+<div class="language-js highlighter-rouge"><pre class="highlight"><code><span class="kd">function</span><span class="o">*</span> <span class="nx">genFunc</span><span class="p">()</span> <span class="p">{</span>
+    <span class="c1">// (A)</span>
+    <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="s1">'First'</span><span class="p">);</span>
+    <span class="k">yield</span><span class="p">;</span>
+    <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="s1">'Second'</span><span class="p">);</span>
+<span class="p">}</span>
+</code></pre>
+</div>
+
+<p>const g = genFunc(); 返回一个<code class="highlighter-rouge">generator object</code>,可以用来控制流程</p>
+
+<p>但是并没有开始执行，g.next()运行到第一个yield</p>
+
+<div class="language-js highlighter-rouge"><pre class="highlight"><code><span class="kr">const</span> <span class="nx">g</span> <span class="o">=</span> <span class="nx">genFunc</span><span class="p">()</span>
+<span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="s1">'11111111111'</span> <span class="o">+</span> <span class="nx">JSON</span><span class="p">.</span><span class="nx">stringify</span><span class="p">(</span><span class="nx">g</span><span class="p">.</span><span class="nx">next</span><span class="p">()))</span>
+<span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="s1">'22222222222'</span> <span class="o">+</span> <span class="nx">JSON</span><span class="p">.</span><span class="nx">stringfy</span><span class="p">(</span><span class="nx">g</span><span class="p">.</span><span class="nx">next</span><span class="p">()))</span>
+
+<span class="c1">// "First"</span>
+<span class="c1">// "1111111111111111.:{\"done\":false}"</span>
+<span class="c1">// "Second"</span>
+<span class="c1">// JSON.stringfy is not a function</span>
+</code></pre>
+</div>
+
+<h3 id="generator">创建generator的几种方式</h3>
+
+<p>Generator function declarations:</p>
+
+<div class="language-js highlighter-rouge"><pre class="highlight"><code> <span class="kd">function</span><span class="o">*</span> <span class="nx">genFunc</span><span class="p">()</span> <span class="p">{</span> <span class="err">···</span> <span class="p">}</span>
+ <span class="kr">const</span> <span class="nx">genObj</span> <span class="o">=</span> <span class="nx">genFunc</span><span class="p">();</span>
+</code></pre>
+</div>
+
+<p>Generator function expressions:</p>
+
+<div class="language-js highlighter-rouge"><pre class="highlight"><code> <span class="kr">const</span> <span class="nx">genFunc</span> <span class="o">=</span> <span class="kd">function</span><span class="o">*</span> <span class="p">()</span> <span class="p">{</span> <span class="err">···</span> <span class="p">};</span>
+ <span class="kr">const</span> <span class="nx">genObj</span> <span class="o">=</span> <span class="nx">genFunc</span><span class="p">();</span>
+</code></pre>
+</div>
+
+<p>Generator method definitions in object literals:</p>
+
+<div class="language-js highlighter-rouge"><pre class="highlight"><code> <span class="kr">const</span> <span class="nx">obj</span> <span class="o">=</span> <span class="p">{</span>
+     <span class="o">*</span> <span class="nx">generatorMethod</span><span class="p">()</span> <span class="p">{</span>
+         <span class="err">···</span>
+     <span class="p">}</span>
+ <span class="p">};</span>
+ <span class="kr">const</span> <span class="nx">genObj</span> <span class="o">=</span> <span class="nx">obj</span><span class="p">.</span><span class="nx">generatorMethod</span><span class="p">();</span>
+ <span class="err">```</span>
+
+<span class="nx">Generator</span> <span class="nx">method</span> <span class="nx">definitions</span> <span class="k">in</span> <span class="kr">class</span> <span class="nx">definitions</span> <span class="p">(</span><span class="kr">class</span> <span class="nx">declarations</span> <span class="nx">or</span> <span class="kr">class</span> <span class="nx">expressions</span><span class="p">):</span>
+
+<span class="err">```</span><span class="nx">js</span>
+ <span class="kr">class</span> <span class="nx">MyClass</span> <span class="p">{</span>
+     <span class="o">*</span> <span class="nx">generatorMethod</span><span class="p">()</span> <span class="p">{</span>
+         <span class="err">···</span>
+     <span class="p">}</span>
+ <span class="p">}</span>
+ <span class="kr">const</span> <span class="nx">myInst</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">MyClass</span><span class="p">();</span>
+ <span class="kr">const</span> <span class="nx">genObj</span> <span class="o">=</span> <span class="nx">myInst</span><span class="p">.</span><span class="nx">generatorMethod</span><span class="p">();</span>
+</code></pre>
+</div>
+
+<h3 id="use-case-implementing-iterables">use case: implementing iterables</h3>
+
+<div class="language-js highlighter-rouge"><pre class="highlight"><code><span class="kd">function</span><span class="o">*</span> <span class="nx">objectEntries</span><span class="p">(</span><span class="nx">obj</span><span class="p">)</span> <span class="p">{</span>
+    <span class="kr">const</span> <span class="nx">propKeys</span> <span class="o">=</span> <span class="nx">Reflect</span><span class="p">.</span><span class="nx">ownKeys</span><span class="p">(</span><span class="nx">obj</span><span class="p">);</span>
+
+    <span class="k">for</span> <span class="p">(</span><span class="kr">const</span> <span class="nx">propKey</span> <span class="nx">of</span> <span class="nx">propKeys</span><span class="p">)</span> <span class="p">{</span>
+        <span class="c1">// `yield` returns a value and then pauses</span>
+        <span class="c1">// the generator. Later, execution continues</span>
+        <span class="c1">// where it was previously paused.</span>
+        <span class="k">yield</span> <span class="p">[</span><span class="nx">propKey</span><span class="p">,</span> <span class="nx">obj</span><span class="p">[</span><span class="nx">propKey</span><span class="p">]];</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+</code></pre>
+</div>
+
+<p>generator返回的对象是iterable的，所以可以用for…of</p>
+
+<div class="language-js highlighter-rouge"><pre class="highlight"><code><span class="kr">const</span> <span class="nx">jane</span> <span class="o">=</span> <span class="p">{</span> <span class="na">first</span><span class="p">:</span> <span class="s1">'Jane'</span><span class="p">,</span> <span class="na">last</span><span class="p">:</span> <span class="s1">'Doe'</span> <span class="p">};</span>
+<span class="k">for</span> <span class="p">(</span><span class="kr">const</span> <span class="p">[</span><span class="nx">key</span><span class="p">,</span><span class="nx">value</span><span class="p">]</span> <span class="nx">of</span> <span class="nx">objectEntries</span><span class="p">(</span><span class="nx">jane</span><span class="p">))</span> <span class="p">{</span>
+    <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="err">`</span><span class="nx">$</span><span class="p">{</span><span class="nx">key</span><span class="p">}</span><span class="err">:</span> <span class="nx">$</span><span class="p">{</span><span class="nx">value</span><span class="p">}</span><span class="err">`</span><span class="p">);</span>
+<span class="p">}</span>
+</code></pre>
+</div>
+
+<h3 id="use-case-simpler-asynchronous-code">use case: simpler asynchronous code</h3>
+
+<div class="language-js highlighter-rouge"><pre class="highlight"><code><span class="kd">function</span> <span class="nx">fetchJson</span><span class="p">(</span><span class="nx">url</span><span class="p">)</span> <span class="p">{</span>
+    <span class="k">return</span> <span class="nx">fetch</span><span class="p">(</span><span class="nx">url</span><span class="p">)</span>
+    <span class="p">.</span><span class="nx">then</span><span class="p">(</span><span class="nx">request</span> <span class="o">=&gt;</span> <span class="nx">request</span><span class="p">.</span><span class="nx">text</span><span class="p">())</span>
+    <span class="p">.</span><span class="nx">then</span><span class="p">(</span><span class="nx">text</span> <span class="o">=&gt;</span> <span class="p">{</span>
+        <span class="k">return</span> <span class="nx">JSON</span><span class="p">.</span><span class="nx">parse</span><span class="p">(</span><span class="nx">text</span><span class="p">);</span>
+    <span class="p">})</span>
+    <span class="p">.</span><span class="k">catch</span><span class="p">(</span><span class="nx">error</span> <span class="o">=&gt;</span> <span class="p">{</span>
+        <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="err">`</span><span class="na">ERROR</span><span class="p">:</span> <span class="nx">$</span><span class="p">{</span><span class="nx">error</span><span class="p">.</span><span class="nx">stack</span><span class="p">}</span><span class="err">`</span><span class="p">);</span>
+    <span class="p">});</span>
+<span class="p">}</span>
+</code></pre>
+</div>
+
+<div class="language-js highlighter-rouge"><pre class="highlight"><code><span class="kr">const</span> <span class="nx">fetchJson</span> <span class="o">=</span> <span class="nx">co</span><span class="p">.</span><span class="nx">wrap</span><span class="p">(</span><span class="kd">function</span><span class="o">*</span> <span class="p">(</span><span class="nx">url</span><span class="p">)</span> <span class="p">{</span>
+    <span class="k">try</span> <span class="p">{</span>
+        <span class="kd">let</span> <span class="nx">request</span> <span class="o">=</span> <span class="k">yield</span> <span class="nx">fetch</span><span class="p">(</span><span class="nx">url</span><span class="p">);</span>
+        <span class="kd">let</span> <span class="nx">text</span> <span class="o">=</span> <span class="k">yield</span> <span class="nx">request</span><span class="p">.</span><span class="nx">text</span><span class="p">();</span>
+        <span class="k">return</span> <span class="nx">JSON</span><span class="p">.</span><span class="nx">parse</span><span class="p">(</span><span class="nx">text</span><span class="p">);</span>
+    <span class="p">}</span>
+    <span class="k">catch</span> <span class="p">(</span><span class="nx">error</span><span class="p">)</span> <span class="p">{</span>
+        <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="err">`</span><span class="na">ERROR</span><span class="p">:</span> <span class="nx">$</span><span class="p">{</span><span class="nx">error</span><span class="p">.</span><span class="nx">stack</span><span class="p">}</span><span class="err">`</span><span class="p">);</span>
+    <span class="p">}</span>
+<span class="p">});</span>
+</code></pre>
+</div>
+
+<p>????
+用高端的 async 写起来是这样的</p>
+
+<div class="language-js highlighter-rouge"><pre class="highlight"><code><span class="nx">async</span> <span class="kd">function</span> <span class="nx">fetchJson</span><span class="p">(</span><span class="nx">url</span><span class="p">)</span> <span class="p">{</span>
+    <span class="k">try</span> <span class="p">{</span>
+        <span class="kd">let</span> <span class="nx">request</span> <span class="o">=</span> <span class="nx">await</span> <span class="nx">fetch</span><span class="p">(</span><span class="nx">url</span><span class="p">);</span>
+        <span class="kd">let</span> <span class="nx">text</span> <span class="o">=</span> <span class="nx">await</span> <span class="nx">request</span><span class="p">.</span><span class="nx">text</span><span class="p">();</span>
+        <span class="k">return</span> <span class="nx">JSON</span><span class="p">.</span><span class="nx">parse</span><span class="p">(</span><span class="nx">text</span><span class="p">);</span>
+    <span class="p">}</span>
+    <span class="k">catch</span> <span class="p">(</span><span class="nx">error</span><span class="p">)</span> <span class="p">{</span>
+        <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="err">`</span><span class="na">ERROR</span><span class="p">:</span> <span class="nx">$</span><span class="p">{</span><span class="nx">error</span><span class="p">.</span><span class="nx">stack</span><span class="p">}</span><span class="err">`</span><span class="p">);</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+</code></pre>
+</div>
+
+<p>上边两个用起来都是这样的</p>
+
+<div class="language-js highlighter-rouge"><pre class="highlight"><code><span class="nx">fetchJson</span><span class="p">(</span><span class="s1">'http://example.com/some_file.json'</span><span class="p">)</span>
+<span class="p">.</span><span class="nx">then</span><span class="p">(</span><span class="nx">obj</span> <span class="o">=&gt;</span> <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="nx">obj</span><span class="p">));</span>
+</code></pre>
+</div>
+
+<div class="language-js highlighter-rouge"><pre class="highlight"><code><span class="nx">fetchJson</span><span class="p">(</span><span class="s1">'http://example.com/some_file.json'</span><span class="p">)</span>
+<span class="p">.</span><span class="nx">then</span><span class="p">(</span><span class="nx">obj</span> <span class="o">=&gt;</span> <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="nx">obj</span><span class="p">));</span>
+</code></pre>
+</div>
+
+<h3 id="generator-1">generator可以作为三种角色</h3>
+
+<ol>
+  <li>Iterator</li>
+</ol>
+
+<p>这个道理很简单，generator objects implementing the interface Iterable，for…of和<code class="highlighter-rouge">...</code>可以操作generator object</p>
+
+<ol>
+  <li>Observer(data consumer)</li>
+</ol>
+
+<p>yield的时候可以从next方法接收参数的，</p>
+
+<div class="language-js highlighter-rouge"><pre class="highlight"><code>
+
+<span class="err">####</span> <span class="mi">1</span><span class="p">.</span> <span class="nx">Generators</span> <span class="nx">as</span> <span class="nx">iterators</span> 
+
+<span class="err">用</span><span class="nx">generator</span><span class="err">实现</span>
+
+<span class="err">```</span><span class="nx">js</span>
+<span class="kd">function</span><span class="o">*</span> <span class="nx">objectEntries</span><span class="p">(</span><span class="nx">obj</span><span class="p">)</span> <span class="p">{</span>
+    <span class="c1">// In ES6, you can use strings or symbols as property keys,</span>
+    <span class="c1">// Reflect.ownKeys() retrieves both</span>
+    <span class="kr">const</span> <span class="nx">propKeys</span> <span class="o">=</span> <span class="nx">Reflect</span><span class="p">.</span><span class="nx">ownKeys</span><span class="p">(</span><span class="nx">obj</span><span class="p">);</span>
+
+    <span class="k">for</span> <span class="p">(</span><span class="kr">const</span> <span class="nx">propKey</span> <span class="nx">of</span> <span class="nx">propKeys</span><span class="p">)</span> <span class="p">{</span>
+        <span class="k">yield</span> <span class="p">[</span><span class="nx">propKey</span><span class="p">,</span> <span class="nx">obj</span><span class="p">[</span><span class="nx">propKey</span><span class="p">]];</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+</code></pre>
+</div>
+
+<div class="language-js highlighter-rouge"><pre class="highlight"><code><span class="kr">const</span> <span class="nx">jane</span> <span class="o">=</span> <span class="p">{</span> <span class="na">first</span><span class="p">:</span> <span class="s1">'Jane'</span><span class="p">,</span> <span class="na">last</span><span class="p">:</span> <span class="s1">'Doe'</span> <span class="p">};</span>
+<span class="k">for</span> <span class="p">(</span><span class="kr">const</span> <span class="p">[</span><span class="nx">key</span><span class="p">,</span><span class="nx">value</span><span class="p">]</span> <span class="nx">of</span> <span class="nx">objectEntries</span><span class="p">(</span><span class="nx">jane</span><span class="p">))</span> <span class="p">{</span>
+    <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="err">`</span><span class="nx">$</span><span class="p">{</span><span class="nx">key</span><span class="p">}</span><span class="err">:</span> <span class="nx">$</span><span class="p">{</span><span class="nx">value</span><span class="p">}</span><span class="err">`</span><span class="p">);</span>
+<span class="p">}</span>
+<span class="c1">// Output:</span>
+<span class="c1">// first: Jane</span>
+<span class="c1">// last: Doe</span>
+</code></pre>
+</div>
+
+<p>如果不使用generator的话</p>
+
+<div class="language-js highlighter-rouge"><pre class="highlight"><code><span class="kd">function</span> <span class="nx">objectEntries</span><span class="p">(</span><span class="nx">obj</span><span class="p">)</span> <span class="p">{</span>
+    <span class="kd">let</span> <span class="nx">index</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
+    <span class="kd">let</span> <span class="nx">propKeys</span> <span class="o">=</span> <span class="nx">Reflect</span><span class="p">.</span><span class="nx">ownKeys</span><span class="p">(</span><span class="nx">obj</span><span class="p">);</span>
+
+    <span class="k">return</span> <span class="p">{</span>
+        <span class="p">[</span><span class="nx">Symbol</span><span class="p">.</span><span class="nx">iterator</span><span class="p">]()</span> <span class="p">{</span>
+            <span class="k">return</span> <span class="k">this</span><span class="p">;</span>
+        <span class="p">},</span>
+        <span class="nx">next</span><span class="p">()</span> <span class="p">{</span>
+            <span class="k">if</span> <span class="p">(</span><span class="nx">index</span> <span class="o">&lt;</span> <span class="nx">propKeys</span><span class="p">.</span><span class="nx">length</span><span class="p">)</span> <span class="p">{</span>
+                <span class="kd">let</span> <span class="nx">key</span> <span class="o">=</span> <span class="nx">propKeys</span><span class="p">[</span><span class="nx">index</span><span class="p">];</span>
+                <span class="nx">index</span><span class="o">++</span><span class="p">;</span>
+                <span class="k">return</span> <span class="p">{</span> <span class="na">value</span><span class="p">:</span> <span class="p">[</span><span class="nx">key</span><span class="p">,</span> <span class="nx">obj</span><span class="p">[</span><span class="nx">key</span><span class="p">]]</span> <span class="p">};</span>
+            <span class="p">}</span> <span class="k">else</span> <span class="p">{</span>
+                <span class="k">return</span> <span class="p">{</span> <span class="na">done</span><span class="p">:</span> <span class="kc">true</span> <span class="p">};</span>
+            <span class="p">}</span>
+        <span class="p">}</span>
+    <span class="p">};</span>
+<span class="p">}</span>
+</code></pre>
+</div>
+
+<h4 id="generators-as-observersdata-consumption">2. Generators as observers(data consumption)</h4>
+
+<div class="language-js highlighter-rouge"><pre class="highlight"><code><span class="kd">function</span><span class="o">*</span> <span class="nx">dataConsumer</span><span class="p">()</span> <span class="p">{</span>
+    <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="s1">'Started'</span><span class="p">);</span>
+    <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="err">`</span><span class="mi">1</span><span class="p">.</span> <span class="nx">$</span><span class="p">{</span><span class="k">yield</span><span class="p">}</span><span class="err">`</span><span class="p">);</span> <span class="c1">// (A)</span>
+    <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="err">`</span><span class="mi">2</span><span class="p">.</span> <span class="nx">$</span><span class="p">{</span><span class="k">yield</span><span class="p">}</span><span class="err">`</span><span class="p">);</span>
+    <span class="k">return</span> <span class="s1">'result'</span><span class="p">;</span>
+<span class="p">}</span>
+</code></pre>
+</div>
+
+<div class="language-js highlighter-rouge"><pre class="highlight"><code><span class="c1">// 获得generator obj</span>
+<span class="kr">const</span> <span class="nx">g</span> <span class="o">=</span> <span class="nx">dataConsumer</span><span class="p">()</span>
+
+<span class="c1">// 第一次调next</span>
+<span class="nx">g</span><span class="p">.</span><span class="nx">next</span><span class="p">()</span> 
+<span class="c1">// =&gt; Started</span>
+<span class="c1">// =&gt; { value: undefined, done: false }</span>
+
+<span class="c1">// 第二次调next</span>
+<span class="nx">g</span><span class="p">.</span><span class="nx">next</span><span class="p">(</span><span class="s1">'a'</span><span class="p">)</span>
+<span class="c1">// =&gt; 1. a</span>
+<span class="c1">// =&gt; { value: undefined, done: false }</span>
+
+<span class="c1">// 第三次调next</span>
+<span class="nx">g</span><span class="p">.</span><span class="nx">next</span><span class="p">(</span><span class="s1">'b'</span><span class="p">)</span>
+<span class="c1">// =&gt; 2. b</span>
+<span class="c1">// =&gt; { value: 'result', done: true }</span>
+<span class="c1">// 注意value有值了，是return回来的 value</span>
+</code></pre>
+</div>
+
+<p>It always sends a value to the currently suspended <code class="highlighter-rouge">yield</code>, but returns the operand of the following <code class="highlighter-rouge">yield</code>.</p>
+
+<p><strong><em>第一个next()很特殊，很讨厌的地方</em></strong></p>
+
+<p>When using a generator as an observer, it is important to note that the only purpose of the first invocation of <code class="highlighter-rouge">next()</code> is to start the observer.</p>
+
+<p>It is only ready for input afterwards, because this first invocation advances execution to the first yield. Therefore, any input you send via the first next() is ignored</p>
+
+<p>```js
+ function* gen() {
+    // (A)
+    while (true) {
+        const input = yield; // (B)
+        console.log(input);
+    }
+}
+const obj = gen();
+obj.next(‘a’);
+obj.next(‘b’);</p>
+
+<p>// Output:
+// b
+// 第一次穿入a是没有yield接收的
+```</p>
+
+<p>总结一下就是: 使用next的时候，传入传出的时机不一样，A传入值，B传出值</p>
+
+<h4 id="generator-obj">generator obj的另外两个方法</h4>
+
+<p>return(x) executes return x at the location of yield.</p>
+
+<p>throw(x) executes throw x at the location of yield.</p>
+
+<h3 id="coroutine">3. coroutine</h3>
+
+<div class="language-js highlighter-rouge"><pre class="highlight"><code><span class="kd">function</span><span class="o">*</span> <span class="nx">tokenize</span><span class="p">(</span><span class="nx">chars</span><span class="p">)</span> <span class="p">{</span>
+    <span class="kr">const</span> <span class="nx">iterator</span> <span class="o">=</span> <span class="nx">chars</span><span class="p">[</span><span class="nx">Symbol</span><span class="p">.</span><span class="nx">iterator</span><span class="p">]();</span>
+    <span class="kd">let</span> <span class="nx">ch</span><span class="p">;</span>
+    <span class="k">do</span> <span class="p">{</span>
+        <span class="nx">ch</span> <span class="o">=</span> <span class="nx">getNextItem</span><span class="p">(</span><span class="nx">iterator</span><span class="p">);</span> <span class="c1">// (A)</span>
+        <span class="k">if</span> <span class="p">(</span><span class="nx">isWordChar</span><span class="p">(</span><span class="nx">ch</span><span class="p">))</span> <span class="p">{</span>
+            <span class="kd">let</span> <span class="nx">word</span> <span class="o">=</span> <span class="s1">''</span><span class="p">;</span>
+            <span class="k">do</span> <span class="p">{</span>
+                <span class="nx">word</span> <span class="o">+=</span> <span class="nx">ch</span><span class="p">;</span>
+                <span class="nx">ch</span> <span class="o">=</span> <span class="nx">getNextItem</span><span class="p">(</span><span class="nx">iterator</span><span class="p">);</span> <span class="c1">// (B)</span>
+            <span class="p">}</span> <span class="k">while</span> <span class="p">(</span><span class="nx">isWordChar</span><span class="p">(</span><span class="nx">ch</span><span class="p">));</span>
+            <span class="k">yield</span> <span class="nx">word</span><span class="p">;</span> <span class="c1">// (C)</span>
+        <span class="p">}</span>
+        <span class="c1">// Ignore all other characters</span>
+    <span class="p">}</span> <span class="k">while</span> <span class="p">(</span><span class="nx">ch</span> <span class="o">!==</span> <span class="nx">END_OF_SEQUENCE</span><span class="p">);</span>
+<span class="p">}</span>
+
+<span class="kr">const</span> <span class="nx">END_OF_SEQUENCE</span> <span class="o">=</span> <span class="nx">Symbol</span><span class="p">();</span>
+
+<span class="kd">function</span> <span class="nx">getNextItem</span><span class="p">(</span><span class="nx">iterator</span><span class="p">)</span> <span class="p">{</span>
+    <span class="kr">const</span> <span class="p">{</span><span class="nx">value</span><span class="p">,</span><span class="nx">done</span><span class="p">}</span> <span class="o">=</span> <span class="nx">iterator</span><span class="p">.</span><span class="nx">next</span><span class="p">();</span>
+    <span class="k">return</span> <span class="nx">done</span> <span class="p">?</span> <span class="nx">END_OF_SEQUENCE</span> <span class="p">:</span> <span class="nx">value</span><span class="p">;</span>
+<span class="p">}</span>
+
+<span class="kd">function</span> <span class="nx">isWordChar</span><span class="p">(</span><span class="nx">ch</span><span class="p">)</span> <span class="p">{</span>
+    <span class="k">return</span> <span class="k">typeof</span> <span class="nx">ch</span> <span class="o">===</span> <span class="s1">'string'</span> <span class="o">&amp;&amp;</span> <span class="sr">/^</span><span class="se">[</span><span class="sr">A-Za-z0-9</span><span class="se">]</span><span class="sr">$/</span><span class="p">.</span><span class="nx">test</span><span class="p">(</span><span class="nx">ch</span><span class="p">);</span>
+<span class="p">}</span>
+</code></pre>
+</div>
+
+<h3 id="examples">examples</h3>
+
+<p><strong><em>process a stream of characters</em></strong></p>
+
+<p>addNumbers(extractNumbers(tokenize(CHARS)))</p>
+
+<div class="language-js highlighter-rouge"><pre class="highlight"><code><span class="cm">/**
+ * Returns an iterable that transforms the input sequence
+ * of characters into an output sequence of words.
+ */</span>
+<span class="kd">function</span><span class="o">*</span> <span class="nx">tokenize</span><span class="p">(</span><span class="nx">chars</span><span class="p">)</span> <span class="p">{</span>
+    <span class="kr">const</span> <span class="nx">iterator</span> <span class="o">=</span> <span class="nx">chars</span><span class="p">[</span><span class="nx">Symbol</span><span class="p">.</span><span class="nx">iterator</span><span class="p">]();</span>
+    <span class="kd">let</span> <span class="nx">ch</span><span class="p">;</span>
+    <span class="k">do</span> <span class="p">{</span>
+        <span class="nx">ch</span> <span class="o">=</span> <span class="nx">getNextItem</span><span class="p">(</span><span class="nx">iterator</span><span class="p">);</span> <span class="c1">// (A)</span>
+        <span class="k">if</span> <span class="p">(</span><span class="nx">isWordChar</span><span class="p">(</span><span class="nx">ch</span><span class="p">))</span> <span class="p">{</span>
+            <span class="kd">let</span> <span class="nx">word</span> <span class="o">=</span> <span class="s1">''</span><span class="p">;</span>
+            <span class="k">do</span> <span class="p">{</span>
+                <span class="nx">word</span> <span class="o">+=</span> <span class="nx">ch</span><span class="p">;</span>
+                <span class="nx">ch</span> <span class="o">=</span> <span class="nx">getNextItem</span><span class="p">(</span><span class="nx">iterator</span><span class="p">);</span> <span class="c1">// (B)</span>
+            <span class="p">}</span> <span class="k">while</span> <span class="p">(</span><span class="nx">isWordChar</span><span class="p">(</span><span class="nx">ch</span><span class="p">));</span>
+            <span class="k">yield</span> <span class="nx">word</span><span class="p">;</span> <span class="c1">// (C)</span>
+        <span class="p">}</span>
+        <span class="c1">// Ignore all other characters</span>
+    <span class="p">}</span> <span class="k">while</span> <span class="p">(</span><span class="nx">ch</span> <span class="o">!==</span> <span class="nx">END_OF_SEQUENCE</span><span class="p">);</span>
+<span class="p">}</span>
+
+<span class="kr">const</span> <span class="nx">END_OF_SEQUENCE</span> <span class="o">=</span> <span class="nx">Symbol</span><span class="p">();</span>
+
+<span class="kd">function</span> <span class="nx">getNextItem</span><span class="p">(</span><span class="nx">iterator</span><span class="p">)</span> <span class="p">{</span>
+    <span class="kr">const</span> <span class="p">{</span><span class="nx">value</span><span class="p">,</span><span class="nx">done</span><span class="p">}</span> <span class="o">=</span> <span class="nx">iterator</span><span class="p">.</span><span class="nx">next</span><span class="p">();</span>
+    <span class="k">return</span> <span class="nx">done</span> <span class="p">?</span> <span class="nx">END_OF_SEQUENCE</span> <span class="p">:</span> <span class="nx">value</span><span class="p">;</span>
+<span class="p">}</span>
+
+<span class="kd">function</span> <span class="nx">isWordChar</span><span class="p">(</span><span class="nx">ch</span><span class="p">)</span> <span class="p">{</span>
+    <span class="k">return</span> <span class="k">typeof</span> <span class="nx">ch</span> <span class="o">===</span> <span class="s1">'string'</span> <span class="o">&amp;&amp;</span> <span class="sr">/^</span><span class="se">[</span><span class="sr">A-Za-z0-9</span><span class="se">]</span><span class="sr">$/</span><span class="p">.</span><span class="nx">test</span><span class="p">(</span><span class="nx">ch</span><span class="p">);</span>
+<span class="p">}</span>
+</code></pre>
+</div>
+
+<p><strong><em>counter</em></strong></p>
+
+<div class="language-html highlighter-rouge"><pre class="highlight"><code><span class="nt">&lt;body&gt;</span>
+    Counter: <span class="nt">&lt;span</span> <span class="na">id=</span><span class="s">"counter"</span><span class="nt">&gt;&lt;/span&gt;</span>
+<span class="nt">&lt;/body&gt;</span>
+</code></pre>
+</div>
+
+<div class="language-js highlighter-rouge"><pre class="highlight"><code><span class="kd">function</span> <span class="nx">countUp</span><span class="p">(</span><span class="nx">start</span> <span class="o">=</span> <span class="mi">0</span><span class="p">)</span> <span class="p">{</span>
+    <span class="kr">const</span> <span class="nx">counterSpan</span> <span class="o">=</span> <span class="nb">document</span><span class="p">.</span><span class="nx">querySelector</span><span class="p">(</span><span class="s1">'#counter'</span><span class="p">);</span>
+    <span class="k">while</span> <span class="p">(</span><span class="kc">true</span><span class="p">)</span> <span class="p">{</span>
+        <span class="nx">counterSpan</span><span class="p">.</span><span class="nx">textContent</span> <span class="o">=</span> <span class="nb">String</span><span class="p">(</span><span class="nx">start</span><span class="p">);</span>
+        <span class="nx">start</span><span class="o">++</span><span class="p">;</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+</code></pre>
+</div>
+
+<p>上边这种while(true)会让浏览器卡主</p>
+
+<p>我们用generator改写</p>
+
+<div class="language-js highlighter-rouge"><pre class="highlight"><code><span class="kd">function</span><span class="o">*</span> <span class="nx">countUp</span><span class="p">(</span><span class="nx">start</span> <span class="o">=</span> <span class="mi">0</span><span class="p">)</span> <span class="p">{</span>
+    <span class="kr">const</span> <span class="nx">counterSpan</span> <span class="o">=</span> <span class="nb">document</span><span class="p">.</span><span class="nx">querySelector</span><span class="p">(</span><span class="s1">'#counter'</span><span class="p">);</span>
+    <span class="k">while</span> <span class="p">(</span><span class="kc">true</span><span class="p">)</span> <span class="p">{</span>
+        <span class="nx">counterSpan</span><span class="p">.</span><span class="nx">textContent</span> <span class="o">=</span> <span class="nb">String</span><span class="p">(</span><span class="nx">start</span><span class="p">);</span>
+        <span class="nx">start</span><span class="o">++</span><span class="p">;</span>
+        <span class="k">yield</span><span class="p">;</span> <span class="c1">// pause</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+</code></pre>
+</div>
+
+<p>我们可以再改进一下</p>
+
+<div class="language-js highlighter-rouge"><pre class="highlight"><code><span class="kd">function</span><span class="o">*</span> <span class="nx">countUp</span><span class="p">(</span><span class="nx">start</span> <span class="o">=</span> <span class="mi">0</span><span class="p">)</span> <span class="p">{</span>
+    <span class="k">while</span> <span class="p">(</span><span class="kc">true</span><span class="p">)</span> <span class="p">{</span>
+        <span class="nx">start</span><span class="o">++</span><span class="p">;</span>
+        <span class="k">yield</span><span class="o">*</span> <span class="nx">displayCounter</span><span class="p">(</span><span class="nx">start</span><span class="p">);</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+
+<span class="kd">function</span><span class="o">*</span> <span class="nx">displayCounter</span><span class="p">(</span><span class="nx">counter</span><span class="p">)</span> <span class="p">{</span>
+    <span class="kr">const</span> <span class="nx">counterSpan</span> <span class="o">=</span> <span class="nb">document</span><span class="p">.</span><span class="nx">querySelector</span><span class="p">(</span><span class="s1">'#counter'</span><span class="p">);</span>
+    <span class="nx">counterSpan</span><span class="p">.</span><span class="nx">textContent</span> <span class="o">=</span> <span class="nb">String</span><span class="p">(</span><span class="nx">counter</span><span class="p">);</span>
+    <span class="k">yield</span><span class="p">;</span> <span class="c1">// pause</span>
+<span class="p">}</span>
+</code></pre>
+</div>
+
+<div class="language-js highlighter-rouge"><pre class="highlight"><code><span class="kd">function</span> <span class="nx">run</span><span class="p">(</span><span class="nx">generatorObject</span><span class="p">)</span> <span class="p">{</span>
+    <span class="k">if</span> <span class="p">(</span><span class="o">!</span><span class="nx">generatorObject</span><span class="p">.</span><span class="nx">next</span><span class="p">().</span><span class="nx">done</span><span class="p">)</span> <span class="p">{</span>
+        <span class="c1">// Add a new task to the event queue</span>
+        <span class="nx">setTimeout</span><span class="p">(</span><span class="kd">function</span> <span class="p">()</span> <span class="p">{</span>
+            <span class="nx">run</span><span class="p">(</span><span class="nx">generatorObject</span><span class="p">);</span>
+        <span class="p">},</span> <span class="mi">1000</span><span class="p">);</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+</code></pre>
+</div>
+
+<h3 id="coroutine-1">coroutine</h3>
+
+<p>因为generator作为observer第一次next()的时候输入值无效，所以在函数中我们先运行一次next()…</p>
+
+<div class="language-js highlighter-rouge"><pre class="highlight"><code><span class="cm">/**
+ * Returns a function that, when called,
+ * returns a generator object that is immediately
+ * ready for input via `next()`
+ */</span>
+<span class="kd">function</span> <span class="nx">coroutine</span><span class="p">(</span><span class="nx">generatorFunction</span><span class="p">)</span> <span class="p">{</span>
+    <span class="k">return</span> <span class="kd">function</span> <span class="p">(...</span><span class="nx">args</span><span class="p">)</span> <span class="p">{</span>
+        <span class="kr">const</span> <span class="nx">generatorObject</span> <span class="o">=</span> <span class="nx">generatorFunction</span><span class="p">(...</span><span class="nx">args</span><span class="p">);</span>
+        <span class="nx">generatorObject</span><span class="p">.</span><span class="nx">next</span><span class="p">();</span>
+        <span class="k">return</span> <span class="nx">generatorObject</span><span class="p">;</span>
+    <span class="p">};</span>
+<span class="p">}</span>
+</code></pre>
+</div>
+
+<p>这样每一次输入都会有对应的输出了</p>
+
+<div class="language-js highlighter-rouge"><pre class="highlight"><code><span class="kr">const</span> <span class="nx">wrapped</span> <span class="o">=</span> <span class="nx">coroutine</span><span class="p">(</span><span class="kd">function</span><span class="o">*</span> <span class="p">()</span> <span class="p">{</span>
+    <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="err">`</span><span class="nx">First</span> <span class="nx">input</span><span class="err">:</span> <span class="nx">$</span><span class="p">{</span><span class="k">yield</span><span class="p">}</span><span class="err">`</span><span class="p">);</span>
+    <span class="k">return</span> <span class="s1">'DONE'</span><span class="p">;</span>
+<span class="p">});</span>
+<span class="kr">const</span> <span class="nx">normal</span> <span class="o">=</span> <span class="kd">function</span><span class="o">*</span> <span class="p">()</span> <span class="p">{</span>
+    <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="err">`</span><span class="nx">First</span> <span class="nx">input</span><span class="err">:</span> <span class="nx">$</span><span class="p">{</span><span class="k">yield</span><span class="p">}</span><span class="err">`</span><span class="p">);</span>
+    <span class="k">return</span> <span class="s1">'DONE'</span><span class="p">;</span>
+<span class="p">};</span>
+</code></pre>
+</div>
+
+<div class="language-shell highlighter-rouge"><pre class="highlight"><code><span class="gp">&gt; </span>wrapped<span class="o">()</span>.next<span class="o">(</span><span class="s1">'hello!'</span><span class="o">)</span>
+First input: hello!
+</code></pre>
+</div>
+
+<div class="language-shell highlighter-rouge"><pre class="highlight"><code><span class="gp">&gt; </span>const genObj <span class="o">=</span> normal<span class="o">()</span>;
+<span class="gp">&gt; </span>genObj.next<span class="o">()</span>
+<span class="o">{</span> value: undefined, <span class="k">done</span>: <span class="nb">false</span> <span class="o">}</span>
+<span class="gp">&gt; </span>genObj.next<span class="o">(</span><span class="s1">'hello!'</span><span class="o">)</span>
+First input: hello!
+<span class="o">{</span> value: <span class="s1">'DONE'</span>, <span class="k">done</span>: <span class="nb">true</span> <span class="o">}</span>
+</code></pre>
+</div>
+
+<h3 id="yield-the-full-story">yield*: the full story</h3>
+
+<p><code class="highlighter-rouge">yield*</code> performs (the equivalent of) a function call from one generator (the caller) to another generator (the callee).</p>
+
+<p><code class="highlighter-rouge">yield</code> it propagates yielded values from the callee to the caller.</p>
+
+<div class="language-js highlighter-rouge"><pre class="highlight"><code><span class="kd">function</span><span class="o">*</span> <span class="nx">callee</span><span class="p">()</span> <span class="p">{</span>
+    <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="s1">'callee: '</span> <span class="o">+</span> <span class="p">(</span><span class="k">yield</span><span class="p">));</span>
+<span class="p">}</span>
+
+<span class="kd">function</span><span class="o">*</span> <span class="nx">caller</span><span class="p">()</span> <span class="p">{</span>
+    <span class="k">while</span> <span class="p">(</span><span class="kc">true</span><span class="p">)</span> <span class="p">{</span>
+        <span class="k">yield</span><span class="o">*</span> <span class="nx">callee</span><span class="p">();</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+</code></pre>
+</div>
+
+<div class="language-shell highlighter-rouge"><pre class="highlight"><code><span class="gp">&gt; </span>const callerObj <span class="o">=</span> <span class="nb">caller</span><span class="o">()</span>;
+
+<span class="gp">&gt; </span>callerObj.next<span class="o">()</span> // start
+<span class="o">{</span> value: undefined, <span class="k">done</span>: <span class="nb">false</span> <span class="o">}</span>
+
+<span class="gp">&gt; </span>callerObj.next<span class="o">(</span><span class="s1">'a'</span><span class="o">)</span>
+callee: a
+<span class="o">{</span> value: undefined, <span class="k">done</span>: <span class="nb">false</span> <span class="o">}</span>
+
+<span class="gp">&gt; </span>callerObj.next<span class="o">(</span><span class="s1">'b'</span><span class="o">)</span>
+callee: b
+<span class="o">{</span> value: undefined, <span class="k">done</span>: <span class="nb">false</span> <span class="o">}</span>
+</code></pre>
+</div>
+
+<p>yield第一次next(),输入什么都没有用，输出value只是看yield后边有什么，有什么输出什么</p>
+
+<p>yield所在的语句不会运行</p>
+
+<h4 id="example-processing-asynchronously-pushed-data">Example: processing asynchronously pushed data</h4>
+
+<ul>
+  <li>
+    <p>Each member of the chain of generators (except the last one) has a parameter <code class="highlighter-rouge">target</code>. It receives data via yield and sends data via <code class="highlighter-rouge">target.next()</code>.</p>
+  </li>
+  <li>
+    <p>The last member of the chain of generators has no parameter target and only receives data.</p>
+  </li>
+  <li>
+    <p>The whole chain is prefixed by a non-generator function that makes an asynchronous request and pushes the results into the chain of generators via <code class="highlighter-rouge">next()</code>.</p>
+  </li>
+</ul>
+
+<p>读文件的例子，3个<code class="highlighter-rouge">generator</code>,splitLines, numberLines and printLines, Data is pushed into the chain via the non-generator function <code class="highlighter-rouge">readFile</code>.</p>
+
+<p><code class="highlighter-rouge">readFile(fileName, splitLines(numberLines(printLines())));</code></p>
+
+<div class="language-js highlighter-rouge"><pre class="highlight"><code><span class="kr">import</span> <span class="p">{</span><span class="nx">createReadStream</span><span class="p">}</span> <span class="nx">from</span> <span class="s1">'fs'</span><span class="p">;</span>
+
+<span class="cm">/**
+ * Creates an asynchronous ReadStream for the file whose name
+ * is `fileName` and feeds it to the generator object `target`.
+ *
+ * @see ReadStream https://nodejs.org/api/fs.html#fs_class_fs_readstream
+ */</span>
+<span class="kd">function</span> <span class="nx">readFile</span><span class="p">(</span><span class="nx">fileName</span><span class="p">,</span> <span class="nx">target</span><span class="p">)</span> <span class="p">{</span>
+    <span class="kr">const</span> <span class="nx">readStream</span> <span class="o">=</span> <span class="nx">createReadStream</span><span class="p">(</span><span class="nx">fileName</span><span class="p">,</span>
+        <span class="p">{</span> <span class="na">encoding</span><span class="p">:</span> <span class="s1">'utf8'</span><span class="p">,</span> <span class="na">bufferSize</span><span class="p">:</span> <span class="mi">1024</span> <span class="p">});</span>
+    <span class="nx">readStream</span><span class="p">.</span><span class="nx">on</span><span class="p">(</span><span class="s1">'data'</span><span class="p">,</span> <span class="nx">buffer</span> <span class="o">=&gt;</span> <span class="p">{</span>
+        <span class="kr">const</span> <span class="nx">str</span> <span class="o">=</span> <span class="nx">buffer</span><span class="p">.</span><span class="nx">toString</span><span class="p">(</span><span class="s1">'utf8'</span><span class="p">);</span>
+        <span class="nx">target</span><span class="p">.</span><span class="nx">next</span><span class="p">(</span><span class="nx">str</span><span class="p">);</span>
+    <span class="p">});</span>
+    <span class="nx">readStream</span><span class="p">.</span><span class="nx">on</span><span class="p">(</span><span class="s1">'end'</span><span class="p">,</span> <span class="p">()</span> <span class="o">=&gt;</span> <span class="p">{</span>
+        <span class="c1">// Signal end of output sequence</span>
+        <span class="nx">target</span><span class="p">.</span><span class="k">return</span><span class="p">();</span>
+    <span class="p">});</span>
+<span class="p">}</span>
+</code></pre>
+</div>
+
+<div class="language-js highlighter-rouge"><pre class="highlight"><code><span class="cm">/**
+ * Turns a sequence of text chunks into a sequence of lines
+ * (where lines are separated by newlines)
+ */</span>
+<span class="kr">const</span> <span class="nx">splitLines</span> <span class="o">=</span> <span class="nx">coroutine</span><span class="p">(</span><span class="kd">function</span><span class="o">*</span> <span class="p">(</span><span class="nx">target</span><span class="p">)</span> <span class="p">{</span>
+    <span class="kd">let</span> <span class="nx">previous</span> <span class="o">=</span> <span class="s1">''</span><span class="p">;</span>
+    <span class="k">try</span> <span class="p">{</span>
+        <span class="k">while</span> <span class="p">(</span><span class="kc">true</span><span class="p">)</span> <span class="p">{</span>
+            <span class="nx">previous</span> <span class="o">+=</span> <span class="k">yield</span><span class="p">;</span>
+            <span class="kd">let</span> <span class="nx">eolIndex</span><span class="p">;</span>
+            <span class="k">while</span> <span class="p">((</span><span class="nx">eolIndex</span> <span class="o">=</span> <span class="nx">previous</span><span class="p">.</span><span class="nx">indexOf</span><span class="p">(</span><span class="s1">'\n'</span><span class="p">))</span> <span class="o">&gt;=</span> <span class="mi">0</span><span class="p">)</span> <span class="p">{</span>
+                <span class="kr">const</span> <span class="nx">line</span> <span class="o">=</span> <span class="nx">previous</span><span class="p">.</span><span class="nx">slice</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="nx">eolIndex</span><span class="p">);</span>
+                <span class="nx">target</span><span class="p">.</span><span class="nx">next</span><span class="p">(</span><span class="nx">line</span><span class="p">);</span>
+                <span class="nx">previous</span> <span class="o">=</span> <span class="nx">previous</span><span class="p">.</span><span class="nx">slice</span><span class="p">(</span><span class="nx">eolIndex</span><span class="o">+</span><span class="mi">1</span><span class="p">);</span>
+            <span class="p">}</span>
+        <span class="p">}</span>
+    <span class="p">}</span> <span class="k">finally</span> <span class="p">{</span>
+        <span class="c1">// Handle the end of the input sequence</span>
+        <span class="c1">// (signaled via `return()`)</span>
+        <span class="k">if</span> <span class="p">(</span><span class="nx">previous</span><span class="p">.</span><span class="nx">length</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">)</span> <span class="p">{</span>
+            <span class="nx">target</span><span class="p">.</span><span class="nx">next</span><span class="p">(</span><span class="nx">previous</span><span class="p">);</span>
+        <span class="p">}</span>
+        <span class="c1">// Signal end of output sequence</span>
+        <span class="nx">target</span><span class="p">.</span><span class="k">return</span><span class="p">();</span>
+    <span class="p">}</span>
+<span class="p">});</span>
+</code></pre>
+</div>
+
+<div class="language-js highlighter-rouge"><pre class="highlight"><code><span class="c1">//**</span>
+ <span class="o">*</span> <span class="nx">Prefixes</span> <span class="nx">numbers</span> <span class="nx">to</span> <span class="nx">a</span> <span class="nx">sequence</span> <span class="nx">of</span> <span class="nx">lines</span>
+ <span class="o">*</span><span class="sr">/</span><span class="err">
+</span><span class="kr">const</span> <span class="nx">numberLines</span> <span class="o">=</span> <span class="nx">coroutine</span><span class="p">(</span><span class="kd">function</span><span class="o">*</span> <span class="p">(</span><span class="nx">target</span><span class="p">)</span> <span class="p">{</span>
+    <span class="k">try</span> <span class="p">{</span>
+        <span class="k">for</span> <span class="p">(</span><span class="kr">const</span> <span class="nx">lineNo</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span> <span class="p">;</span> <span class="nx">lineNo</span><span class="o">++</span><span class="p">)</span> <span class="p">{</span>
+            <span class="kr">const</span> <span class="nx">line</span> <span class="o">=</span> <span class="k">yield</span><span class="p">;</span>
+            <span class="nx">target</span><span class="p">.</span><span class="nx">next</span><span class="p">(</span><span class="err">`</span><span class="nx">$</span><span class="p">{</span><span class="nx">lineNo</span><span class="p">}:</span> <span class="nx">$</span><span class="p">{</span><span class="nx">line</span><span class="p">}</span><span class="err">`</span><span class="p">);</span>
+        <span class="p">}</span>
+    <span class="p">}</span> <span class="k">finally</span> <span class="p">{</span>
+        <span class="c1">// Signal end of output sequence</span>
+        <span class="nx">target</span><span class="p">.</span><span class="k">return</span><span class="p">();</span>
+    <span class="p">}</span>
+<span class="p">});</span>
+</code></pre>
+</div>
+
+<div class="language-js highlighter-rouge"><pre class="highlight"><code><span class="kr">const</span> <span class="nx">printLines</span> <span class="o">=</span> <span class="nx">coroutine</span><span class="p">(</span><span class="kd">function</span><span class="o">*</span> <span class="p">()</span> <span class="p">{</span>
+    <span class="k">while</span> <span class="p">(</span><span class="kc">true</span><span class="p">)</span> <span class="p">{</span>
+        <span class="kr">const</span> <span class="nx">line</span> <span class="o">=</span> <span class="k">yield</span><span class="p">;</span>
+        <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="nx">line</span><span class="p">);</span>
+    <span class="p">}</span>
+<span class="p">});</span>
+</code></pre>
+</div>
+
+<h3 id="lazy-pull-generators-as-iterators">Lazy pull (generators as iterators)</h3>
+
+<p>addNumbers(extractNumbers(tokenize(CHARS)))</p>
+
+<p>Each of the chain members pulls data from a source and yields a sequence of items. Processing starts with tokenize whose source is the string CHARS.</p>
+
+<div class="language-js highlighter-rouge"><pre class="highlight"><code><span class="cm">/**
+ * Returns an iterable that transforms the input sequence
+ * of characters into an output sequence of words.
+ */</span>
+<span class="kd">function</span><span class="o">*</span> <span class="nx">tokenize</span><span class="p">(</span><span class="nx">chars</span><span class="p">)</span> <span class="p">{</span>
+    <span class="kr">const</span> <span class="nx">iterator</span> <span class="o">=</span> <span class="nx">chars</span><span class="p">[</span><span class="nx">Symbol</span><span class="p">.</span><span class="nx">iterator</span><span class="p">]();</span>
+    <span class="kd">let</span> <span class="nx">ch</span><span class="p">;</span>
+    <span class="k">do</span> <span class="p">{</span>
+        <span class="nx">ch</span> <span class="o">=</span> <span class="nx">getNextItem</span><span class="p">(</span><span class="nx">iterator</span><span class="p">);</span> <span class="c1">// (A)</span>
+        <span class="k">if</span> <span class="p">(</span><span class="nx">isWordChar</span><span class="p">(</span><span class="nx">ch</span><span class="p">))</span> <span class="p">{</span>
+            <span class="kd">let</span> <span class="nx">word</span> <span class="o">=</span> <span class="s1">''</span><span class="p">;</span>
+            <span class="k">do</span> <span class="p">{</span>
+                <span class="nx">word</span> <span class="o">+=</span> <span class="nx">ch</span><span class="p">;</span>
+                <span class="nx">ch</span> <span class="o">=</span> <span class="nx">getNextItem</span><span class="p">(</span><span class="nx">iterator</span><span class="p">);</span> <span class="c1">// (B)</span>
+            <span class="p">}</span> <span class="k">while</span> <span class="p">(</span><span class="nx">isWordChar</span><span class="p">(</span><span class="nx">ch</span><span class="p">));</span>
+            <span class="k">yield</span> <span class="nx">word</span><span class="p">;</span> <span class="c1">// (C)</span>
+        <span class="p">}</span>
+        <span class="c1">// Ignore all other characters</span>
+    <span class="p">}</span> <span class="k">while</span> <span class="p">(</span><span class="nx">ch</span> <span class="o">!==</span> <span class="nx">END_OF_SEQUENCE</span><span class="p">);</span>
+<span class="p">}</span>
+<span class="kr">const</span> <span class="nx">END_OF_SEQUENCE</span> <span class="o">=</span> <span class="nx">Symbol</span><span class="p">();</span>
+<span class="kd">function</span> <span class="nx">getNextItem</span><span class="p">(</span><span class="nx">iterator</span><span class="p">)</span> <span class="p">{</span>
+    <span class="kr">const</span> <span class="p">{</span><span class="nx">value</span><span class="p">,</span><span class="nx">done</span><span class="p">}</span> <span class="o">=</span> <span class="nx">iterator</span><span class="p">.</span><span class="nx">next</span><span class="p">();</span>
+    <span class="k">return</span> <span class="nx">done</span> <span class="p">?</span> <span class="nx">END_OF_SEQUENCE</span> <span class="p">:</span> <span class="nx">value</span><span class="p">;</span>
+<span class="p">}</span>
+<span class="kd">function</span> <span class="nx">isWordChar</span><span class="p">(</span><span class="nx">ch</span><span class="p">)</span> <span class="p">{</span>
+    <span class="k">return</span> <span class="k">typeof</span> <span class="nx">ch</span> <span class="o">===</span> <span class="s1">'string'</span> <span class="o">&amp;&amp;</span> <span class="sr">/^</span><span class="se">[</span><span class="sr">A-Za-z0-9</span><span class="se">]</span><span class="sr">$/</span><span class="p">.</span><span class="nx">test</span><span class="p">(</span><span class="nx">ch</span><span class="p">);</span>
+<span class="p">}</span>
+</code></pre>
+</div>
+
+<p>他是lazy的，以为运行它 tokenize()<a href="">Symbol.iterator</a>返回iterator, .next()返回一个结果，然后暂停</p>
+
+<p>想一口气查看所有结果可以for of 或者 …</p>
+
+<div class="language-js highlighter-rouge"><pre class="highlight"><code><span class="kd">function</span><span class="o">*</span> <span class="nx">extractNumbers</span><span class="p">(</span><span class="nx">words</span><span class="p">)</span> <span class="p">{</span>
+    <span class="k">for</span> <span class="p">(</span><span class="kr">const</span> <span class="nx">word</span> <span class="nx">of</span> <span class="nx">words</span><span class="p">)</span> <span class="p">{</span>
+        <span class="k">if</span> <span class="p">(</span><span class="sr">/^</span><span class="se">[</span><span class="sr">0-9</span><span class="se">]</span><span class="sr">+$/</span><span class="p">.</span><span class="nx">test</span><span class="p">(</span><span class="nx">word</span><span class="p">))</span> <span class="p">{</span>
+            <span class="k">yield</span> <span class="nb">Number</span><span class="p">(</span><span class="nx">word</span><span class="p">);</span>
+        <span class="p">}</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+</code></pre>
+</div>
+
+<div class="language-js highlighter-rouge"><pre class="highlight"><code><span class="kd">function</span><span class="o">*</span> <span class="nx">addNumbers</span><span class="p">(</span><span class="nx">numbers</span><span class="p">)</span> <span class="p">{</span>
+    <span class="kd">let</span> <span class="nx">result</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
+    <span class="k">for</span> <span class="p">(</span><span class="kr">const</span> <span class="nx">n</span> <span class="nx">of</span> <span class="nx">numbers</span><span class="p">)</span> <span class="p">{</span>
+        <span class="nx">result</span> <span class="o">+=</span> <span class="nx">n</span><span class="p">;</span>
+        <span class="k">yield</span> <span class="nx">result</span><span class="p">;</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+</code></pre>
+</div>
+
+<div class="language-js highlighter-rouge"><pre class="highlight"><code><span class="kr">const</span> <span class="nx">CHARS</span> <span class="o">=</span> <span class="s1">'2 apples and 5 oranges.'</span><span class="p">;</span>
+<span class="kr">const</span> <span class="nx">CHAIN</span> <span class="o">=</span> <span class="nx">addNumbers</span><span class="p">(</span><span class="nx">extractNumbers</span><span class="p">(</span><span class="nx">tokenize</span><span class="p">(</span><span class="nx">CHARS</span><span class="p">)));</span>
+<span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">([...</span><span class="nx">CHAIN</span><span class="p">]);</span>
+</code></pre>
+</div>
+
+<h3 id="lazy-push-generators-as-observables">Lazy push (generators as observables)</h3>
+
+<p>一开始要把数据push进generator里</p>
+
+<div class="language-js highlighter-rouge"><pre class="highlight"><code><span class="cm">/**
+ * Pushes the items of `iterable` into `sink`, a generator.
+ * It uses the generator method `next()` to do so.
+ */</span>
+<span class="kd">function</span> <span class="nx">send</span><span class="p">(</span><span class="nx">iterable</span><span class="p">,</span> <span class="nx">sink</span><span class="p">)</span> <span class="p">{</span>
+    <span class="k">for</span> <span class="p">(</span><span class="kr">const</span> <span class="nx">x</span> <span class="nx">of</span> <span class="nx">iterable</span><span class="p">)</span> <span class="p">{</span>
+        <span class="nx">sink</span><span class="p">.</span><span class="nx">next</span><span class="p">(</span><span class="nx">x</span><span class="p">);</span>
+    <span class="p">}</span>
+    <span class="nx">sink</span><span class="p">.</span><span class="k">return</span><span class="p">();</span> <span class="c1">// signal end of stream</span>
+<span class="p">}</span>
+</code></pre>
+</div>
+<p>写个log函数试一下</p>
+
+<div class="language-js highlighter-rouge"><pre class="highlight"><code><span class="kr">const</span> <span class="nx">logItems</span> <span class="o">=</span> <span class="nx">coroutine</span><span class="p">(</span><span class="kd">function</span><span class="o">*</span> <span class="p">()</span> <span class="p">{</span>
+    <span class="k">try</span> <span class="p">{</span>
+        <span class="k">while</span> <span class="p">(</span><span class="kc">true</span><span class="p">)</span> <span class="p">{</span>
+            <span class="kr">const</span> <span class="nx">item</span> <span class="o">=</span> <span class="k">yield</span><span class="p">;</span> <span class="c1">// receive item via `next()`</span>
+            <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="nx">item</span><span class="p">);</span>
+        <span class="p">}</span>
+    <span class="p">}</span> <span class="k">finally</span> <span class="p">{</span>
+        <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="s1">'DONE'</span><span class="p">);</span>
+    <span class="p">}</span>
+<span class="p">});</span>
+</code></pre>
+</div>
+
+<p>下边我们要写push版的tokenize,上边pull版的数据感觉像是现成的，想要就要。。。可是push版的数据来自next(data)传进来,传给下一个也要sink.next(data)</p>
+
+<p>把char攒够成一个word才push给下一个</p>
+
+<div class="language-js highlighter-rouge"><pre class="highlight"><code><span class="kr">const</span> <span class="nx">tokenize</span> <span class="o">=</span> <span class="nx">coroutine</span><span class="p">(</span><span class="kd">function</span><span class="o">*</span> <span class="p">(</span><span class="nx">sink</span><span class="p">)</span> <span class="p">{</span>
+    <span class="k">try</span> <span class="p">{</span>
+        <span class="k">while</span> <span class="p">(</span><span class="kc">true</span><span class="p">)</span> <span class="p">{</span> <span class="c1">// (A)</span>
+            <span class="kd">let</span> <span class="nx">ch</span> <span class="o">=</span> <span class="k">yield</span><span class="p">;</span> <span class="c1">// (B)</span>
+            <span class="k">if</span> <span class="p">(</span><span class="nx">isWordChar</span><span class="p">(</span><span class="nx">ch</span><span class="p">))</span> <span class="p">{</span>
+                <span class="c1">// A word has started</span>
+                <span class="kd">let</span> <span class="nx">word</span> <span class="o">=</span> <span class="s1">''</span><span class="p">;</span>
+                <span class="k">try</span> <span class="p">{</span>
+                    <span class="k">do</span> <span class="p">{</span>
+                        <span class="nx">word</span> <span class="o">+=</span> <span class="nx">ch</span><span class="p">;</span>
+                        <span class="nx">ch</span> <span class="o">=</span> <span class="k">yield</span><span class="p">;</span> <span class="c1">// (C)</span>
+                    <span class="p">}</span> <span class="k">while</span> <span class="p">(</span><span class="nx">isWordChar</span><span class="p">(</span><span class="nx">ch</span><span class="p">));</span>
+                <span class="p">}</span> <span class="k">finally</span> <span class="p">{</span>
+                    <span class="c1">// The word is finished.</span>
+                    <span class="c1">// We get here if</span>
+                    <span class="c1">// - the loop terminates normally</span>
+                    <span class="c1">// - the loop is terminated via `return()` in line C</span>
+                    <span class="nx">sink</span><span class="p">.</span><span class="nx">next</span><span class="p">(</span><span class="nx">word</span><span class="p">);</span> <span class="c1">// (D)</span>
+                <span class="p">}</span>
+            <span class="p">}</span>
+            <span class="c1">// Ignore all other characters</span>
+        <span class="p">}</span>
+    <span class="p">}</span> <span class="k">finally</span> <span class="p">{</span>
+        <span class="c1">// We only get here if the infinite loop is terminated</span>
+        <span class="c1">// via `return()` (in line B or C).</span>
+        <span class="c1">// Forward `return()` to `sink` so that it is also</span>
+        <span class="c1">// aware of the end of stream.</span>
+        <span class="nx">sink</span><span class="p">.</span><span class="k">return</span><span class="p">();</span>
+    <span class="p">}</span>
+<span class="p">});</span>
+
+<span class="kd">function</span> <span class="nx">isWordChar</span><span class="p">(</span><span class="nx">ch</span><span class="p">)</span> <span class="p">{</span>
+    <span class="k">return</span> <span class="sr">/^</span><span class="se">[</span><span class="sr">A-Za-z0-9</span><span class="se">]</span><span class="sr">$/</span><span class="p">.</span><span class="nx">test</span><span class="p">(</span><span class="nx">ch</span><span class="p">);</span>
+<span class="p">}</span>
+</code></pre>
+</div>
+
+<div class="language-js highlighter-rouge"><pre class="highlight"><code><span class="cm">/**
+ * Receives a sequence of strings (via the generator object
+ * method `next()`) and pushes only those strings to the generator
+ * `sink` that are “numbers” (consist only of decimal digits).
+ */</span>
+<span class="kr">const</span> <span class="nx">extractNumbers</span> <span class="o">=</span> <span class="nx">coroutine</span><span class="p">(</span><span class="kd">function</span><span class="o">*</span> <span class="p">(</span><span class="nx">sink</span><span class="p">)</span> <span class="p">{</span>
+    <span class="k">try</span> <span class="p">{</span>
+        <span class="k">while</span> <span class="p">(</span><span class="kc">true</span><span class="p">)</span> <span class="p">{</span>
+            <span class="kr">const</span> <span class="nx">word</span> <span class="o">=</span> <span class="k">yield</span><span class="p">;</span>
+            <span class="k">if</span> <span class="p">(</span><span class="sr">/^</span><span class="se">[</span><span class="sr">0-9</span><span class="se">]</span><span class="sr">+$/</span><span class="p">.</span><span class="nx">test</span><span class="p">(</span><span class="nx">word</span><span class="p">))</span> <span class="p">{</span>
+                <span class="nx">sink</span><span class="p">.</span><span class="nx">next</span><span class="p">(</span><span class="nb">Number</span><span class="p">(</span><span class="nx">word</span><span class="p">));</span>
+            <span class="p">}</span>
+        <span class="p">}</span>
+    <span class="p">}</span> <span class="k">finally</span> <span class="p">{</span>
+        <span class="c1">// Only reached via `return()`, forward.</span>
+        <span class="nx">sink</span><span class="p">.</span><span class="k">return</span><span class="p">();</span>
+    <span class="p">}</span>
+<span class="p">});</span>
+</code></pre>
+</div>
+
+<div class="language-js highlighter-rouge"><pre class="highlight"><code><span class="cm">/**
+ * Receives a sequence of numbers (via the generator object
+ * method `next()`). For each number, it pushes the total sum
+ * so far to the generator `sink`.
+ */</span>
+<span class="kr">const</span> <span class="nx">addNumbers</span> <span class="o">=</span> <span class="nx">coroutine</span><span class="p">(</span><span class="kd">function</span><span class="o">*</span> <span class="p">(</span><span class="nx">sink</span><span class="p">)</span> <span class="p">{</span>
+    <span class="kd">let</span> <span class="nx">sum</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
+    <span class="k">try</span> <span class="p">{</span>
+        <span class="k">while</span> <span class="p">(</span><span class="kc">true</span><span class="p">)</span> <span class="p">{</span>
+            <span class="nx">sum</span> <span class="o">+=</span> <span class="k">yield</span><span class="p">;</span>
+            <span class="nx">sink</span><span class="p">.</span><span class="nx">next</span><span class="p">(</span><span class="nx">sum</span><span class="p">);</span>
+        <span class="p">}</span>
+    <span class="p">}</span> <span class="k">finally</span> <span class="p">{</span>
+        <span class="c1">// We received an end-of-stream</span>
+        <span class="nx">sink</span><span class="p">.</span><span class="k">return</span><span class="p">();</span> <span class="c1">// signal end of stream</span>
+    <span class="p">}</span>
+<span class="p">});</span>
+</code></pre>
+</div>
+
+<div class="language-shell highlighter-rouge"><pre class="highlight"><code><span class="gp">&gt; </span>send<span class="o">([</span>5, -2, 12], addNumbers<span class="o">(</span>logItems<span class="o">()))</span>;
+5
+3
+15
+DONE
+</code></pre>
+</div>
+
+
+  </div>
+
+</article>
+
+      </div>
+    </div>
+
+    <footer class="site-footer">
+
+  <div class="wrapper">
+
+    <h2 class="footer-heading"></h2>
+
+    <div class="footer-col-wrapper">
+      <div class="footer-col footer-col-1">
+        <ul class="contact-list">
+          <li></li>
+          <li><a href="mailto:"></a></li>
+        </ul>
+      </div>
+
+      <div class="footer-col footer-col-2">
+        <ul class="social-media-list">
+          
+
+          
+        </ul>
+      </div>
+
+      <div class="footer-col footer-col-3">
+        <p></p>
+      </div>
+    </div>
+
+  </div>
+
+</footer>
+
+
+  </body>
+
+</html>

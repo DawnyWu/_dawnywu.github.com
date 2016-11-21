@@ -1,0 +1,59 @@
+---
+layout: post
+title:  "module"
+date:   2016-11-15
+categories: js
+---
+
+### es5 module
+
+```js
+var moduleName = function () {
+    function privateFunction () { ... }
+    function publicFunction(...) {
+        privateFunction();
+        otherModule.doSomething();  // implicit import
+    }
+    return { // exports
+        publicFunction: publicFunction
+    };
+}();
+```
+
+使用起来是这样的,注意依赖，otherModule要先加载,moduleName.js要后加载,加载后就可以运行函数了
+
+```html
+<script src="modules/otherModule.js"></script>
+<script src="modules/moduleName.js"></script>
+<script type="text/javascript">
+    moduleName.publicFunction(...);
+</script>
+```
+
+### es5 module to es6 module
+
+```js
+var my_module = (function () {
+    // Module-private variable:
+    var countInvocations = 0;
+
+    function myFunc(x) {
+        countInvocations++;
+        ···
+    }
+
+    // Exported by module:
+    return {
+        myFunc: myFunc
+    };
+}());
+```
+
+```js
+let countInvocations = 0;
+
+export function myFunc(x) {
+    countInvocations++;
+    ···
+}
+```

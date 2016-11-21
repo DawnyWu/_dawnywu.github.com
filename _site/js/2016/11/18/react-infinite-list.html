@@ -1,0 +1,507 @@
+<!DOCTYPE html>
+<html>
+
+  <head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  <title>react infinite</title>
+  <meta name="description" content="```jsvar GridBody = React.createClass({  getInitialState: function() {    return {      shouldUpdate: true,      total: 0,      displayStart: 0,      display...">
+
+  <link rel="stylesheet" href="/css/main.css">
+  <link rel="canonical" href="http://localhost:4000/js/2016/11/18/react-infinite-list.html">
+  <link rel="alternate" type="application/rss+xml" title="" href="http://localhost:4000/feed.xml">
+</head>
+
+
+  <body>
+
+    <header class="site-header">
+
+  <div class="wrapper">
+
+    <a class="site-title" href="/"></a>
+
+    <nav class="site-nav">
+      <a href="#" class="menu-icon">
+        <svg viewBox="0 0 18 15">
+          <path fill="#424242" d="M18,1.484c0,0.82-0.665,1.484-1.484,1.484H1.484C0.665,2.969,0,2.304,0,1.484l0,0C0,0.665,0.665,0,1.484,0 h15.031C17.335,0,18,0.665,18,1.484L18,1.484z"/>
+          <path fill="#424242" d="M18,7.516C18,8.335,17.335,9,16.516,9H1.484C0.665,9,0,8.335,0,7.516l0,0c0-0.82,0.665-1.484,1.484-1.484 h15.031C17.335,6.031,18,6.696,18,7.516L18,7.516z"/>
+          <path fill="#424242" d="M18,13.516C18,14.335,17.335,15,16.516,15H1.484C0.665,15,0,14.335,0,13.516l0,0 c0-0.82,0.665-1.484,1.484-1.484h15.031C17.335,12.031,18,12.696,18,13.516L18,13.516z"/>
+        </svg>
+      </a>
+
+      <div class="trigger">
+        
+          
+          <a class="page-link" href="/about/">About</a>
+          
+        
+          
+        
+          
+        
+          
+        
+      </div>
+    </nav>
+
+  </div>
+
+</header>
+
+
+    <div class="page-content">
+      <div class="wrapper">
+        <article class="post" itemscope itemtype="http://schema.org/BlogPosting">
+
+  <header class="post-header">
+    <h1 class="post-title" itemprop="name headline">react infinite</h1>
+    <p class="post-meta"><time datetime="2016-11-18T00:00:00+08:00" itemprop="datePublished">Nov 18, 2016</time></p>
+  </header>
+
+  <div class="post-content" itemprop="articleBody">
+    <div class="language-js highlighter-rouge"><pre class="highlight"><code><span class="kd">var</span> <span class="nx">GridBody</span> <span class="o">=</span> <span class="nx">React</span><span class="p">.</span><span class="nx">createClass</span><span class="p">({</span>
+  <span class="na">getInitialState</span><span class="p">:</span> <span class="kd">function</span><span class="p">()</span> <span class="p">{</span>
+    <span class="k">return</span> <span class="p">{</span>
+      <span class="na">shouldUpdate</span><span class="p">:</span> <span class="kc">true</span><span class="p">,</span>
+      <span class="na">total</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span>
+      <span class="na">displayStart</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span>
+      <span class="na">displayEnd</span><span class="p">:</span> <span class="mi">0</span>
+    <span class="p">};</span>
+  <span class="p">},</span>
+
+  <span class="na">componentWillReceiveProps</span><span class="p">:</span> <span class="kd">function</span><span class="p">(</span><span class="nx">nextProps</span><span class="p">)</span> <span class="p">{</span>
+    <span class="kd">var</span> <span class="nx">shouldUpdate</span> <span class="o">=</span> <span class="o">!</span><span class="p">(</span>
+      <span class="nx">nextProps</span><span class="p">.</span><span class="nx">visibleStart</span> <span class="o">&gt;=</span> <span class="k">this</span><span class="p">.</span><span class="nx">state</span><span class="p">.</span><span class="nx">displayStart</span> <span class="o">&amp;&amp;</span>
+      <span class="nx">nextProps</span><span class="p">.</span><span class="nx">visibleEnd</span> <span class="o">&lt;=</span> <span class="k">this</span><span class="p">.</span><span class="nx">state</span><span class="p">.</span><span class="nx">displayEnd</span>
+    <span class="p">)</span> <span class="o">||</span> <span class="p">(</span><span class="nx">nextProps</span><span class="p">.</span><span class="nx">total</span> <span class="o">!==</span> <span class="k">this</span><span class="p">.</span><span class="nx">state</span><span class="p">.</span><span class="nx">total</span><span class="p">);</span>
+
+    <span class="k">if</span> <span class="p">(</span><span class="nx">shouldUpdate</span><span class="p">)</span> <span class="p">{</span>
+      <span class="k">this</span><span class="p">.</span><span class="nx">setState</span><span class="p">({</span>
+        <span class="na">shouldUpdate</span><span class="p">:</span> <span class="nx">shouldUpdate</span><span class="p">,</span>
+        <span class="na">total</span><span class="p">:</span> <span class="nx">nextProps</span><span class="p">.</span><span class="nx">total</span><span class="p">,</span>
+        <span class="na">displayStart</span><span class="p">:</span> <span class="nx">nextProps</span><span class="p">.</span><span class="nx">displayStart</span><span class="p">,</span>
+        <span class="na">displayEnd</span><span class="p">:</span> <span class="nx">nextProps</span><span class="p">.</span><span class="nx">displayEnd</span>
+      <span class="p">});</span>
+    <span class="p">}</span> <span class="k">else</span> <span class="p">{</span>
+      <span class="k">this</span><span class="p">.</span><span class="nx">setState</span><span class="p">({</span>
+        <span class="na">shouldUpdate</span><span class="p">:</span> <span class="kc">false</span>
+      <span class="p">});</span>
+    <span class="p">}</span>
+  <span class="p">},</span>
+
+  <span class="na">shouldComponentUpdate</span><span class="p">:</span> <span class="kd">function</span><span class="p">(</span><span class="nx">nextProps</span><span class="p">,</span> <span class="nx">nextState</span><span class="p">)</span> <span class="p">{</span>
+    <span class="k">return</span> <span class="k">this</span><span class="p">.</span><span class="nx">state</span><span class="p">.</span><span class="nx">shouldUpdate</span><span class="p">;</span>
+  <span class="p">},</span>
+
+  <span class="na">render</span><span class="p">:</span> <span class="kd">function</span><span class="p">()</span> <span class="p">{</span>
+    <span class="kd">var</span> <span class="nx">rows</span> <span class="o">=</span> <span class="p">[];</span>
+    <span class="nx">rows</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span><span class="o">&lt;</span><span class="nx">tr</span> <span class="nx">id</span><span class="o">=</span><span class="s2">"gridgridrectop"</span> <span class="nx">line</span><span class="o">=</span><span class="s2">"top"</span> <span class="nx">key</span><span class="o">=</span><span class="p">{</span><span class="mi">0</span><span class="p">}</span> <span class="nx">style</span><span class="o">=</span><span class="p">{</span>
+        <span class="p">{</span>
+          <span class="na">height</span><span class="p">:</span> <span class="k">this</span><span class="p">.</span><span class="nx">props</span><span class="p">.</span><span class="nx">displayStart</span> <span class="o">*</span> <span class="k">this</span><span class="p">.</span><span class="nx">props</span><span class="p">.</span><span class="nx">recordHeight</span>
+        <span class="p">}</span>
+      <span class="p">}</span><span class="o">&gt;</span>
+        <span class="o">&lt;</span><span class="nx">td</span> <span class="nx">colSpan</span><span class="o">=</span><span class="s2">"200"</span><span class="o">&gt;</span>
+        <span class="o">&lt;</span><span class="sr">/td</span><span class="err">&gt;
+</span>      <span class="o">&lt;</span><span class="sr">/tr</span><span class="err">&gt;
+</span>    <span class="p">);</span>
+
+    <span class="k">for</span> <span class="p">(</span><span class="kd">var</span> <span class="nx">i</span> <span class="o">=</span> <span class="k">this</span><span class="p">.</span><span class="nx">props</span><span class="p">.</span><span class="nx">displayStart</span><span class="p">;</span> <span class="nx">i</span> <span class="o">&lt;</span> <span class="k">this</span><span class="p">.</span><span class="nx">props</span><span class="p">.</span><span class="nx">displayEnd</span><span class="p">;</span> <span class="o">++</span><span class="nx">i</span><span class="p">)</span> <span class="p">{</span>
+      <span class="kd">var</span> <span class="nx">record</span> <span class="o">=</span> <span class="k">this</span><span class="p">.</span><span class="nx">props</span><span class="p">.</span><span class="nx">records</span><span class="p">[</span><span class="nx">i</span><span class="p">];</span>
+      <span class="nx">rows</span><span class="p">[</span><span class="nx">i</span> <span class="o">+</span> <span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span><span class="o">&lt;</span><span class="nx">tr</span> <span class="nx">className</span><span class="o">=</span><span class="p">{</span><span class="nx">i</span> <span class="o">%</span> <span class="mi">2</span> <span class="o">===</span> <span class="mi">0</span> <span class="p">?</span> <span class="s1">'w2ui-even'</span> <span class="p">:</span> <span class="s1">'w2ui-odd'</span><span class="p">}</span> <span class="nx">key</span><span class="o">=</span><span class="p">{</span><span class="nx">i</span><span class="o">+</span><span class="mi">1</span><span class="p">}</span> <span class="nx">style</span><span class="o">=</span><span class="p">{</span>
+          <span class="p">{</span>
+            <span class="na">height</span><span class="p">:</span> <span class="k">this</span><span class="p">.</span><span class="nx">props</span><span class="p">.</span><span class="nx">recordHeight</span>
+          <span class="p">}</span>
+        <span class="p">}</span><span class="o">&gt;</span>
+          <span class="o">&lt;</span><span class="nx">td</span> <span class="nx">className</span><span class="o">=</span><span class="s2">"w2ui-grid-data"</span> <span class="nx">col</span><span class="o">=</span><span class="s2">"0"</span><span class="o">&gt;</span>
+            <span class="o">&lt;</span><span class="nx">div</span> <span class="nx">title</span><span class="o">=</span><span class="p">{</span><span class="nx">i</span> <span class="o">+</span> <span class="mi">1</span><span class="p">}</span><span class="o">&gt;</span><span class="p">{</span><span class="nx">i</span> <span class="o">+</span> <span class="mi">1</span><span class="p">}</span><span class="o">&lt;</span><span class="sr">/div</span><span class="err">&gt;
+</span>          <span class="o">&lt;</span><span class="sr">/td</span><span class="err">&gt;
+</span>          <span class="o">&lt;</span><span class="nx">td</span> <span class="nx">className</span><span class="o">=</span><span class="s2">"w2ui-grid-data"</span> <span class="nx">col</span><span class="o">=</span><span class="s2">"1"</span><span class="o">&gt;</span>
+          <span class="o">&lt;</span><span class="nx">div</span> <span class="nx">title</span><span class="o">=</span><span class="p">{</span><span class="nx">record</span><span class="p">.</span><span class="nx">fname</span><span class="p">}</span><span class="o">&gt;</span><span class="p">{</span><span class="nx">record</span><span class="p">.</span><span class="nx">fname</span><span class="p">}</span><span class="o">&lt;</span><span class="sr">/div</span><span class="err">&gt;
+</span>        <span class="o">&lt;</span><span class="sr">/td</span><span class="err">&gt;
+</span>        <span class="o">&lt;</span><span class="nx">td</span> <span class="nx">className</span><span class="o">=</span><span class="s2">"w2ui-grid-data"</span> <span class="nx">col</span><span class="o">=</span><span class="s2">"2"</span><span class="o">&gt;</span>
+          <span class="o">&lt;</span><span class="nx">div</span> <span class="nx">title</span><span class="o">=</span><span class="p">{</span><span class="nx">record</span><span class="p">.</span><span class="nx">lname</span><span class="p">}</span><span class="o">&gt;</span><span class="p">{</span><span class="nx">record</span><span class="p">.</span><span class="nx">lname</span><span class="p">}</span><span class="o">&lt;</span><span class="sr">/div</span><span class="err">&gt;
+</span>        <span class="o">&lt;</span><span class="sr">/td</span><span class="err">&gt;
+</span>        <span class="o">&lt;</span><span class="nx">td</span> <span class="nx">className</span><span class="o">=</span><span class="s2">"w2ui-grid-data"</span> <span class="nx">col</span><span class="o">=</span><span class="s2">"3"</span><span class="o">&gt;</span>
+          <span class="o">&lt;</span><span class="nx">div</span> <span class="nx">title</span><span class="o">=</span><span class="p">{</span><span class="nx">record</span><span class="p">.</span><span class="nx">email</span><span class="p">}</span><span class="o">&gt;</span><span class="p">{</span><span class="nx">record</span><span class="p">.</span><span class="nx">email</span><span class="p">}</span><span class="o">&lt;</span><span class="sr">/div</span><span class="err">&gt;
+</span>        <span class="o">&lt;</span><span class="sr">/td</span><span class="err">&gt;
+</span>        <span class="o">&lt;</span><span class="nx">td</span> <span class="nx">className</span><span class="o">=</span><span class="s2">"w2ui-grid-data-last"</span><span class="o">&gt;&lt;</span><span class="sr">/td</span><span class="err">&gt;
+</span>      <span class="o">&lt;</span><span class="sr">/tr&gt;</span><span class="se">)</span><span class="err">;
+</span>    <span class="p">}</span>
+    <span class="nx">rows</span><span class="p">.</span><span class="nx">push</span><span class="p">((</span><span class="o">&lt;</span><span class="nx">tr</span> <span class="nx">id</span> <span class="o">=</span> <span class="s2">"gridgridrecbottom"</span> <span class="nx">key</span><span class="o">=</span><span class="p">{</span><span class="nx">rows</span><span class="p">.</span><span class="nx">length</span><span class="p">}</span> <span class="nx">line</span><span class="o">=</span><span class="s2">"bottom"</span> <span class="nx">style</span><span class="o">=</span><span class="p">{</span>
+        <span class="p">{</span>
+          <span class="na">height</span><span class="p">:</span> <span class="p">(</span><span class="k">this</span><span class="p">.</span><span class="nx">props</span><span class="p">.</span><span class="nx">records</span><span class="p">.</span><span class="nx">length</span> <span class="o">-</span> <span class="k">this</span><span class="p">.</span><span class="nx">props</span><span class="p">.</span><span class="nx">displayEnd</span><span class="p">)</span> <span class="o">*</span> <span class="k">this</span><span class="p">.</span><span class="nx">props</span><span class="p">.</span><span class="nx">recordHeight</span>
+        <span class="p">}</span>
+      <span class="p">}</span><span class="o">&gt;</span>
+        <span class="o">&lt;</span><span class="nx">td</span> <span class="nx">colSpan</span><span class="o">=</span><span class="s2">"200"</span><span class="o">&gt;&lt;</span><span class="sr">/td</span><span class="err">&gt;
+</span>      <span class="o">&lt;</span><span class="sr">/tr</span><span class="err">&gt;
+</span>    <span class="p">));</span>
+
+    <span class="k">return</span> <span class="p">(</span><span class="o">&lt;</span><span class="nx">table</span><span class="o">&gt;</span>
+      <span class="o">&lt;</span><span class="nx">tbody</span><span class="o">&gt;</span>
+        <span class="o">&lt;</span><span class="nx">tr</span> <span class="nx">line</span><span class="o">=</span><span class="s2">"0"</span><span class="o">&gt;</span>
+          <span class="o">&lt;</span><span class="nx">td</span> <span class="nx">className</span><span class="o">=</span><span class="s2">"w2ui-grid-data"</span> <span class="nx">col</span><span class="o">=</span><span class="s2">"0"</span> <span class="nx">style</span><span class="o">=</span><span class="p">{</span>
+            <span class="p">{</span>
+              <span class="na">height</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span>
+              <span class="na">width</span><span class="p">:</span> <span class="mi">50</span><span class="p">,</span>
+            <span class="p">}</span>
+          <span class="p">}</span><span class="o">&gt;&lt;</span><span class="sr">/td</span><span class="err">&gt;
+</span>          <span class="o">&lt;</span><span class="nx">td</span> <span class="nx">className</span><span class="o">=</span><span class="s2">"w2ui-grid-data"</span> <span class="nx">col</span><span class="o">=</span><span class="s2">"1"</span> <span class="nx">style</span><span class="o">=</span><span class="p">{</span>
+              <span class="p">{</span>
+                <span class="na">height</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span>
+                <span class="na">width</span><span class="p">:</span> <span class="mi">150</span><span class="p">,</span>
+              <span class="p">}</span>
+            <span class="p">}</span><span class="o">&gt;</span>
+          <span class="o">&lt;</span><span class="sr">/td</span><span class="err">&gt;
+</span>          <span class="o">&lt;</span><span class="nx">td</span> <span class="nx">className</span><span class="o">=</span><span class="s2">"w2ui-grid-data"</span> <span class="nx">col</span><span class="o">=</span><span class="s2">"2"</span> <span class="nx">style</span><span class="o">=</span><span class="p">{</span>
+              <span class="p">{</span>
+                <span class="na">height</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span>
+                <span class="na">width</span><span class="p">:</span> <span class="mi">150</span><span class="p">,</span>
+              <span class="p">}</span>
+            <span class="p">}</span><span class="o">&gt;</span>
+          <span class="o">&lt;</span><span class="sr">/td</span><span class="err">&gt;
+</span>          <span class="o">&lt;</span><span class="nx">td</span> <span class="nx">className</span><span class="o">=</span><span class="s2">"w2ui-grid-data"</span> <span class="nx">col</span><span class="o">=</span><span class="s2">"3"</span> <span class="nx">style</span><span class="o">=</span><span class="p">{</span>
+              <span class="p">{</span>
+                <span class="na">height</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span>
+                <span class="na">width</span><span class="p">:</span> <span class="mi">150</span><span class="p">,</span>
+              <span class="p">}</span>
+            <span class="p">}</span><span class="o">&gt;</span>
+          <span class="o">&lt;</span><span class="sr">/td</span><span class="err">&gt;
+</span>          <span class="o">&lt;</span><span class="nx">td</span> <span class="nx">className</span><span class="o">=</span><span class="s2">"w2ui-grid-data-last"</span> <span class="nx">style</span><span class="o">=</span><span class="p">{</span>
+              <span class="p">{</span>
+                <span class="na">height</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span>
+                <span class="na">width</span><span class="p">:</span> <span class="mi">81</span>
+              <span class="p">}</span>
+            <span class="p">}</span><span class="o">&gt;</span>
+          <span class="o">&lt;</span><span class="sr">/td</span><span class="err">&gt;
+</span>        <span class="o">&lt;</span><span class="sr">/tr</span><span class="err">&gt;
+</span>        <span class="p">{</span><span class="nx">rows</span><span class="p">}</span>
+      <span class="o">&lt;</span><span class="sr">/tbody</span><span class="err">&gt;
+</span>    <span class="o">&lt;</span><span class="sr">/table&gt;</span><span class="se">)</span><span class="err">;
+</span>  <span class="p">}</span>
+<span class="p">});</span>
+
+<span class="kd">var</span> <span class="nx">Grid</span> <span class="o">=</span> <span class="nx">React</span><span class="p">.</span><span class="nx">createClass</span><span class="p">({</span>
+  <span class="na">getDefaultState</span><span class="p">:</span> <span class="kd">function</span><span class="p">(</span><span class="nx">props</span><span class="p">)</span> <span class="p">{</span>
+    <span class="kd">var</span> <span class="nx">recordHeight</span> <span class="o">=</span> <span class="mi">25</span><span class="p">;</span>
+    <span class="kd">var</span> <span class="nx">recordsPerBody</span> <span class="o">=</span> <span class="nb">Math</span><span class="p">.</span><span class="nx">floor</span><span class="p">((</span><span class="nx">props</span><span class="p">.</span><span class="nx">height</span> <span class="o">-</span> <span class="mi">2</span><span class="p">)</span> <span class="o">/</span> <span class="nx">recordHeight</span><span class="p">);</span>
+    <span class="k">return</span> <span class="p">{</span>
+      <span class="na">total</span><span class="p">:</span> <span class="nx">props</span><span class="p">.</span><span class="nx">records</span><span class="p">.</span><span class="nx">length</span><span class="p">,</span>
+      <span class="na">records</span><span class="p">:</span> <span class="nx">props</span><span class="p">.</span><span class="nx">records</span><span class="p">,</span>
+      <span class="na">recordHeight</span><span class="p">:</span> <span class="nx">recordHeight</span><span class="p">,</span>
+      <span class="na">recordsPerBody</span><span class="p">:</span> <span class="nx">recordsPerBody</span><span class="p">,</span>
+      <span class="na">visibleStart</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span>
+      <span class="na">visibleEnd</span><span class="p">:</span> <span class="nx">recordsPerBody</span><span class="p">,</span>
+      <span class="na">displayStart</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span>
+      <span class="na">displayEnd</span><span class="p">:</span> <span class="nx">recordsPerBody</span> <span class="o">*</span> <span class="mi">2</span>
+    <span class="p">};</span>
+  <span class="p">},</span>
+
+  <span class="na">componentWillReceiveProps</span><span class="p">:</span> <span class="kd">function</span><span class="p">(</span><span class="nx">nextProps</span><span class="p">)</span> <span class="p">{</span>
+    <span class="k">this</span><span class="p">.</span><span class="nx">setState</span><span class="p">(</span><span class="k">this</span><span class="p">.</span><span class="nx">getDefaultState</span><span class="p">(</span><span class="nx">nextProps</span><span class="p">));</span>
+    <span class="k">this</span><span class="p">.</span><span class="nx">scrollState</span><span class="p">(</span><span class="k">this</span><span class="p">.</span><span class="nx">state</span><span class="p">.</span><span class="nx">scroll</span><span class="p">);</span>
+  <span class="p">},</span>
+
+  <span class="na">getInitialState</span><span class="p">:</span> <span class="kd">function</span><span class="p">()</span> <span class="p">{</span>
+    <span class="k">return</span> <span class="k">this</span><span class="p">.</span><span class="nx">getDefaultState</span><span class="p">(</span><span class="k">this</span><span class="p">.</span><span class="nx">props</span><span class="p">);</span>
+  <span class="p">},</span>
+
+  <span class="na">scrollState</span><span class="p">:</span> <span class="kd">function</span><span class="p">(</span><span class="nx">scroll</span><span class="p">)</span> <span class="p">{</span>
+    <span class="kd">var</span> <span class="nx">visibleStart</span> <span class="o">=</span> <span class="nb">Math</span><span class="p">.</span><span class="nx">floor</span><span class="p">(</span><span class="nx">scroll</span> <span class="o">/</span> <span class="k">this</span><span class="p">.</span><span class="nx">state</span><span class="p">.</span><span class="nx">recordHeight</span><span class="p">);</span>
+    <span class="kd">var</span> <span class="nx">visibleEnd</span> <span class="o">=</span> <span class="nb">Math</span><span class="p">.</span><span class="nx">min</span><span class="p">(</span><span class="nx">visibleStart</span> <span class="o">+</span> <span class="k">this</span><span class="p">.</span><span class="nx">state</span><span class="p">.</span><span class="nx">recordsPerBody</span><span class="p">,</span> <span class="k">this</span><span class="p">.</span><span class="nx">state</span><span class="p">.</span><span class="nx">total</span> <span class="o">-</span> <span class="mi">1</span><span class="p">);</span>
+
+    <span class="kd">var</span> <span class="nx">displayStart</span> <span class="o">=</span> <span class="nb">Math</span><span class="p">.</span><span class="nx">max</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="nb">Math</span><span class="p">.</span><span class="nx">floor</span><span class="p">(</span><span class="nx">scroll</span> <span class="o">/</span> <span class="k">this</span><span class="p">.</span><span class="nx">state</span><span class="p">.</span><span class="nx">recordHeight</span><span class="p">)</span> <span class="o">-</span> <span class="k">this</span><span class="p">.</span><span class="nx">state</span><span class="p">.</span><span class="nx">recordsPerBody</span> <span class="o">*</span> <span class="mf">1.5</span><span class="p">);</span>
+    <span class="kd">var</span> <span class="nx">displayEnd</span> <span class="o">=</span> <span class="nb">Math</span><span class="p">.</span><span class="nx">min</span><span class="p">(</span><span class="nx">displayStart</span> <span class="o">+</span> <span class="mi">4</span> <span class="o">*</span> <span class="k">this</span><span class="p">.</span><span class="nx">state</span><span class="p">.</span><span class="nx">recordsPerBody</span><span class="p">,</span> <span class="k">this</span><span class="p">.</span><span class="nx">state</span><span class="p">.</span><span class="nx">total</span> <span class="o">-</span> <span class="mi">1</span><span class="p">);</span>
+
+    <span class="k">this</span><span class="p">.</span><span class="nx">setState</span><span class="p">({</span>
+      <span class="na">visibleStart</span><span class="p">:</span> <span class="nx">visibleStart</span><span class="p">,</span>
+      <span class="na">visibleEnd</span><span class="p">:</span> <span class="nx">visibleEnd</span><span class="p">,</span>
+      <span class="na">displayStart</span><span class="p">:</span> <span class="nx">displayStart</span><span class="p">,</span>
+      <span class="na">displayEnd</span><span class="p">:</span> <span class="nx">displayEnd</span><span class="p">,</span>
+      <span class="na">scroll</span><span class="p">:</span> <span class="nx">scroll</span>
+    <span class="p">});</span>
+  <span class="p">},</span>
+
+  <span class="na">onScroll</span><span class="p">:</span> <span class="kd">function</span><span class="p">(</span><span class="nx">event</span><span class="p">)</span> <span class="p">{</span>
+    <span class="k">this</span><span class="p">.</span><span class="nx">scrollState</span><span class="p">(</span><span class="k">this</span><span class="p">.</span><span class="nx">refs</span><span class="p">.</span><span class="nx">scrollable</span><span class="p">.</span><span class="nx">scrollTop</span><span class="p">);</span>
+  <span class="p">},</span>
+
+  <span class="na">formatNumber</span><span class="p">:</span> <span class="kd">function</span><span class="p">(</span><span class="nx">number</span><span class="p">)</span> <span class="p">{</span>
+    <span class="k">return</span> <span class="p">(</span><span class="s1">''</span> <span class="o">+</span> <span class="nx">number</span><span class="p">).</span><span class="nx">split</span><span class="p">(</span><span class="s1">''</span><span class="p">).</span><span class="nx">reverse</span><span class="p">().</span><span class="nx">join</span><span class="p">(</span><span class="s1">''</span><span class="p">).</span><span class="nx">replace</span><span class="p">(</span><span class="sr">/</span><span class="se">(</span><span class="sr">...</span><span class="se">)</span><span class="sr">/g</span><span class="p">,</span> <span class="s1">'$1,'</span><span class="p">).</span><span class="nx">split</span><span class="p">(</span><span class="s1">''</span><span class="p">).</span><span class="nx">reverse</span><span class="p">().</span><span class="nx">join</span><span class="p">(</span><span class="s1">''</span><span class="p">).</span><span class="nx">replace</span><span class="p">(</span><span class="sr">/^,/</span><span class="p">,</span> <span class="s1">''</span><span class="p">);</span>
+  <span class="p">},</span>
+
+  <span class="na">getCount</span><span class="p">:</span> <span class="kd">function</span><span class="p">()</span> <span class="p">{</span>
+    <span class="k">return</span> <span class="p">(</span><span class="mi">1</span> <span class="o">+</span> <span class="k">this</span><span class="p">.</span><span class="nx">formatNumber</span><span class="p">(</span><span class="k">this</span><span class="p">.</span><span class="nx">state</span><span class="p">.</span><span class="nx">visibleStart</span><span class="p">))</span> <span class="o">+</span>
+      <span class="s1">'-'</span> <span class="o">+</span> <span class="p">(</span><span class="mi">1</span> <span class="o">+</span> <span class="k">this</span><span class="p">.</span><span class="nx">formatNumber</span><span class="p">(</span><span class="k">this</span><span class="p">.</span><span class="nx">state</span><span class="p">.</span><span class="nx">visibleEnd</span><span class="p">))</span> <span class="o">+</span>
+      <span class="s1">' of '</span> <span class="o">+</span> <span class="k">this</span><span class="p">.</span><span class="nx">formatNumber</span><span class="p">(</span><span class="k">this</span><span class="p">.</span><span class="nx">state</span><span class="p">.</span><span class="nx">total</span><span class="p">);</span>
+  <span class="p">},</span>
+
+  <span class="na">render</span><span class="p">:</span> <span class="kd">function</span><span class="p">()</span> <span class="p">{</span>
+    <span class="k">return</span> <span class="p">(</span><span class="o">&lt;</span><span class="nx">div</span> <span class="nx">id</span><span class="o">=</span><span class="s2">"grid"</span> <span class="nx">style</span><span class="o">=</span><span class="p">{</span>
+        <span class="p">{</span>
+          <span class="na">width</span><span class="p">:</span> <span class="mi">600</span><span class="p">,</span>
+          <span class="na">height</span><span class="p">:</span> <span class="mi">568</span><span class="p">,</span>
+        <span class="p">}</span>
+      <span class="p">}</span> <span class="nx">name</span><span class="o">=</span><span class="s2">"grid"</span> <span class="nx">className</span><span class="o">=</span><span class="s2">"w2ui-reset w2ui-grid"</span><span class="o">&gt;</span>
+      <span class="o">&lt;</span><span class="nx">div</span> <span class="nx">style</span><span class="o">=&gt;</span>
+        <span class="o">&lt;</span><span class="nx">div</span> <span class="nx">id</span><span class="o">=</span><span class="s2">"gridgridheader"</span> <span class="nx">className</span><span class="o">=</span><span class="s2">"w2ui-grid-header"</span> <span class="nx">style</span><span class="o">=&gt;&lt;</span><span class="sr">/div</span><span class="err">&gt;
+</span>        <span class="o">&lt;</span><span class="nx">GridToolbar</span><span class="o">/&gt;</span>
+        <span class="o">&lt;</span><span class="nx">div</span> <span class="nx">id</span><span class="o">=</span><span class="s2">"gridgridbody"</span> <span class="nx">className</span><span class="o">=</span><span class="s2">"w2ui-grid-body"</span> <span class="nx">style</span><span class="o">=</span><span class="p">{</span>
+          <span class="p">{</span>
+            <span class="na">top</span><span class="p">:</span> <span class="mi">38</span><span class="p">,</span>
+            <span class="na">bottom</span><span class="p">:</span> <span class="mi">24</span><span class="p">,</span>
+            <span class="na">left</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span>
+            <span class="na">right</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span>
+            <span class="na">height</span><span class="p">:</span> <span class="mi">504</span><span class="p">,</span>
+          <span class="p">}</span>
+        <span class="p">}</span><span class="o">&gt;</span>
+          <span class="o">&lt;</span><span class="nx">div</span> <span class="nx">id</span><span class="o">=</span><span class="s2">"gridgridrecords"</span> <span class="nx">className</span><span class="o">=</span><span class="s2">"w2ui-grid-records"</span> <span class="nx">style</span><span class="o">=</span>
+            <span class="nx">ref</span><span class="o">=</span><span class="s2">"scrollable"</span> <span class="nx">onScroll</span><span class="o">=</span><span class="p">{</span><span class="k">this</span><span class="p">.</span><span class="nx">onScroll</span><span class="p">}</span><span class="o">&gt;</span>
+            <span class="o">&lt;</span><span class="nx">GridBody</span> <span class="nx">records</span><span class="o">=</span><span class="p">{</span><span class="k">this</span><span class="p">.</span><span class="nx">state</span><span class="p">.</span><span class="nx">records</span><span class="p">}</span> <span class="nx">total</span><span class="o">=</span><span class="p">{</span><span class="k">this</span><span class="p">.</span><span class="nx">state</span><span class="p">.</span><span class="nx">records</span><span class="p">.</span><span class="nx">length</span><span class="p">}</span> <span class="nx">visibleStart</span><span class="o">=</span><span class="p">{</span>
+                <span class="k">this</span><span class="p">.</span><span class="nx">state</span><span class="p">.</span><span class="nx">visibleStart</span>
+              <span class="p">}</span>
+              <span class="nx">visibleEnd</span><span class="o">=</span><span class="p">{</span><span class="k">this</span><span class="p">.</span><span class="nx">state</span><span class="p">.</span><span class="nx">visibleEnd</span><span class="p">}</span> <span class="nx">displayStart</span><span class="o">=</span><span class="p">{</span><span class="k">this</span><span class="p">.</span><span class="nx">state</span><span class="p">.</span><span class="nx">displayStart</span><span class="p">}</span> <span class="nx">displayEnd</span><span class="o">=</span><span class="p">{</span>
+                <span class="k">this</span><span class="p">.</span><span class="nx">state</span><span class="p">.</span><span class="nx">displayEnd</span>
+              <span class="p">}</span>
+              <span class="nx">recordHeight</span><span class="o">=</span><span class="p">{</span><span class="k">this</span><span class="p">.</span><span class="nx">state</span><span class="p">.</span><span class="nx">recordHeight</span><span class="p">}</span>
+            <span class="sr">/</span><span class="err">&gt;
+</span>          <span class="o">&lt;</span><span class="sr">/div</span><span class="err">&gt;
+</span>          <span class="o">&lt;</span><span class="nx">div</span> <span class="nx">id</span><span class="o">=</span><span class="s2">"gridgridcolumns"</span> <span class="nx">className</span><span class="o">=</span><span class="s2">"w2ui-grid-columns"</span><span class="o">&gt;</span>
+            <span class="o">&lt;</span><span class="nx">table</span><span class="o">&gt;</span>
+              <span class="o">&lt;</span><span class="nx">tbody</span><span class="o">&gt;</span>
+                <span class="o">&lt;</span><span class="nx">tr</span><span class="o">&gt;</span>
+                  <span class="o">&lt;</span><span class="nx">td</span> <span class="nx">col</span><span class="o">=</span><span class="s2">"0"</span> <span class="nx">className</span><span class="o">=</span><span class="s2">"w2ui-head"</span> <span class="nx">style</span><span class="o">=&gt;</span>
+                    <span class="o">&lt;</span><span class="nx">div</span> <span class="nx">className</span><span class="o">=</span><span class="s2">"w2ui-resizer"</span> <span class="nx">name</span><span class="o">=</span><span class="s2">"0"</span> <span class="nx">style</span><span class="o">=&gt;</span>
+                    <span class="o">&lt;</span><span class="sr">/div</span><span class="err">&gt;
+</span>                    <span class="o">&lt;</span><span class="nx">div</span><span class="o">&gt;</span><span class="nx">ID</span><span class="o">&lt;</span><span class="sr">/div</span><span class="err">&gt;
+</span>                  <span class="o">&lt;</span><span class="sr">/td</span><span class="err">&gt;
+</span>                  <span class="o">&lt;</span><span class="nx">td</span> <span class="nx">col</span><span class="o">=</span><span class="s2">"1"</span> <span class="nx">className</span><span class="o">=</span><span class="s2">"w2ui-head"</span> <span class="nx">style</span><span class="o">=&gt;</span>
+                    <span class="o">&lt;</span><span class="nx">div</span> <span class="nx">className</span><span class="o">=</span><span class="s2">"w2ui-resizer"</span> <span class="nx">name</span><span class="o">=</span><span class="s2">"1"</span> <span class="nx">style</span><span class="o">=&gt;&lt;</span><span class="sr">/div</span><span class="err">&gt;
+</span>                    <span class="o">&lt;</span><span class="nx">div</span><span class="o">&gt;</span><span class="nx">First</span> <span class="nx">Name</span><span class="o">&lt;</span><span class="sr">/div</span><span class="err">&gt;
+</span>                  <span class="o">&lt;</span><span class="sr">/td</span><span class="err">&gt;
+</span>                  <span class="o">&lt;</span><span class="nx">td</span> <span class="nx">col</span><span class="o">=</span><span class="s2">"2"</span> <span class="nx">className</span><span class="o">=</span><span class="s2">"w2ui-head"</span> <span class="nx">style</span><span class="o">=&gt;</span>
+                    <span class="o">&lt;</span><span class="nx">div</span> <span class="nx">className</span><span class="o">=</span><span class="s2">"w2ui-resizer"</span> <span class="nx">name</span><span class="o">=</span><span class="s2">"2"</span> <span class="nx">style</span><span class="o">=&gt;&lt;</span><span class="sr">/div</span><span class="err">&gt;
+</span>                    <span class="o">&lt;</span><span class="nx">div</span><span class="o">&gt;</span><span class="nx">Last</span> <span class="nx">Name</span><span class="o">&lt;</span><span class="sr">/div</span><span class="err">&gt;
+</span>                  <span class="o">&lt;</span><span class="sr">/td</span><span class="err">&gt;
+</span>                  <span class="o">&lt;</span><span class="nx">td</span> <span class="nx">col</span><span class="o">=</span><span class="s2">"3"</span> <span class="nx">className</span><span class="o">=</span><span class="s2">"w2ui-head"</span> <span class="nx">style</span><span class="o">=&gt;</span>
+                    <span class="o">&lt;</span><span class="nx">div</span> <span class="nx">className</span><span class="o">=</span><span class="s2">"w2ui-resizer"</span> <span class="nx">name</span><span class="o">=</span><span class="s2">"3"</span> <span class="nx">style</span><span class="o">=&gt;&lt;</span><span class="sr">/div</span><span class="err">&gt;
+</span>                    <span class="o">&lt;</span><span class="nx">div</span><span class="o">&gt;</span><span class="nx">Email</span><span class="o">&lt;</span><span class="sr">/div</span><span class="err">&gt;
+</span>                  <span class="o">&lt;</span><span class="sr">/td&gt;&lt;td className="w2ui-head w2ui-head-last" style=</span><span class="err">&gt;
+</span>                    <span class="o">&lt;</span><span class="nx">div</span><span class="o">&gt;</span><span class="p">{</span><span class="nb">String</span><span class="p">.</span><span class="nx">fromCharCode</span><span class="p">(</span><span class="mi">160</span><span class="p">)}</span><span class="o">&lt;</span><span class="sr">/div</span><span class="err">&gt;
+</span>                  <span class="o">&lt;</span><span class="sr">/td</span><span class="err">&gt;
+</span>                <span class="o">&lt;</span><span class="sr">/tr</span><span class="err">&gt;
+</span>              <span class="o">&lt;</span><span class="sr">/tbody</span><span class="err">&gt;
+</span>            <span class="o">&lt;</span><span class="sr">/table</span><span class="err">&gt;
+</span>          <span class="o">&lt;</span><span class="sr">/div</span><span class="err">&gt;
+</span>        <span class="o">&lt;</span><span class="sr">/div</span><span class="err">&gt;
+</span>        <span class="o">&lt;</span><span class="nx">div</span> <span class="nx">id</span><span class="o">=</span><span class="s2">"gridgridsummary"</span> <span class="nx">className</span><span class="o">=</span><span class="s2">"w2ui-grid-body w2ui-grid-summary"</span> <span class="nx">style</span><span class="o">=&gt;</span>
+        <span class="o">&lt;</span><span class="sr">/div</span><span class="err">&gt;
+</span>        <span class="o">&lt;</span><span class="nx">div</span> <span class="nx">id</span><span class="o">=</span><span class="s2">"gridgridfooter"</span> <span class="nx">className</span><span class="o">=</span><span class="s2">"w2ui-grid-footer"</span> <span class="nx">style</span><span class="o">=&gt;</span>
+          <span class="o">&lt;</span><span class="nx">div</span><span class="o">&gt;</span>
+            <span class="o">&lt;</span><span class="nx">div</span> <span class="nx">className</span><span class="o">=</span><span class="s2">"w2ui-footer-left"</span><span class="o">&gt;&lt;</span><span class="sr">/div</span><span class="err">&gt;
+</span>            <span class="o">&lt;</span><span class="nx">div</span> <span class="nx">className</span><span class="o">=</span><span class="s2">"w2ui-footer-right"</span><span class="o">&gt;</span><span class="p">{</span><span class="k">this</span><span class="p">.</span><span class="nx">getCount</span><span class="p">()}</span><span class="o">&lt;</span><span class="sr">/div</span><span class="err">&gt;
+</span>            <span class="o">&lt;</span><span class="nx">div</span> <span class="nx">className</span><span class="o">=</span><span class="s2">"w2ui-footer-center"</span><span class="o">&gt;&lt;</span><span class="sr">/div</span><span class="err">&gt;
+</span>          <span class="o">&lt;</span><span class="sr">/div</span><span class="err">&gt;
+</span>        <span class="o">&lt;</span><span class="sr">/div</span><span class="err">&gt;
+</span>      <span class="o">&lt;</span><span class="sr">/div</span><span class="err">&gt;
+</span>    <span class="o">&lt;</span><span class="sr">/div&gt;</span><span class="se">)</span><span class="err">;
+</span>  <span class="p">}</span>
+<span class="p">});</span>
+
+<span class="kd">var</span> <span class="nx">GridToolbar</span> <span class="o">=</span> <span class="nx">React</span><span class="p">.</span><span class="nx">createClass</span><span class="p">({</span>
+  <span class="na">shouldUpdateComponent</span><span class="p">:</span> <span class="kd">function</span><span class="p">()</span> <span class="p">{</span>
+    <span class="k">return</span> <span class="kc">false</span><span class="p">;</span>
+  <span class="p">},</span>
+
+  <span class="na">render</span><span class="p">:</span> <span class="kd">function</span><span class="p">()</span> <span class="p">{</span>
+    <span class="k">return</span> <span class="p">(</span><span class="o">&lt;</span><span class="nx">div</span> <span class="nx">id</span><span class="o">=</span><span class="s2">"gridgridtoolbar"</span>
+      <span class="nx">className</span><span class="o">=</span><span class="s2">"w2ui-grid-toolbar w2ui-reset w2ui-toolbar"</span>
+      <span class="nx">name</span><span class="o">=</span><span class="s2">"gridtoolbar"</span>
+      <span class="nx">style</span><span class="o">=</span><span class="p">{</span>
+        <span class="p">{</span>
+          <span class="na">top</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span>
+          <span class="na">left</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span>
+          <span class="na">right</span><span class="p">:</span> <span class="mi">0</span>
+        <span class="p">}</span>
+      <span class="p">}</span><span class="o">&gt;</span>
+        <span class="o">&lt;</span><span class="nx">table</span> <span class="nx">cellSpacing</span><span class="o">=</span><span class="s2">"0"</span> <span class="nx">cellPadding</span><span class="o">=</span><span class="s2">"0"</span> <span class="nx">width</span><span class="o">=</span><span class="s2">"100%"</span><span class="o">&gt;</span>
+          <span class="o">&lt;</span><span class="nx">tbody</span><span class="o">&gt;</span>
+            <span class="o">&lt;</span><span class="nx">tr</span><span class="o">&gt;</span>
+              <span class="o">&lt;</span><span class="nx">td</span> <span class="nx">id</span><span class="o">=</span><span class="s2">"tbgridtoolbaritemreload"</span> <span class="nx">valign</span><span class="o">=</span><span class="s2">"middle"</span><span class="o">&gt;</span>
+                <span class="o">&lt;</span><span class="nx">table</span> <span class="nx">cellPadding</span><span class="o">=</span><span class="s2">"0"</span> <span class="nx">cellSpacing</span><span class="o">=</span><span class="s2">"0"</span> <span class="nx">title</span><span class="o">=</span><span class="s2">"Reload data in the list"</span> <span class="nx">className</span><span class="o">=</span><span class="s2">"w2ui-button"</span><span class="o">&gt;</span>
+                  <span class="o">&lt;</span><span class="nx">tbody</span><span class="o">&gt;</span>
+                    <span class="o">&lt;</span><span class="nx">tr</span><span class="o">&gt;</span>
+                      <span class="o">&lt;</span><span class="nx">td</span><span class="o">&gt;</span>
+                        <span class="o">&lt;</span><span class="nx">table</span> <span class="nx">cellPadding</span><span class="o">=</span><span class="s2">"1"</span> <span class="nx">cellSpacing</span><span class="o">=</span><span class="s2">"0"</span><span class="o">&gt;</span>
+                          <span class="o">&lt;</span><span class="nx">tbody</span><span class="o">&gt;</span>
+                            <span class="o">&lt;</span><span class="nx">tr</span><span class="o">&gt;</span>
+                              <span class="o">&lt;</span><span class="nx">td</span><span class="o">&gt;</span>
+                                <span class="o">&lt;</span><span class="nx">div</span> <span class="nx">className</span><span class="o">=</span><span class="s2">"w2ui-tb-image w2ui-icon icon-reload"</span><span class="o">&gt;&lt;</span><span class="sr">/div&gt;&lt;/</span><span class="nx">td</span><span class="o">&gt;</span>
+                            <span class="o">&lt;</span><span class="sr">/tr</span><span class="err">&gt;
+</span>                          <span class="o">&lt;</span><span class="sr">/tbody</span><span class="err">&gt;
+</span>                        <span class="o">&lt;</span><span class="sr">/table</span><span class="err">&gt;
+</span>                      <span class="o">&lt;</span><span class="sr">/td</span><span class="err">&gt;
+</span>                    <span class="o">&lt;</span><span class="sr">/tr</span><span class="err">&gt;
+</span>                  <span class="o">&lt;</span><span class="sr">/tbody</span><span class="err">&gt;
+</span>                <span class="o">&lt;</span><span class="sr">/table</span><span class="err">&gt;
+</span>              <span class="o">&lt;</span><span class="sr">/td</span><span class="err">&gt;
+</span>              <span class="o">&lt;</span><span class="nx">td</span> <span class="nx">id</span><span class="o">=</span><span class="s2">"tbgridtoolbaritemcolumn-on-off"</span> <span class="nx">valign</span><span class="o">=</span><span class="s2">"middle"</span><span class="o">&gt;</span>
+                <span class="o">&lt;</span><span class="nx">table</span> <span class="nx">cellPadding</span><span class="o">=</span><span class="s2">"0"</span> <span class="nx">cellSpacing</span><span class="o">=</span><span class="s2">"0"</span> <span class="nx">title</span><span class="o">=</span><span class="s2">"Show/hide columns"</span> <span class="nx">className</span><span class="o">=</span><span class="s2">"w2ui-button"</span><span class="o">&gt;</span>
+                  <span class="o">&lt;</span><span class="nx">tbody</span><span class="o">&gt;</span>
+                    <span class="o">&lt;</span><span class="nx">tr</span><span class="o">&gt;</span>
+                      <span class="o">&lt;</span><span class="nx">td</span><span class="o">&gt;</span>
+                        <span class="o">&lt;</span><span class="nx">table</span> <span class="nx">cellPadding</span><span class="o">=</span><span class="s2">"1"</span> <span class="nx">cellSpacing</span><span class="o">=</span><span class="s2">"0"</span><span class="o">&gt;</span>
+                          <span class="o">&lt;</span><span class="nx">tbody</span><span class="o">&gt;</span>
+                            <span class="o">&lt;</span><span class="nx">tr</span><span class="o">&gt;</span>
+                              <span class="o">&lt;</span><span class="nx">td</span><span class="o">&gt;</span>
+                                <span class="o">&lt;</span><span class="nx">div</span> <span class="nx">className</span><span class="o">=</span><span class="s2">"w2ui-tb-image w2ui-icon icon-columns"</span><span class="o">&gt;</span>
+                                <span class="o">&lt;</span><span class="sr">/div</span><span class="err">&gt;
+</span>                              <span class="o">&lt;</span><span class="sr">/td</span><span class="err">&gt;
+</span>                            <span class="o">&lt;</span><span class="sr">/tr</span><span class="err">&gt;
+</span>                          <span class="o">&lt;</span><span class="sr">/tbody</span><span class="err">&gt;
+</span>                        <span class="o">&lt;</span><span class="sr">/table</span><span class="err">&gt;
+</span>                      <span class="o">&lt;</span><span class="sr">/td</span><span class="err">&gt;
+</span>                    <span class="o">&lt;</span><span class="sr">/tr</span><span class="err">&gt;
+</span>                  <span class="o">&lt;</span><span class="sr">/tbody</span><span class="err">&gt;
+</span>                <span class="o">&lt;</span><span class="sr">/table</span><span class="err">&gt;
+</span>              <span class="o">&lt;</span><span class="sr">/td</span><span class="err">&gt;
+</span>              <span class="o">&lt;</span><span class="nx">td</span> <span class="nx">id</span><span class="o">=</span><span class="s2">"tbgridtoolbaritembreak0"</span> <span class="nx">valign</span><span class="o">=</span><span class="s2">"middle"</span><span class="o">&gt;</span>
+                <span class="o">&lt;</span><span class="nx">table</span> <span class="nx">cellPadding</span><span class="o">=</span><span class="s2">"0"</span> <span class="nx">cellSpacing</span><span class="o">=</span><span class="s2">"0"</span><span class="o">&gt;</span>
+                  <span class="o">&lt;</span><span class="nx">tbody</span><span class="o">&gt;</span>
+                    <span class="o">&lt;</span><span class="nx">tr</span><span class="o">&gt;</span>
+                      <span class="o">&lt;</span><span class="nx">td</span><span class="o">&gt;</span>
+                        <span class="o">&lt;</span><span class="nx">div</span> <span class="nx">className</span><span class="o">=</span><span class="s2">"w2ui-break"</span><span class="o">&gt;</span> <span class="p">{</span><span class="nb">String</span><span class="p">.</span><span class="nx">fromCharCode</span><span class="p">(</span><span class="mi">160</span><span class="p">)}</span>
+                        <span class="o">&lt;</span><span class="sr">/div</span><span class="err">&gt;
+</span>                      <span class="o">&lt;</span><span class="sr">/td</span><span class="err">&gt;
+</span>                    <span class="o">&lt;</span><span class="sr">/tr</span><span class="err">&gt;
+</span>                  <span class="o">&lt;</span><span class="sr">/tbody</span><span class="err">&gt;
+</span>                <span class="o">&lt;</span><span class="sr">/table</span><span class="err">&gt;
+</span>              <span class="o">&lt;</span><span class="sr">/td</span><span class="err">&gt;
+</span>              <span class="o">&lt;</span><span class="nx">td</span> <span class="nx">id</span><span class="o">=</span><span class="s2">"tbgridtoolbaritemsearch"</span> <span class="nx">valign</span><span class="o">=</span><span class="s2">"middle"</span><span class="o">&gt;</span>
+                <span class="o">&lt;</span><span class="nx">table</span> <span class="nx">cellPadding</span><span class="o">=</span><span class="s2">"0"</span> <span class="nx">cellSpacing</span><span class="o">=</span><span class="s2">"0"</span><span class="o">&gt;</span>
+                  <span class="o">&lt;</span><span class="nx">tbody</span><span class="o">&gt;</span>
+                    <span class="o">&lt;</span><span class="nx">tr</span><span class="o">&gt;</span>
+                      <span class="o">&lt;</span><span class="nx">td</span> <span class="nx">nowrap</span><span class="o">=</span><span class="s2">"nowrap"</span><span class="o">&gt;</span>
+                        <span class="o">&lt;</span><span class="nx">table</span> <span class="nx">cellPadding</span><span class="o">=</span><span class="s2">"0"</span> <span class="nx">cellSpacing</span><span class="o">=</span><span class="s2">"0"</span><span class="o">&gt;</span>
+                          <span class="o">&lt;</span><span class="nx">tbody</span><span class="o">&gt;</span>
+                            <span class="o">&lt;</span><span class="nx">tr</span><span class="o">&gt;</span>
+                              <span class="o">&lt;</span><span class="nx">td</span><span class="o">&gt;</span>
+                                <span class="o">&lt;</span><span class="nx">div</span> <span class="nx">className</span><span class="o">=</span><span class="s2">"w2ui-icon icon-search-down w2ui-search-down"</span>
+                                  <span class="nx">title</span> <span class="o">=</span> <span class="s2">"Select Search Field"</span><span class="o">&gt;</span>
+                                <span class="o">&lt;</span><span class="sr">/div</span><span class="err">&gt;
+</span>                              <span class="o">&lt;</span><span class="sr">/td</span><span class="err">&gt;
+</span>                              <span class="o">&lt;</span><span class="nx">td</span><span class="o">&gt;</span>
+                                <span class="o">&lt;</span><span class="nx">input</span> <span class="nx">id</span><span class="o">=</span><span class="s2">"gridgridsearchall"</span> <span class="nx">className</span><span class="o">=</span><span class="s2">"w2ui-search-all"</span>
+                                  <span class="nx">placeholder</span> <span class="o">=</span> <span class="s2">"All Fields"</span><span class="o">/&gt;</span>
+                              <span class="o">&lt;</span><span class="sr">/td</span><span class="err">&gt;
+</span>                            <span class="o">&lt;</span><span class="nx">td</span><span class="o">&gt;</span>
+                              <span class="o">&lt;</span><span class="nx">div</span> <span class="nx">title</span><span class="o">=</span><span class="s2">"Clear Search"</span> <span class="nx">className</span><span class="o">=</span><span class="s2">"w2ui-search-clear"</span> <span class="nx">id</span><span class="o">=</span><span class="s2">"gridgridsearchClear"</span>
+                                <span class="nx">style</span> <span class="o">=</span> <span class="p">{</span>
+                                  <span class="p">{</span><span class="na">display</span><span class="p">:</span> <span class="s1">'none'</span><span class="p">}</span>
+                                <span class="p">}</span><span class="o">&gt;</span><span class="p">{</span><span class="nb">String</span><span class="p">.</span><span class="nx">fromCharCode</span><span class="p">(</span><span class="mi">160</span><span class="p">)}</span> <span class="p">{</span><span class="nb">String</span><span class="p">.</span><span class="nx">fromCharCode</span><span class="p">(</span><span class="mi">160</span><span class="p">)}</span>
+                              <span class="o">&lt;</span><span class="sr">/div</span><span class="err">&gt;
+</span>                            <span class="o">&lt;</span><span class="sr">/td</span><span class="err">&gt;
+</span>                          <span class="o">&lt;</span><span class="sr">/tr</span><span class="err">&gt;
+</span>                        <span class="o">&lt;</span><span class="sr">/tbody</span><span class="err">&gt;
+</span>                      <span class="o">&lt;</span><span class="sr">/table</span><span class="err">&gt;
+</span>                    <span class="o">&lt;</span><span class="sr">/td</span><span class="err">&gt;
+</span>                  <span class="o">&lt;</span><span class="sr">/tr</span><span class="err">&gt;
+</span>                <span class="o">&lt;</span><span class="sr">/tbody</span><span class="err">&gt;
+</span>              <span class="o">&lt;</span><span class="sr">/table</span><span class="err">&gt;
+</span>            <span class="o">&lt;</span><span class="sr">/td</span><span class="err">&gt;
+</span>            <span class="o">&lt;</span><span class="nx">td</span> <span class="nx">id</span><span class="o">=</span><span class="s2">"tbgridtoolbaritemsearch-advanced"</span> <span class="nx">valign</span><span class="o">=</span><span class="s2">"middle"</span><span class="o">&gt;</span>
+              <span class="o">&lt;</span><span class="nx">table</span> <span class="nx">cellPadding</span><span class="o">=</span><span class="s2">"0"</span> <span class="nx">cellSpacing</span><span class="o">=</span><span class="s2">"0"</span> <span class="nx">title</span><span class="o">=</span><span class="s2">"Open Search Fields"</span> <span class="nx">className</span><span class="o">=</span><span class="s2">"w2ui-button"</span><span class="o">&gt;</span>
+                <span class="o">&lt;</span><span class="nx">tbody</span><span class="o">&gt;</span>
+                  <span class="o">&lt;</span><span class="nx">tr</span><span class="o">&gt;</span>
+                    <span class="o">&lt;</span><span class="nx">td</span><span class="o">&gt;</span>
+                      <span class="o">&lt;</span><span class="nx">table</span> <span class="nx">cellPadding</span><span class="o">=</span><span class="s2">"1"</span> <span class="nx">cellSpacing</span><span class="o">=</span><span class="s2">"0"</span><span class="o">&gt;</span>
+                        <span class="o">&lt;</span><span class="nx">tbody</span><span class="o">&gt;</span>
+                          <span class="o">&lt;</span><span class="nx">tr</span><span class="o">&gt;</span>
+                            <span class="o">&lt;</span><span class="nx">td</span><span class="o">&gt;</span><span class="p">{</span><span class="nb">String</span><span class="p">.</span><span class="nx">fromCharCode</span><span class="p">(</span><span class="mi">160</span><span class="p">)}</span><span class="o">&lt;</span><span class="sr">/td</span><span class="err">&gt;
+</span>                            <span class="o">&lt;</span><span class="nx">td</span> <span class="nx">className</span><span class="o">=</span><span class="s2">"w2ui-tb-caption"</span> <span class="nx">nowrap</span><span class="o">=</span><span class="s2">"nowrap"</span><span class="o">&gt;</span>
+                              <span class="nx">Search</span><span class="p">...</span>
+                            <span class="o">&lt;</span><span class="sr">/td</span><span class="err">&gt;
+</span>                          <span class="o">&lt;</span><span class="sr">/tr</span><span class="err">&gt;
+</span>                        <span class="o">&lt;</span><span class="sr">/tbody</span><span class="err">&gt;
+</span>                      <span class="o">&lt;</span><span class="sr">/table</span><span class="err">&gt;
+</span>                    <span class="o">&lt;</span><span class="sr">/td</span><span class="err">&gt;
+</span>                  <span class="o">&lt;</span><span class="sr">/tr</span><span class="err">&gt;
+</span>                <span class="o">&lt;</span><span class="sr">/tbody</span><span class="err">&gt;
+</span>              <span class="o">&lt;</span><span class="sr">/table</span><span class="err">&gt;
+</span>            <span class="o">&lt;</span><span class="sr">/td</span><span class="err">&gt;
+</span>            <span class="o">&lt;</span><span class="nx">td</span> <span class="nx">width</span><span class="o">=</span><span class="s2">"100%"</span> <span class="nx">id</span><span class="o">=</span><span class="s2">"tbgridtoolbarright"</span> <span class="nx">align</span><span class="o">=</span><span class="s2">"right"</span><span class="o">&gt;&lt;</span><span class="sr">/td</span><span class="err">&gt;
+</span>          <span class="o">&lt;</span><span class="sr">/tr</span><span class="err">&gt;
+</span>        <span class="o">&lt;</span><span class="sr">/tbody</span><span class="err">&gt;
+</span>      <span class="o">&lt;</span><span class="sr">/table</span><span class="err">&gt;
+</span>    <span class="o">&lt;</span><span class="sr">/div&gt;</span><span class="se">)</span><span class="err">;
+</span>  <span class="p">}</span>
+<span class="p">});</span>
+
+<span class="nb">window</span><span class="p">.</span><span class="nx">generate</span> <span class="o">=</span> <span class="kd">function</span> <span class="nx">generate</span><span class="p">(</span><span class="nx">count</span><span class="p">)</span> <span class="p">{</span> <span class="c1">// generate</span>
+  <span class="kd">var</span> <span class="nx">fname</span> <span class="o">=</span> <span class="p">[</span><span class="s1">'Vitali'</span><span class="p">,</span> <span class="s1">'~Katsia'</span><span class="p">,</span> <span class="s1">'John'</span><span class="p">,</span> <span class="s1">'Peter'</span><span class="p">,</span> <span class="s1">'#Sue'</span><span class="p">,</span> <span class="s1">'$Olivia'</span><span class="p">,</span> <span class="s1">'&lt;Thomas'</span><span class="p">,</span> <span class="s1">'&gt;Sergei'</span><span class="p">,</span> <span class="s1">'Snehal'</span><span class="p">,</span> <span class="s1">'Avinash'</span><span class="p">,</span> <span class="s1">'Divia'</span><span class="p">];</span>
+  <span class="kd">var</span> <span class="nx">lname</span> <span class="o">=</span> <span class="p">[</span><span class="s1">'Peterson'</span><span class="p">,</span> <span class="s1">'Rene'</span><span class="p">,</span> <span class="s1">'Johnson-Petrov-Sannikov-Ivanov-Smirnov'</span><span class="p">,</span> <span class="s1">'Cuban'</span><span class="p">,</span> <span class="s1">'Twist'</span><span class="p">,</span> <span class="s1">'Sidorov'</span><span class="p">,</span> <span class="s1">'Vasiliev'</span><span class="p">,</span> <span class="s1">'Yadav'</span><span class="p">,</span> <span class="s1">'Vaishnav'</span><span class="p">];</span>
+  <span class="c1">// add records</span>
+  <span class="kd">var</span> <span class="nx">records</span> <span class="o">=</span> <span class="p">[];</span>
+  <span class="k">for</span> <span class="p">(</span><span class="kd">var</span> <span class="nx">i</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span> <span class="nx">i</span> <span class="o">&lt;</span> <span class="nx">count</span> <span class="o">*</span> <span class="mi">1000</span><span class="p">;</span> <span class="nx">i</span><span class="o">++</span><span class="p">)</span> <span class="p">{</span>
+    <span class="nx">records</span><span class="p">.</span><span class="nx">push</span><span class="p">({</span>
+      <span class="na">recid</span><span class="p">:</span> <span class="nx">i</span> <span class="o">+</span> <span class="mi">1</span><span class="p">,</span>
+      <span class="na">personid</span><span class="p">:</span> <span class="nx">i</span> <span class="o">+</span> <span class="mi">1</span><span class="p">,</span>
+      <span class="na">fname</span><span class="p">:</span> <span class="nx">fname</span><span class="p">[</span><span class="nb">Math</span><span class="p">.</span><span class="nx">floor</span><span class="p">(</span><span class="nb">Math</span><span class="p">.</span><span class="nx">random</span><span class="p">()</span> <span class="o">*</span> <span class="nx">fname</span><span class="p">.</span><span class="nx">length</span><span class="p">)],</span>
+      <span class="na">lname</span><span class="p">:</span> <span class="nx">lname</span><span class="p">[</span><span class="nb">Math</span><span class="p">.</span><span class="nx">floor</span><span class="p">(</span><span class="nb">Math</span><span class="p">.</span><span class="nx">random</span><span class="p">()</span> <span class="o">*</span> <span class="nx">lname</span><span class="p">.</span><span class="nx">length</span><span class="p">)],</span>
+      <span class="na">email</span><span class="p">:</span> <span class="s1">'vm@gmail.com'</span><span class="p">,</span>
+      <span class="na">sdate</span><span class="p">:</span> <span class="s1">'1/1/2013'</span><span class="p">,</span>
+      <span class="na">manager</span><span class="p">:</span> <span class="s1">'--'</span>
+    <span class="p">});</span>
+  <span class="p">}</span>
+  <span class="nx">ReactDOM</span><span class="p">.</span><span class="nx">render</span><span class="p">(</span><span class="o">&lt;</span><span class="nx">Grid</span> <span class="nx">width</span><span class="o">=</span><span class="p">{</span><span class="mi">600</span><span class="p">}</span> <span class="nx">height</span><span class="o">=</span><span class="p">{</span><span class="mi">568</span><span class="p">}</span> <span class="nx">header</span><span class="o">=</span><span class="s2">"List of Names"</span> <span class="nx">showFooter</span><span class="o">=</span><span class="p">{</span><span class="kc">true</span><span class="p">}</span>
+    <span class="nx">showToolbar</span><span class="o">=</span><span class="p">{</span><span class="kc">true</span><span class="p">}</span> <span class="nx">name</span><span class="o">=</span><span class="s2">"grid"</span> <span class="nx">records</span><span class="o">=</span><span class="p">{</span><span class="nx">records</span><span class="p">}</span> <span class="sr">/&gt;, document.getElementById</span><span class="se">(</span><span class="sr">'grid'</span><span class="se">))</span><span class="err">;
+</span><span class="p">};</span>
+
+<span class="nx">generate</span><span class="p">(</span><span class="mi">25</span><span class="p">);</span>
+</code></pre>
+</div>
+
+  </div>
+
+</article>
+
+      </div>
+    </div>
+
+    <footer class="site-footer">
+
+  <div class="wrapper">
+
+    <h2 class="footer-heading"></h2>
+
+    <div class="footer-col-wrapper">
+      <div class="footer-col footer-col-1">
+        <ul class="contact-list">
+          <li></li>
+          <li><a href="mailto:"></a></li>
+        </ul>
+      </div>
+
+      <div class="footer-col footer-col-2">
+        <ul class="social-media-list">
+          
+
+          
+        </ul>
+      </div>
+
+      <div class="footer-col footer-col-3">
+        <p></p>
+      </div>
+    </div>
+
+  </div>
+
+</footer>
+
+
+  </body>
+
+</html>

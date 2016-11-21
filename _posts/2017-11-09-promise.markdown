@@ -1,0 +1,317 @@
+---
+layout: post
+title:  "promise"
+date:   2016-11-09
+categories: js
+---
+
+### javascript async background
+
+***Asynchronous results via events***
+
+
+创建请求对象，在后边添加event listener
+
+XMLHttpRequest的例子
+
+```js
+var req = new XMLHttpRequest();
+req.open('GET', url);
+
+req.onload = function () {
+    if (req.status == 200) {
+        processData(req.response);
+    } else {
+        console.log('ERROR', req.statusText);
+    }
+};
+
+req.onerror = function () {
+    console.log('Network Error');
+};
+
+req.send(); // Add request to task queue
+```
+
+indexDB的例子
+
+```js
+var openRequest = indexedDB.open('test', 1);
+
+openRequest.onsuccess = function (event) {
+    console.log('Success!');
+    var db = event.target.result;
+};
+
+openRequest.onerror = function (error) {
+    console.log(error);
+};
+```
+
+如果只是请求一次数据的话，event listener这种方式太啰嗦了
+
+***Asynchronous results via callbacks***
+
+传递一个callback函数作为trailling parameter，通过callback来处理结果
+
+continuation-passing style (CPS)
+
+callback hell
+
+```js
+console.log('A');
+identity('B', function step2(result2) {
+    console.log(result2);
+    identity('C', function step3(result3) {
+       console.log(result3);
+    });
+    console.log('D');
+});
+console.log('E');
+
+// Output: A E B D C
+
+function identity(input, callback) {
+    setTimeout(function () {
+        callback(input);
+    }, 0);
+}
+```
+
+可以利用js function definition会hoist的特性
+
+```js
+console.log('A');
+identity('B', step2);
+
+function step2(result2) {
+    // The program continues here
+    console.log(result2);
+    identity('C', step3);
+    console.log('D');
+}
+
+function step3(result3) {
+   console.log(result3);
+}
+console.log('E');
+```
+
+缺点：
+
+* Error handling becomes more complicated: There are now two ways in which errors are reported – via callbacks and via exceptions. You have to be careful to combine both properly.
+* Less elegant signatures: In synchronous functions, there is a clear separation of concerns between input (parameters) and output (function result). In asynchronous functions that use callbacks, these concerns are mixed: the function result doesn’t matter and some parameters are used for input, others for output.
+* Composition is more complicated: Because the concern “output” shows up in the parameters, it is more complicated to compose code via combinators.
+
+* The if statement for error handling adds verbosity.
+
+* Reusing error handlers is harder.
+
+* Providing a default error handler is also harder. A default error handler is useful if you make a function call and don’t want to write your own handler. It could also be used by a function if a caller doesn’t specify a handler.
+
+
+
+### Promise
+
+a promise represents a value that is not yet known
+
+A promise is a placeholder for a result which is initially unknown while a deferred represents the computation that results in the value. 
+
+Every deferred has a promise which functions as a proxy for the future result. 
+
+优点：
+
+* No inversion of control: similarly to synchronous code, Promise-based functions return results, they don’t (directly) continue – and control – execution via callbacks. That is, the caller stays in control.
+
+* Chaining is simpler: If the callback of then() returns a Promise (e.g. the result of calling another Promise-based function) then then() returns that Promise (how this really works is more complicated and explained later). As a consequence, you can chain then() method calls:
+
+* Composing asynchronous calls (loops, mapping, etc.): is a little easier, because you have data (Promise objects) you can work with.
+
+* Error handling: As we shall see later, error handling is simpler with Promises, because, once again, there isn’t an inversion of control. Furthermore, both exceptions and asynchronous errors are managed the same way.
+
+* Cleaner signatures: With callbacks, the parameters of a function are mixed; some are input for the function, others are responsible for delivering its output. With Promises, function signatures become cleaner; all parameters are input.
+
+* Standardized: Prior to Promises, there were several incompatible ways of handling asynchronous results (Node.js callbacks, XMLHttpRequest, IndexedDB, etc.). With Promises, there is a clearly defined standard: 
+
+
+#### Example: delaying an activity
+
+```js
+function delay(ms) {
+    return new Promise(function (resolve, reject) {
+        setTimeout(resolve, ms); // (A)
+    });
+}
+```
+
+delay(1000).then()// then并不需要传值，所以resolve的参数是空，没有传东西,也可以写成 resolve(undefined)
+
+### 其他创建promise的方法
+
+用Promise.resolve
+
+```js
+Promise.resolve('abc')
+.then(x => console.log(x)); // abc
+```
+
+用 Promise.resolve 去 thenable obj
+
+```js
+const fulfilledThenable = {
+    then(reaction) {
+        reaction('hello');
+    }
+};
+const promise = Promise.resolve(fulfilledThenable);
+console.log(promise instanceof Promise); // true
+promise.then(x => console.log(x)); // hello
+```
+
+Promise.reject(err) returns a Promise that is rejected with err:
+
+```js
+const myError = new Error('Problem!');
+Promise.reject(myError)
+.catch(err => console.log(err === myError)); // true
+```
+
+### then的级联
+
+```js
+retrieveFileName()
+.catch(function () {
+    // Something went wrong, use a default value
+    return 'Untitled.txt';
+})
+.then(function (fileName) {
+    ···
+});
+```
+
+```js
+asyncFunc()
+.then(function (value) {
+    throw new Error();
+})
+.catch(function (reason) {
+    // Handle error here
+});
+```
+
+多个then的话，error会传递知道被最后一个接收
+
+```js
+asyncFunc1()
+.then(asyncFunc2)
+.then(asyncFunc3)
+.catch(function (reason) {
+    // Something went wrong above
+});
+```
+
+### Promise chaining 错误
+
+```js
+// Don’t do this
+function foo() {
+    const promise = asyncFunc();
+    promise.then(result => {
+        ···
+    });
+
+    return promise;
+}
+```
+
+***Mistake: nesting Promises***
+
+```js
+// Don’t do this
+asyncFunc1()
+.then(result1 => {
+    asyncFunc2()
+    .then(result2 => {
+        ···
+    });
+});
+```
+
+```js
+asyncFunc1()
+.then(result1 => {
+    return asyncFunc2();
+})
+.then(result2 => {
+    ···
+});
+```
+
+***Mistake: creating Promises instead of chaining***
+
+```js
+// Don’t do this
+class Model {
+    insertInto(db) {
+        return new Promise((resolve, reject) => { // (A)
+          db.insert(this.fields) // (B)
+          .then(resultCode => {
+              this.notifyObservers({event: 'created', model: this});
+              resolve(resultCode); // (C)
+          }).catch(err => {
+              reject(err); // (D)
+          })
+        });
+    }
+    ···
+}
+```
+
+```js
+class Model {
+    insertInto(db) {
+        return db.insert(this.fields) // (A)
+        .then(resultCode => {
+            this.notifyObservers({event: 'created', model: this});
+            return resultCode; // (B)
+        });
+    }
+    ···
+}
+```
+
+***Mistake: using then() for error handling***
+
+```js
+// Don’t do this
+asyncFunc1()
+.then(
+    value => { // (A)
+        doSomething(); // (B)
+        return asyncFunc2(); // (C)
+    },
+    error => { // (D)
+        ···
+    });
+```
+
+这样写error的话，A B C出的错误都没有catch到，只catch到了asyncFunc1的error
+
+还是要这样写
+
+```js
+asyncFunc1()
+.then(value => {
+    doSomething();
+    return asyncFunc2();
+})
+.catch(error => {
+    ···
+});
+```
+
+
+
+
+
+

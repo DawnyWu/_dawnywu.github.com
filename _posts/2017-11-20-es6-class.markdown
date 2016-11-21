@@ -1,0 +1,47 @@
+---
+layout: post
+title:  "es6 class"
+date:   2016-11-20
+categories: js
+---
+
+### area()前边的get是什么？
+
+叫 Prototype methods
+
+```js
+class Polygon {
+  constructor(height, width) {
+    this.height = height;
+    this.width = width;
+  }
+  
+  get area() {
+    return this.calcArea();
+  }
+
+  calcArea() {
+    return this.height * this.width;
+  }
+}
+
+const square = new Polygon(10, 10);
+
+// 有get的话，可以如下方式
+console.log(square.area);
+
+// 没有get的话, 后边必须加括号
+console.log(square.area());
+```
+
+static 版的 。。。
+
+```js
+class SCAccordion  {
+  static get KEY_UP () {
+    return 38;
+  }
+}
+
+console.log(SCAccordion.KEY_UP)
+```

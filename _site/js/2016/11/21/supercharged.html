@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html>
+
+  <head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  <title>google supercharged</title>
+  <meta name="description" content="sidebar transition">
+
+  <link rel="stylesheet" href="/css/main.css">
+  <link rel="canonical" href="http://localhost:4000/js/2016/11/21/supercharged.html">
+  <link rel="alternate" type="application/rss+xml" title="" href="http://localhost:4000/feed.xml">
+</head>
+
+
+  <body>
+
+    <header class="site-header">
+
+  <div class="wrapper">
+
+    <a class="site-title" href="/"></a>
+
+    <nav class="site-nav">
+      <a href="#" class="menu-icon">
+        <svg viewBox="0 0 18 15">
+          <path fill="#424242" d="M18,1.484c0,0.82-0.665,1.484-1.484,1.484H1.484C0.665,2.969,0,2.304,0,1.484l0,0C0,0.665,0.665,0,1.484,0 h15.031C17.335,0,18,0.665,18,1.484L18,1.484z"/>
+          <path fill="#424242" d="M18,7.516C18,8.335,17.335,9,16.516,9H1.484C0.665,9,0,8.335,0,7.516l0,0c0-0.82,0.665-1.484,1.484-1.484 h15.031C17.335,6.031,18,6.696,18,7.516L18,7.516z"/>
+          <path fill="#424242" d="M18,13.516C18,14.335,17.335,15,16.516,15H1.484C0.665,15,0,14.335,0,13.516l0,0 c0-0.82,0.665-1.484,1.484-1.484h15.031C17.335,12.031,18,12.696,18,13.516L18,13.516z"/>
+        </svg>
+      </a>
+
+      <div class="trigger">
+        
+          
+          <a class="page-link" href="/about/">About</a>
+          
+        
+          
+        
+          
+        
+          
+        
+      </div>
+    </nav>
+
+  </div>
+
+</header>
+
+
+    <div class="page-content">
+      <div class="wrapper">
+        <article class="post" itemscope itemtype="http://schema.org/BlogPosting">
+
+  <header class="post-header">
+    <h1 class="post-title" itemprop="name headline">google supercharged</h1>
+    <p class="post-meta"><time datetime="2016-11-21T00:00:00+08:00" itemprop="datePublished">Nov 21, 2016</time></p>
+  </header>
+
+  <div class="post-content" itemprop="articleBody">
+    <h3 id="sidebar-transition">sidebar transition</h3>
+
+<p><strong><em>显示sidebar</em></strong></p>
+
+<div class="language-css highlighter-rouge"><pre class="highlight"><code><span class="o">//</span> <span class="err">开始状态</span>
+<span class="nc">.side-nav__container</span> <span class="p">{</span>
+  <span class="err">//</span> <span class="err">注意这个</span>
+  <span class="nl">transform</span><span class="p">:</span> <span class="n">translateX</span><span class="p">(</span><span class="m">-102%</span><span class="p">);</span>
+  <span class="nl">display</span><span class="p">:</span> <span class="n">flex</span><span class="p">;</span>
+  <span class="nl">flex-direction</span><span class="p">:</span> <span class="n">column</span><span class="p">;</span>
+  <span class="py">will-change</span><span class="p">:</span> <span class="n">transform</span><span class="p">;</span>
+<span class="p">}</span>
+
+<span class="o">//</span> <span class="err">变化后结果，</span> <span class="err">添加</span><span class="nt">class</span> <span class="nt">visible</span><span class="o">,</span> <span class="nt">nav</span><span class="err">恢复到原来位置，显示出来</span>
+<span class="nc">.side-nav--visible</span> <span class="nc">.side-nav__container</span> <span class="p">{</span>
+  <span class="nl">transform</span><span class="p">:</span> <span class="nb">none</span><span class="p">;</span>
+<span class="p">}</span>
+
+<span class="o">//</span> <span class="err">添加</span><span class="nt">transition</span> <span class="nt">css</span>
+<span class="nc">.side-nav--visible.side-nav--animatable</span> <span class="nc">.side-nav__container</span> <span class="p">{</span>
+  <span class="nl">transition</span><span class="p">:</span> <span class="n">transform</span> <span class="m">1s</span> <span class="n">ease-in-out</span><span class="p">;</span>
+<span class="p">}</span>
+</code></pre>
+</div>
+
+<div class="language-js highlighter-rouge"><pre class="highlight"><code><span class="nx">showSideNav</span> <span class="p">()</span> <span class="p">{</span>
+  <span class="c1">// 先添加transition相关的class</span>
+  <span class="k">this</span><span class="p">.</span><span class="nx">sideNavEl</span><span class="p">.</span><span class="nx">classList</span><span class="p">.</span><span class="nx">add</span><span class="p">(</span><span class="s1">'side-nav--animatable'</span><span class="p">);</span>
+  <span class="k">this</span><span class="p">.</span><span class="nx">sideNavEl</span><span class="p">.</span><span class="nx">classList</span><span class="p">.</span><span class="nx">add</span><span class="p">(</span><span class="s1">'side-nav--visible'</span><span class="p">);</span>
+  <span class="k">this</span><span class="p">.</span><span class="nx">detabinator</span><span class="p">.</span><span class="nx">inert</span> <span class="o">=</span> <span class="kc">false</span><span class="p">;</span>
+  <span class="c1">// 下边这句优点问题，transitionend时间触发过早，设动动画时间3s,不到3s就会触发这个</span>
+  <span class="k">this</span><span class="p">.</span><span class="nx">sideNavEl</span><span class="p">.</span><span class="nx">addEventListener</span><span class="p">(</span><span class="s1">'transitionend'</span><span class="p">,</span> <span class="k">this</span><span class="p">.</span><span class="nx">onTransitionEnd</span><span class="p">);</span>
+<span class="p">}</span>
+
+<span class="nx">onTransitionEnd</span> <span class="p">(</span><span class="nx">evt</span><span class="p">)</span> <span class="p">{</span>
+  <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="s1">'transition end'</span><span class="p">)</span>
+  <span class="k">this</span><span class="p">.</span><span class="nx">sideNavEl</span><span class="p">.</span><span class="nx">classList</span><span class="p">.</span><span class="nx">remove</span><span class="p">(</span><span class="s1">'side-nav--animatable'</span><span class="p">);</span>
+  <span class="k">this</span><span class="p">.</span><span class="nx">sideNavEl</span><span class="p">.</span><span class="nx">removeEventListener</span><span class="p">(</span><span class="s1">'transitionend'</span><span class="p">,</span> <span class="k">this</span><span class="p">.</span><span class="nx">onTransitionEnd</span><span class="p">);</span>
+<span class="p">}</span>
+</code></pre>
+</div>
+
+<p><strong><em>隐藏sidebar的时候</em></strong></p>
+
+<p>class是 js-side-nav-container side-nav__container</p>
+
+<div class="language-js highlighter-rouge"><pre class="highlight"><code><span class="nx">hideSideNav</span> <span class="p">()</span> <span class="p">{</span>
+  <span class="k">this</span><span class="p">.</span><span class="nx">sideNavEl</span><span class="p">.</span><span class="nx">classList</span><span class="p">.</span><span class="nx">add</span><span class="p">(</span><span class="s1">'side-nav--animatable'</span><span class="p">);</span>
+  <span class="k">this</span><span class="p">.</span><span class="nx">sideNavEl</span><span class="p">.</span><span class="nx">classList</span><span class="p">.</span><span class="nx">remove</span><span class="p">(</span><span class="s1">'side-nav--visible'</span><span class="p">);</span>
+  <span class="k">this</span><span class="p">.</span><span class="nx">detabinator</span><span class="p">.</span><span class="nx">inert</span> <span class="o">=</span> <span class="kc">true</span><span class="p">;</span>
+  <span class="k">this</span><span class="p">.</span><span class="nx">sideNavEl</span><span class="p">.</span><span class="nx">addEventListener</span><span class="p">(</span><span class="s1">'transitionend'</span><span class="p">,</span> <span class="k">this</span><span class="p">.</span><span class="nx">onTransitionEnd</span><span class="p">);</span>
+<span class="p">}</span>
+</code></pre>
+</div>
+
+<div class="language-css highlighter-rouge"><pre class="highlight"><code><span class="o">//</span> <span class="err">前后结果都已经写过了，现在只需注明</span><span class="nt">transition</span><span class="err">动画即可</span>
+<span class="nc">.side-nav--animatable</span> <span class="nc">.side-nav__container</span> <span class="p">{</span>
+  <span class="nl">transition</span><span class="p">:</span> <span class="n">transform</span> <span class="m">3s</span> <span class="n">cubic-bezier</span><span class="p">(</span><span class="m">0</span><span class="p">,</span><span class="m">0</span><span class="p">,</span><span class="m">0.3</span><span class="p">,</span><span class="m">1</span><span class="p">);</span>
+<span class="p">}</span>
+</code></pre>
+</div>
+
+
+  </div>
+
+</article>
+
+      </div>
+    </div>
+
+    <footer class="site-footer">
+
+  <div class="wrapper">
+
+    <h2 class="footer-heading"></h2>
+
+    <div class="footer-col-wrapper">
+      <div class="footer-col footer-col-1">
+        <ul class="contact-list">
+          <li></li>
+          <li><a href="mailto:"></a></li>
+        </ul>
+      </div>
+
+      <div class="footer-col footer-col-2">
+        <ul class="social-media-list">
+          
+
+          
+        </ul>
+      </div>
+
+      <div class="footer-col footer-col-3">
+        <p></p>
+      </div>
+    </div>
+
+  </div>
+
+</footer>
+
+
+  </body>
+
+</html>

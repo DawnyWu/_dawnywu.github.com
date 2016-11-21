@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html>
+
+  <head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  <title>window history</title>
+  <meta name="description" content="历史相关的,不能去新的页面">
+
+  <link rel="stylesheet" href="/css/main.css">
+  <link rel="canonical" href="http://localhost:4000/js/2016/11/21/window-history.html">
+  <link rel="alternate" type="application/rss+xml" title="" href="http://localhost:4000/feed.xml">
+</head>
+
+
+  <body>
+
+    <header class="site-header">
+
+  <div class="wrapper">
+
+    <a class="site-title" href="/"></a>
+
+    <nav class="site-nav">
+      <a href="#" class="menu-icon">
+        <svg viewBox="0 0 18 15">
+          <path fill="#424242" d="M18,1.484c0,0.82-0.665,1.484-1.484,1.484H1.484C0.665,2.969,0,2.304,0,1.484l0,0C0,0.665,0.665,0,1.484,0 h15.031C17.335,0,18,0.665,18,1.484L18,1.484z"/>
+          <path fill="#424242" d="M18,7.516C18,8.335,17.335,9,16.516,9H1.484C0.665,9,0,8.335,0,7.516l0,0c0-0.82,0.665-1.484,1.484-1.484 h15.031C17.335,6.031,18,6.696,18,7.516L18,7.516z"/>
+          <path fill="#424242" d="M18,13.516C18,14.335,17.335,15,16.516,15H1.484C0.665,15,0,14.335,0,13.516l0,0 c0-0.82,0.665-1.484,1.484-1.484h15.031C17.335,12.031,18,12.696,18,13.516L18,13.516z"/>
+        </svg>
+      </a>
+
+      <div class="trigger">
+        
+          
+          <a class="page-link" href="/about/">About</a>
+          
+        
+          
+        
+          
+        
+          
+        
+      </div>
+    </nav>
+
+  </div>
+
+</header>
+
+
+    <div class="page-content">
+      <div class="wrapper">
+        <article class="post" itemscope itemtype="http://schema.org/BlogPosting">
+
+  <header class="post-header">
+    <h1 class="post-title" itemprop="name headline">window history</h1>
+    <p class="post-meta"><time datetime="2016-11-21T00:00:00+08:00" itemprop="datePublished">Nov 21, 2016</time></p>
+  </header>
+
+  <div class="post-content" itemprop="articleBody">
+    <h3 id="section">历史相关的,不能去新的页面</h3>
+
+<div class="language-js highlighter-rouge"><pre class="highlight"><code><span class="nb">window</span><span class="p">.</span><span class="nx">history</span><span class="p">.</span><span class="nx">back</span><span class="p">();</span>
+
+<span class="nb">window</span><span class="p">.</span><span class="nx">history</span><span class="p">.</span><span class="nx">forward</span><span class="p">();</span>
+
+<span class="c1">// Go back two entries.</span>
+<span class="nb">window</span><span class="p">.</span><span class="nx">history</span><span class="p">.</span><span class="nx">go</span><span class="p">(</span><span class="o">-</span><span class="mi">2</span><span class="p">);</span>
+
+<span class="c1">// Go forward 3 entries.</span>
+<span class="nb">window</span><span class="p">.</span><span class="nx">history</span><span class="p">.</span><span class="nx">go</span><span class="p">(</span><span class="mi">3</span><span class="p">);</span>
+
+<span class="c1">// length</span>
+<span class="nb">window</span><span class="p">.</span><span class="nx">history</span><span class="p">.</span><span class="nx">length</span>
+</code></pre>
+</div>
+
+<h3 id="section-1">对历史的修改等</h3>
+
+<p><strong><em>pushState</em></strong></p>
+
+<div class="language-js highlighter-rouge"><pre class="highlight"><code><span class="nb">window</span><span class="p">.</span><span class="nx">history</span><span class="p">.</span><span class="nx">pushState</span><span class="p">(</span><span class="nx">stateObj</span><span class="p">,</span> <span class="nx">title</span><span class="p">,</span> <span class="nx">URL</span><span class="p">);</span>
+</code></pre>
+</div>
+
+<ul>
+  <li>stateObj – The state object is used to store data that is associated the new history entry. This could include the page title, a URL to load via AJAX or even the page content itself.</li>
+  <li>title – The title parameter should act as a description for the history entry.</li>
+  <li>URL – (optional) This is the URL that will be associated with the history entry. The browser won’t load this URL when pushState() is called, but will display it in the address bar. It’s worth noting that this URL may be loaded if the user decides to refresh the page or restarts the browser.</li>
+</ul>
+
+<p><strong><em>replaceState()</em></strong></p>
+
+<p>This can be useful if you want to add some data to your state object after pushState() has been called.</p>
+
+<div class="language-js highlighter-rouge"><pre class="highlight"><code><span class="c1">// Updates the current history entry.</span>
+<span class="nb">window</span><span class="p">.</span><span class="nx">history</span><span class="p">.</span><span class="nx">replaceState</span><span class="p">(</span><span class="nx">stateObj</span><span class="p">,</span> <span class="nx">title</span><span class="p">,</span> <span class="nx">URL</span><span class="p">);</span>
+</code></pre>
+</div>
+
+<p>Note: The <code class="highlighter-rouge">pushState()</code> and <code class="highlighter-rouge">replaceState()</code> methods will not cause a hashchange event to be fired.</p>
+
+<h3 id="the-popstate-event">The popstate Event</h3>
+
+<p>Most commonly when the browsers back or forward buttons are clicked (or a call to back(), forward() or go() is executed).</p>
+
+<div class="language-js highlighter-rouge"><pre class="highlight"><code><span class="nb">window</span><span class="p">.</span><span class="nx">addEventListener</span><span class="p">(</span><span class="s1">'popstate'</span><span class="p">,</span> <span class="kd">function</span><span class="p">(</span><span class="nx">event</span><span class="p">)</span> <span class="p">{</span>
+  <span class="kd">var</span> <span class="nx">state</span> <span class="o">=</span> <span class="nx">event</span><span class="p">.</span><span class="nx">state</span><span class="p">;</span>
+<span class="p">});</span>
+</code></pre>
+</div>
+
+<p>It’s worth noting that calls to pushState() and replaceState() will not trigger a popstate event.</p>
+
+<h3 id="windowhistorystate">window.history.state</h3>
+
+<p>This is useful if you need to read the state object when a popstate event has not been fired.</p>
+
+<div class="language-js highlighter-rouge"><pre class="highlight"><code><span class="nb">window</span><span class="p">.</span><span class="nx">history</span><span class="p">.</span><span class="nx">state</span><span class="p">;</span>
+</code></pre>
+</div>
+
+
+  </div>
+
+</article>
+
+      </div>
+    </div>
+
+    <footer class="site-footer">
+
+  <div class="wrapper">
+
+    <h2 class="footer-heading"></h2>
+
+    <div class="footer-col-wrapper">
+      <div class="footer-col footer-col-1">
+        <ul class="contact-list">
+          <li></li>
+          <li><a href="mailto:"></a></li>
+        </ul>
+      </div>
+
+      <div class="footer-col footer-col-2">
+        <ul class="social-media-list">
+          
+
+          
+        </ul>
+      </div>
+
+      <div class="footer-col footer-col-3">
+        <p></p>
+      </div>
+    </div>
+
+  </div>
+
+</footer>
+
+
+  </body>
+
+</html>

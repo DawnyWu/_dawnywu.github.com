@@ -1,0 +1,422 @@
+<!DOCTYPE html>
+<html>
+
+  <head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  <title>promise</title>
+  <meta name="description" content="javascript async background">
+
+  <link rel="stylesheet" href="/css/main.css">
+  <link rel="canonical" href="http://localhost:4000/js/2016/11/09/promise.html">
+  <link rel="alternate" type="application/rss+xml" title="" href="http://localhost:4000/feed.xml">
+</head>
+
+
+  <body>
+
+    <header class="site-header">
+
+  <div class="wrapper">
+
+    <a class="site-title" href="/"></a>
+
+    <nav class="site-nav">
+      <a href="#" class="menu-icon">
+        <svg viewBox="0 0 18 15">
+          <path fill="#424242" d="M18,1.484c0,0.82-0.665,1.484-1.484,1.484H1.484C0.665,2.969,0,2.304,0,1.484l0,0C0,0.665,0.665,0,1.484,0 h15.031C17.335,0,18,0.665,18,1.484L18,1.484z"/>
+          <path fill="#424242" d="M18,7.516C18,8.335,17.335,9,16.516,9H1.484C0.665,9,0,8.335,0,7.516l0,0c0-0.82,0.665-1.484,1.484-1.484 h15.031C17.335,6.031,18,6.696,18,7.516L18,7.516z"/>
+          <path fill="#424242" d="M18,13.516C18,14.335,17.335,15,16.516,15H1.484C0.665,15,0,14.335,0,13.516l0,0 c0-0.82,0.665-1.484,1.484-1.484h15.031C17.335,12.031,18,12.696,18,13.516L18,13.516z"/>
+        </svg>
+      </a>
+
+      <div class="trigger">
+        
+          
+          <a class="page-link" href="/about/">About</a>
+          
+        
+          
+        
+          
+        
+          
+        
+      </div>
+    </nav>
+
+  </div>
+
+</header>
+
+
+    <div class="page-content">
+      <div class="wrapper">
+        <article class="post" itemscope itemtype="http://schema.org/BlogPosting">
+
+  <header class="post-header">
+    <h1 class="post-title" itemprop="name headline">promise</h1>
+    <p class="post-meta"><time datetime="2016-11-09T00:00:00+08:00" itemprop="datePublished">Nov 9, 2016</time></p>
+  </header>
+
+  <div class="post-content" itemprop="articleBody">
+    <h3 id="javascript-async-background">javascript async background</h3>
+
+<p><strong><em>Asynchronous results via events</em></strong></p>
+
+<p>创建请求对象，在后边添加event listener</p>
+
+<p>XMLHttpRequest的例子</p>
+
+<div class="language-js highlighter-rouge"><pre class="highlight"><code><span class="kd">var</span> <span class="nx">req</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">XMLHttpRequest</span><span class="p">();</span>
+<span class="nx">req</span><span class="p">.</span><span class="nx">open</span><span class="p">(</span><span class="s1">'GET'</span><span class="p">,</span> <span class="nx">url</span><span class="p">);</span>
+
+<span class="nx">req</span><span class="p">.</span><span class="nx">onload</span> <span class="o">=</span> <span class="kd">function</span> <span class="p">()</span> <span class="p">{</span>
+    <span class="k">if</span> <span class="p">(</span><span class="nx">req</span><span class="p">.</span><span class="nx">status</span> <span class="o">==</span> <span class="mi">200</span><span class="p">)</span> <span class="p">{</span>
+        <span class="nx">processData</span><span class="p">(</span><span class="nx">req</span><span class="p">.</span><span class="nx">response</span><span class="p">);</span>
+    <span class="p">}</span> <span class="k">else</span> <span class="p">{</span>
+        <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="s1">'ERROR'</span><span class="p">,</span> <span class="nx">req</span><span class="p">.</span><span class="nx">statusText</span><span class="p">);</span>
+    <span class="p">}</span>
+<span class="p">};</span>
+
+<span class="nx">req</span><span class="p">.</span><span class="nx">onerror</span> <span class="o">=</span> <span class="kd">function</span> <span class="p">()</span> <span class="p">{</span>
+    <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="s1">'Network Error'</span><span class="p">);</span>
+<span class="p">};</span>
+
+<span class="nx">req</span><span class="p">.</span><span class="nx">send</span><span class="p">();</span> <span class="c1">// Add request to task queue</span>
+</code></pre>
+</div>
+
+<p>indexDB的例子</p>
+
+<div class="language-js highlighter-rouge"><pre class="highlight"><code><span class="kd">var</span> <span class="nx">openRequest</span> <span class="o">=</span> <span class="nx">indexedDB</span><span class="p">.</span><span class="nx">open</span><span class="p">(</span><span class="s1">'test'</span><span class="p">,</span> <span class="mi">1</span><span class="p">);</span>
+
+<span class="nx">openRequest</span><span class="p">.</span><span class="nx">onsuccess</span> <span class="o">=</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">event</span><span class="p">)</span> <span class="p">{</span>
+    <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="s1">'Success!'</span><span class="p">);</span>
+    <span class="kd">var</span> <span class="nx">db</span> <span class="o">=</span> <span class="nx">event</span><span class="p">.</span><span class="nx">target</span><span class="p">.</span><span class="nx">result</span><span class="p">;</span>
+<span class="p">};</span>
+
+<span class="nx">openRequest</span><span class="p">.</span><span class="nx">onerror</span> <span class="o">=</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">error</span><span class="p">)</span> <span class="p">{</span>
+    <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="nx">error</span><span class="p">);</span>
+<span class="p">};</span>
+</code></pre>
+</div>
+
+<p>如果只是请求一次数据的话，event listener这种方式太啰嗦了</p>
+
+<p><strong><em>Asynchronous results via callbacks</em></strong></p>
+
+<p>传递一个callback函数作为trailling parameter，通过callback来处理结果</p>
+
+<p>continuation-passing style (CPS)</p>
+
+<p>callback hell</p>
+
+<div class="language-js highlighter-rouge"><pre class="highlight"><code><span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="s1">'A'</span><span class="p">);</span>
+<span class="nx">identity</span><span class="p">(</span><span class="s1">'B'</span><span class="p">,</span> <span class="kd">function</span> <span class="nx">step2</span><span class="p">(</span><span class="nx">result2</span><span class="p">)</span> <span class="p">{</span>
+    <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="nx">result2</span><span class="p">);</span>
+    <span class="nx">identity</span><span class="p">(</span><span class="s1">'C'</span><span class="p">,</span> <span class="kd">function</span> <span class="nx">step3</span><span class="p">(</span><span class="nx">result3</span><span class="p">)</span> <span class="p">{</span>
+       <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="nx">result3</span><span class="p">);</span>
+    <span class="p">});</span>
+    <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="s1">'D'</span><span class="p">);</span>
+<span class="p">});</span>
+<span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="s1">'E'</span><span class="p">);</span>
+
+<span class="c1">// Output: A E B D C</span>
+
+<span class="kd">function</span> <span class="nx">identity</span><span class="p">(</span><span class="nx">input</span><span class="p">,</span> <span class="nx">callback</span><span class="p">)</span> <span class="p">{</span>
+    <span class="nx">setTimeout</span><span class="p">(</span><span class="kd">function</span> <span class="p">()</span> <span class="p">{</span>
+        <span class="nx">callback</span><span class="p">(</span><span class="nx">input</span><span class="p">);</span>
+    <span class="p">},</span> <span class="mi">0</span><span class="p">);</span>
+<span class="p">}</span>
+</code></pre>
+</div>
+
+<p>可以利用js function definition会hoist的特性</p>
+
+<div class="language-js highlighter-rouge"><pre class="highlight"><code><span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="s1">'A'</span><span class="p">);</span>
+<span class="nx">identity</span><span class="p">(</span><span class="s1">'B'</span><span class="p">,</span> <span class="nx">step2</span><span class="p">);</span>
+
+<span class="kd">function</span> <span class="nx">step2</span><span class="p">(</span><span class="nx">result2</span><span class="p">)</span> <span class="p">{</span>
+    <span class="c1">// The program continues here</span>
+    <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="nx">result2</span><span class="p">);</span>
+    <span class="nx">identity</span><span class="p">(</span><span class="s1">'C'</span><span class="p">,</span> <span class="nx">step3</span><span class="p">);</span>
+    <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="s1">'D'</span><span class="p">);</span>
+<span class="p">}</span>
+
+<span class="kd">function</span> <span class="nx">step3</span><span class="p">(</span><span class="nx">result3</span><span class="p">)</span> <span class="p">{</span>
+   <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="nx">result3</span><span class="p">);</span>
+<span class="p">}</span>
+<span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="s1">'E'</span><span class="p">);</span>
+</code></pre>
+</div>
+
+<p>缺点：</p>
+
+<ul>
+  <li>Error handling becomes more complicated: There are now two ways in which errors are reported – via callbacks and via exceptions. You have to be careful to combine both properly.</li>
+  <li>Less elegant signatures: In synchronous functions, there is a clear separation of concerns between input (parameters) and output (function result). In asynchronous functions that use callbacks, these concerns are mixed: the function result doesn’t matter and some parameters are used for input, others for output.</li>
+  <li>
+    <p>Composition is more complicated: Because the concern “output” shows up in the parameters, it is more complicated to compose code via combinators.</p>
+  </li>
+  <li>
+    <p>The if statement for error handling adds verbosity.</p>
+  </li>
+  <li>
+    <p>Reusing error handlers is harder.</p>
+  </li>
+  <li>Providing a default error handler is also harder. A default error handler is useful if you make a function call and don’t want to write your own handler. It could also be used by a function if a caller doesn’t specify a handler.</li>
+</ul>
+
+<h3 id="promise">Promise</h3>
+
+<p>a promise represents a value that is not yet known</p>
+
+<p>A promise is a placeholder for a result which is initially unknown while a deferred represents the computation that results in the value.</p>
+
+<p>Every deferred has a promise which functions as a proxy for the future result.</p>
+
+<p>优点：</p>
+
+<ul>
+  <li>
+    <p>No inversion of control: similarly to synchronous code, Promise-based functions return results, they don’t (directly) continue – and control – execution via callbacks. That is, the caller stays in control.</p>
+  </li>
+  <li>
+    <p>Chaining is simpler: If the callback of then() returns a Promise (e.g. the result of calling another Promise-based function) then then() returns that Promise (how this really works is more complicated and explained later). As a consequence, you can chain then() method calls:</p>
+  </li>
+  <li>
+    <p>Composing asynchronous calls (loops, mapping, etc.): is a little easier, because you have data (Promise objects) you can work with.</p>
+  </li>
+  <li>
+    <p>Error handling: As we shall see later, error handling is simpler with Promises, because, once again, there isn’t an inversion of control. Furthermore, both exceptions and asynchronous errors are managed the same way.</p>
+  </li>
+  <li>
+    <p>Cleaner signatures: With callbacks, the parameters of a function are mixed; some are input for the function, others are responsible for delivering its output. With Promises, function signatures become cleaner; all parameters are input.</p>
+  </li>
+  <li>
+    <p>Standardized: Prior to Promises, there were several incompatible ways of handling asynchronous results (Node.js callbacks, XMLHttpRequest, IndexedDB, etc.). With Promises, there is a clearly defined standard:</p>
+  </li>
+</ul>
+
+<h4 id="example-delaying-an-activity">Example: delaying an activity</h4>
+
+<div class="language-js highlighter-rouge"><pre class="highlight"><code><span class="kd">function</span> <span class="nx">delay</span><span class="p">(</span><span class="nx">ms</span><span class="p">)</span> <span class="p">{</span>
+    <span class="k">return</span> <span class="k">new</span> <span class="nx">Promise</span><span class="p">(</span><span class="kd">function</span> <span class="p">(</span><span class="nx">resolve</span><span class="p">,</span> <span class="nx">reject</span><span class="p">)</span> <span class="p">{</span>
+        <span class="nx">setTimeout</span><span class="p">(</span><span class="nx">resolve</span><span class="p">,</span> <span class="nx">ms</span><span class="p">);</span> <span class="c1">// (A)</span>
+    <span class="p">});</span>
+<span class="p">}</span>
+</code></pre>
+</div>
+
+<p>delay(1000).then()// then并不需要传值，所以resolve的参数是空，没有传东西,也可以写成 resolve(undefined)</p>
+
+<h3 id="promise-1">其他创建promise的方法</h3>
+
+<p>用Promise.resolve</p>
+
+<div class="language-js highlighter-rouge"><pre class="highlight"><code><span class="nx">Promise</span><span class="p">.</span><span class="nx">resolve</span><span class="p">(</span><span class="s1">'abc'</span><span class="p">)</span>
+<span class="p">.</span><span class="nx">then</span><span class="p">(</span><span class="nx">x</span> <span class="o">=&gt;</span> <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="nx">x</span><span class="p">));</span> <span class="c1">// abc</span>
+</code></pre>
+</div>
+
+<p>用 Promise.resolve 去 thenable obj</p>
+
+<div class="language-js highlighter-rouge"><pre class="highlight"><code><span class="kr">const</span> <span class="nx">fulfilledThenable</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="nx">then</span><span class="p">(</span><span class="nx">reaction</span><span class="p">)</span> <span class="p">{</span>
+        <span class="nx">reaction</span><span class="p">(</span><span class="s1">'hello'</span><span class="p">);</span>
+    <span class="p">}</span>
+<span class="p">};</span>
+<span class="kr">const</span> <span class="nx">promise</span> <span class="o">=</span> <span class="nx">Promise</span><span class="p">.</span><span class="nx">resolve</span><span class="p">(</span><span class="nx">fulfilledThenable</span><span class="p">);</span>
+<span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="nx">promise</span> <span class="k">instanceof</span> <span class="nx">Promise</span><span class="p">);</span> <span class="c1">// true</span>
+<span class="nx">promise</span><span class="p">.</span><span class="nx">then</span><span class="p">(</span><span class="nx">x</span> <span class="o">=&gt;</span> <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="nx">x</span><span class="p">));</span> <span class="c1">// hello</span>
+</code></pre>
+</div>
+
+<p>Promise.reject(err) returns a Promise that is rejected with err:</p>
+
+<div class="language-js highlighter-rouge"><pre class="highlight"><code><span class="kr">const</span> <span class="nx">myError</span> <span class="o">=</span> <span class="k">new</span> <span class="nb">Error</span><span class="p">(</span><span class="s1">'Problem!'</span><span class="p">);</span>
+<span class="nx">Promise</span><span class="p">.</span><span class="nx">reject</span><span class="p">(</span><span class="nx">myError</span><span class="p">)</span>
+<span class="p">.</span><span class="k">catch</span><span class="p">(</span><span class="nx">err</span> <span class="o">=&gt;</span> <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="nx">err</span> <span class="o">===</span> <span class="nx">myError</span><span class="p">));</span> <span class="c1">// true</span>
+</code></pre>
+</div>
+
+<h3 id="then">then的级联</h3>
+
+<div class="language-js highlighter-rouge"><pre class="highlight"><code><span class="nx">retrieveFileName</span><span class="p">()</span>
+<span class="p">.</span><span class="k">catch</span><span class="p">(</span><span class="kd">function</span> <span class="p">()</span> <span class="p">{</span>
+    <span class="c1">// Something went wrong, use a default value</span>
+    <span class="k">return</span> <span class="s1">'Untitled.txt'</span><span class="p">;</span>
+<span class="p">})</span>
+<span class="p">.</span><span class="nx">then</span><span class="p">(</span><span class="kd">function</span> <span class="p">(</span><span class="nx">fileName</span><span class="p">)</span> <span class="p">{</span>
+    <span class="err">···</span>
+<span class="p">});</span>
+</code></pre>
+</div>
+
+<div class="language-js highlighter-rouge"><pre class="highlight"><code><span class="nx">asyncFunc</span><span class="p">()</span>
+<span class="p">.</span><span class="nx">then</span><span class="p">(</span><span class="kd">function</span> <span class="p">(</span><span class="nx">value</span><span class="p">)</span> <span class="p">{</span>
+    <span class="k">throw</span> <span class="k">new</span> <span class="nb">Error</span><span class="p">();</span>
+<span class="p">})</span>
+<span class="p">.</span><span class="k">catch</span><span class="p">(</span><span class="kd">function</span> <span class="p">(</span><span class="nx">reason</span><span class="p">)</span> <span class="p">{</span>
+    <span class="c1">// Handle error here</span>
+<span class="p">});</span>
+</code></pre>
+</div>
+
+<p>多个then的话，error会传递知道被最后一个接收</p>
+
+<div class="language-js highlighter-rouge"><pre class="highlight"><code><span class="nx">asyncFunc1</span><span class="p">()</span>
+<span class="p">.</span><span class="nx">then</span><span class="p">(</span><span class="nx">asyncFunc2</span><span class="p">)</span>
+<span class="p">.</span><span class="nx">then</span><span class="p">(</span><span class="nx">asyncFunc3</span><span class="p">)</span>
+<span class="p">.</span><span class="k">catch</span><span class="p">(</span><span class="kd">function</span> <span class="p">(</span><span class="nx">reason</span><span class="p">)</span> <span class="p">{</span>
+    <span class="c1">// Something went wrong above</span>
+<span class="p">});</span>
+</code></pre>
+</div>
+
+<h3 id="promise-chaining-">Promise chaining 错误</h3>
+
+<div class="language-js highlighter-rouge"><pre class="highlight"><code><span class="c1">// Don’t do this</span>
+<span class="kd">function</span> <span class="nx">foo</span><span class="p">()</span> <span class="p">{</span>
+    <span class="kr">const</span> <span class="nx">promise</span> <span class="o">=</span> <span class="nx">asyncFunc</span><span class="p">();</span>
+    <span class="nx">promise</span><span class="p">.</span><span class="nx">then</span><span class="p">(</span><span class="nx">result</span> <span class="o">=&gt;</span> <span class="p">{</span>
+        <span class="err">···</span>
+    <span class="p">});</span>
+
+    <span class="k">return</span> <span class="nx">promise</span><span class="p">;</span>
+<span class="p">}</span>
+</code></pre>
+</div>
+
+<p><strong><em>Mistake: nesting Promises</em></strong></p>
+
+<div class="language-js highlighter-rouge"><pre class="highlight"><code><span class="c1">// Don’t do this</span>
+<span class="nx">asyncFunc1</span><span class="p">()</span>
+<span class="p">.</span><span class="nx">then</span><span class="p">(</span><span class="nx">result1</span> <span class="o">=&gt;</span> <span class="p">{</span>
+    <span class="nx">asyncFunc2</span><span class="p">()</span>
+    <span class="p">.</span><span class="nx">then</span><span class="p">(</span><span class="nx">result2</span> <span class="o">=&gt;</span> <span class="p">{</span>
+        <span class="err">···</span>
+    <span class="p">});</span>
+<span class="p">});</span>
+</code></pre>
+</div>
+
+<div class="language-js highlighter-rouge"><pre class="highlight"><code><span class="nx">asyncFunc1</span><span class="p">()</span>
+<span class="p">.</span><span class="nx">then</span><span class="p">(</span><span class="nx">result1</span> <span class="o">=&gt;</span> <span class="p">{</span>
+    <span class="k">return</span> <span class="nx">asyncFunc2</span><span class="p">();</span>
+<span class="p">})</span>
+<span class="p">.</span><span class="nx">then</span><span class="p">(</span><span class="nx">result2</span> <span class="o">=&gt;</span> <span class="p">{</span>
+    <span class="err">···</span>
+<span class="p">});</span>
+</code></pre>
+</div>
+
+<p><strong><em>Mistake: creating Promises instead of chaining</em></strong></p>
+
+<div class="language-js highlighter-rouge"><pre class="highlight"><code><span class="c1">// Don’t do this</span>
+<span class="kr">class</span> <span class="nx">Model</span> <span class="p">{</span>
+    <span class="nx">insertInto</span><span class="p">(</span><span class="nx">db</span><span class="p">)</span> <span class="p">{</span>
+        <span class="k">return</span> <span class="k">new</span> <span class="nx">Promise</span><span class="p">((</span><span class="nx">resolve</span><span class="p">,</span> <span class="nx">reject</span><span class="p">)</span> <span class="o">=&gt;</span> <span class="p">{</span> <span class="c1">// (A)</span>
+          <span class="nx">db</span><span class="p">.</span><span class="nx">insert</span><span class="p">(</span><span class="k">this</span><span class="p">.</span><span class="nx">fields</span><span class="p">)</span> <span class="c1">// (B)</span>
+          <span class="p">.</span><span class="nx">then</span><span class="p">(</span><span class="nx">resultCode</span> <span class="o">=&gt;</span> <span class="p">{</span>
+              <span class="k">this</span><span class="p">.</span><span class="nx">notifyObservers</span><span class="p">({</span><span class="na">event</span><span class="p">:</span> <span class="s1">'created'</span><span class="p">,</span> <span class="na">model</span><span class="p">:</span> <span class="k">this</span><span class="p">});</span>
+              <span class="nx">resolve</span><span class="p">(</span><span class="nx">resultCode</span><span class="p">);</span> <span class="c1">// (C)</span>
+          <span class="p">}).</span><span class="k">catch</span><span class="p">(</span><span class="nx">err</span> <span class="o">=&gt;</span> <span class="p">{</span>
+              <span class="nx">reject</span><span class="p">(</span><span class="nx">err</span><span class="p">);</span> <span class="c1">// (D)</span>
+          <span class="p">})</span>
+        <span class="p">});</span>
+    <span class="p">}</span>
+    <span class="err">···</span>
+<span class="p">}</span>
+</code></pre>
+</div>
+
+<div class="language-js highlighter-rouge"><pre class="highlight"><code><span class="kr">class</span> <span class="nx">Model</span> <span class="p">{</span>
+    <span class="nx">insertInto</span><span class="p">(</span><span class="nx">db</span><span class="p">)</span> <span class="p">{</span>
+        <span class="k">return</span> <span class="nx">db</span><span class="p">.</span><span class="nx">insert</span><span class="p">(</span><span class="k">this</span><span class="p">.</span><span class="nx">fields</span><span class="p">)</span> <span class="c1">// (A)</span>
+        <span class="p">.</span><span class="nx">then</span><span class="p">(</span><span class="nx">resultCode</span> <span class="o">=&gt;</span> <span class="p">{</span>
+            <span class="k">this</span><span class="p">.</span><span class="nx">notifyObservers</span><span class="p">({</span><span class="na">event</span><span class="p">:</span> <span class="s1">'created'</span><span class="p">,</span> <span class="na">model</span><span class="p">:</span> <span class="k">this</span><span class="p">});</span>
+            <span class="k">return</span> <span class="nx">resultCode</span><span class="p">;</span> <span class="c1">// (B)</span>
+        <span class="p">});</span>
+    <span class="p">}</span>
+    <span class="err">···</span>
+<span class="p">}</span>
+</code></pre>
+</div>
+
+<p><strong><em>Mistake: using then() for error handling</em></strong></p>
+
+<div class="language-js highlighter-rouge"><pre class="highlight"><code><span class="c1">// Don’t do this</span>
+<span class="nx">asyncFunc1</span><span class="p">()</span>
+<span class="p">.</span><span class="nx">then</span><span class="p">(</span>
+    <span class="nx">value</span> <span class="o">=&gt;</span> <span class="p">{</span> <span class="c1">// (A)</span>
+        <span class="nx">doSomething</span><span class="p">();</span> <span class="c1">// (B)</span>
+        <span class="k">return</span> <span class="nx">asyncFunc2</span><span class="p">();</span> <span class="c1">// (C)</span>
+    <span class="p">},</span>
+    <span class="nx">error</span> <span class="o">=&gt;</span> <span class="p">{</span> <span class="c1">// (D)</span>
+        <span class="err">···</span>
+    <span class="p">});</span>
+</code></pre>
+</div>
+
+<p>这样写error的话，A B C出的错误都没有catch到，只catch到了asyncFunc1的error</p>
+
+<p>还是要这样写</p>
+
+<div class="language-js highlighter-rouge"><pre class="highlight"><code><span class="nx">asyncFunc1</span><span class="p">()</span>
+<span class="p">.</span><span class="nx">then</span><span class="p">(</span><span class="nx">value</span> <span class="o">=&gt;</span> <span class="p">{</span>
+    <span class="nx">doSomething</span><span class="p">();</span>
+    <span class="k">return</span> <span class="nx">asyncFunc2</span><span class="p">();</span>
+<span class="p">})</span>
+<span class="p">.</span><span class="k">catch</span><span class="p">(</span><span class="nx">error</span> <span class="o">=&gt;</span> <span class="p">{</span>
+    <span class="err">···</span>
+<span class="p">});</span>
+</code></pre>
+</div>
+
+
+  </div>
+
+</article>
+
+      </div>
+    </div>
+
+    <footer class="site-footer">
+
+  <div class="wrapper">
+
+    <h2 class="footer-heading"></h2>
+
+    <div class="footer-col-wrapper">
+      <div class="footer-col footer-col-1">
+        <ul class="contact-list">
+          <li></li>
+          <li><a href="mailto:"></a></li>
+        </ul>
+      </div>
+
+      <div class="footer-col footer-col-2">
+        <ul class="social-media-list">
+          
+
+          
+        </ul>
+      </div>
+
+      <div class="footer-col footer-col-3">
+        <p></p>
+      </div>
+    </div>
+
+  </div>
+
+</footer>
+
+
+  </body>
+
+</html>

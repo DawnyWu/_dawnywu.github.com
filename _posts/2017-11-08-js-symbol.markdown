@@ -1,0 +1,117 @@
+---
+layout: post
+title:  ""
+date:   2016-11-08
+categories: js
+---
+
+http://www.2ality.com/2014/12/es6-symbols.html
+
+Every symbol returned by `Symbol()` is unique, every symbol has its own identity:
+
+```js
+a = Symbol() // Symbol()
+b = Symbol() // Symbol()
+a == b // false
+a === b // false
+```
+
+可以传入一个字符串作为描述
+
+```js
+symbol2 = Symbol('symbol2');
+symbol2 // => Symbol(symbol2)
+```
+
+symbol是es6新加入的类型
+
+```js
+typeof symbol1 // => 'symbol'
+```
+
+### symbol创建object
+
+`Classes` and `object literals` have a feature called `computed property keys`: You can specify the key of a property via an expression, by putting it in square brackets.
+
+```js
+obj = {}
+SYM = Symbol()
+
+obj.SYM = "hello" // 这个定义的是普通的key
+obj[SYM] = 123; // 这个定义的是Symbol key, 要用中括号
+
+// 输出也是相同的道理，也要用中括号
+console.log(obj[SYM]); // 123
+console.log(obj.SYM); // "hello"
+```
+
+```js
+const MY_KEY = Symbol();
+  let obj = {
+      [MY_KEY]: 123
+  };
+```
+
+```js
+const FOO = Symbol();
+
+let obj = {
+  [FOO]() {
+      return 'bar';
+  }
+};
+
+console.log(obj[FOO]()); // bar
+```
+
+上边这是es6 obj里定义函数的方法
+
+
+### Enumerating own property keys
+
+`Object.getOwnPropertyNames()` ignores symbol-valued property keys:
+
+```js
+let obj = {
+    // symbol key
+    [Symbol('my_key')]: 1,
+    // normal key
+    enum: 2,
+    // enumerable false key
+    nonEnum: 3
+};
+Object.defineProperty(obj,
+    'nonEnum', { enumerable: false });
+```
+
+getOwnPropertyNames忽略symbol-valued property keys
+
+```js
+Object.getOwnPropertyNames(obj)
+// => ['enum', 'nonEnum']
+```
+
+Object.getOwnPropertySymbols() 忽略 string-valued property keys:
+
+```js
+Object.getOwnPropertySymbols(obj)
+// => [Symbol(my_key)]
+```
+
+想要看所有的keys
+
+```js
+Reflect.ownKeys(obj)
+// => [Symbol(my_key), 'enum', 'nonEnum']
+```
+
+`Object.keys` it only considers enumerable property keys that are strings.
+
+```js
+Object.keys(obj)
+// => ['enum']
+```
+
+### Using symbols to represent concepts
+
+

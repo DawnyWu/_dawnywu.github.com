@@ -1,0 +1,205 @@
+<!DOCTYPE html>
+<html>
+
+  <head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  <title>promise</title>
+  <meta name="description" content="what is a Promise?">
+
+  <link rel="stylesheet" href="/css/main.css">
+  <link rel="canonical" href="http://localhost:4000/js/2016/11/14/gtor.html">
+  <link rel="alternate" type="application/rss+xml" title="" href="http://localhost:4000/feed.xml">
+</head>
+
+
+  <body>
+
+    <header class="site-header">
+
+  <div class="wrapper">
+
+    <a class="site-title" href="/"></a>
+
+    <nav class="site-nav">
+      <a href="#" class="menu-icon">
+        <svg viewBox="0 0 18 15">
+          <path fill="#424242" d="M18,1.484c0,0.82-0.665,1.484-1.484,1.484H1.484C0.665,2.969,0,2.304,0,1.484l0,0C0,0.665,0.665,0,1.484,0 h15.031C17.335,0,18,0.665,18,1.484L18,1.484z"/>
+          <path fill="#424242" d="M18,7.516C18,8.335,17.335,9,16.516,9H1.484C0.665,9,0,8.335,0,7.516l0,0c0-0.82,0.665-1.484,1.484-1.484 h15.031C17.335,6.031,18,6.696,18,7.516L18,7.516z"/>
+          <path fill="#424242" d="M18,13.516C18,14.335,17.335,15,16.516,15H1.484C0.665,15,0,14.335,0,13.516l0,0 c0-0.82,0.665-1.484,1.484-1.484h15.031C17.335,12.031,18,12.696,18,13.516L18,13.516z"/>
+        </svg>
+      </a>
+
+      <div class="trigger">
+        
+          
+          <a class="page-link" href="/about/">About</a>
+          
+        
+          
+        
+          
+        
+          
+        
+      </div>
+    </nav>
+
+  </div>
+
+</header>
+
+
+    <div class="page-content">
+      <div class="wrapper">
+        <article class="post" itemscope itemtype="http://schema.org/BlogPosting">
+
+  <header class="post-header">
+    <h1 class="post-title" itemprop="name headline">promise</h1>
+    <p class="post-meta"><time datetime="2016-11-14T00:00:00+08:00" itemprop="datePublished">Nov 14, 2016</time></p>
+  </header>
+
+  <div class="post-content" itemprop="articleBody">
+    <h3 id="what-is-a-promise">what is a Promise?</h3>
+
+<ul>
+  <li>
+    <p>Conceptually, invoking asyncFunc() is a blocking function call.</p>
+  </li>
+  <li>
+    <p>A Promise is both a container for a value and an event emitter.</p>
+  </li>
+</ul>
+
+<h5 id="conceptually-calling-a-promise-based-function-is-blocking">Conceptually: calling a Promise-based function is blocking</h5>
+
+<div class="language-js highlighter-rouge"><pre class="highlight"><code><span class="nx">async</span> <span class="kd">function</span> <span class="nx">main</span><span class="p">()</span> <span class="p">{</span>
+    <span class="kr">const</span> <span class="nx">x</span> <span class="o">=</span> <span class="nx">await</span> <span class="nx">asyncFunc</span><span class="p">();</span> <span class="c1">// (A)</span>
+    <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="s1">'Result: '</span><span class="o">+</span><span class="nx">x</span><span class="p">);</span> <span class="c1">// (B)</span>
+
+    <span class="c1">// Same as:</span>
+    <span class="c1">// asyncFunc()</span>
+    <span class="c1">// .then(x =&gt; console.log('Result: '+x));</span>
+<span class="p">}</span>
+<span class="nx">main</span><span class="p">();</span>
+</code></pre>
+</div>
+
+<h4 id="a-promise-is-a-container-for-an-asynchronously-delivered-value">A Promise is a container for an asynchronously delivered value</h4>
+
+<div class="language-js highlighter-rouge"><pre class="highlight"><code><span class="kd">function</span> <span class="nx">asyncFunc</span><span class="p">()</span> <span class="p">{</span>
+    <span class="kr">const</span> <span class="nx">blank</span> <span class="o">=</span> <span class="p">[];</span>
+    <span class="nx">setTimeout</span><span class="p">(()</span> <span class="o">=&gt;</span> <span class="nx">blank</span><span class="p">.</span><span class="nx">push</span><span class="p">(</span><span class="s1">'DONE'</span><span class="p">),</span> <span class="mi">100</span><span class="p">);</span>
+    <span class="k">return</span> <span class="nx">blank</span><span class="p">;</span>
+<span class="p">}</span>
+<span class="kr">const</span> <span class="nx">blank</span> <span class="o">=</span> <span class="nx">asyncFunc</span><span class="p">();</span>
+<span class="c1">// Wait until the value has been filled in</span>
+<span class="nx">setTimeout</span><span class="p">(()</span> <span class="o">=&gt;</span> <span class="p">{</span>
+    <span class="kr">const</span> <span class="nx">x</span> <span class="o">=</span> <span class="nx">blank</span><span class="p">[</span><span class="mi">0</span><span class="p">];</span> <span class="c1">// (A)</span>
+    <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="s1">'Result: '</span><span class="o">+</span><span class="nx">x</span><span class="p">);</span>
+<span class="p">},</span> <span class="mi">200</span><span class="p">);</span>
+</code></pre>
+</div>
+
+<h4 id="a-promise-is-an-event-emitter">A Promise is an event emitter</h4>
+
+<div class="language-js highlighter-rouge"><pre class="highlight"><code><span class="kd">function</span> <span class="nx">asyncFunc</span><span class="p">()</span> <span class="p">{</span>
+    <span class="kr">const</span> <span class="nx">eventEmitter</span> <span class="o">=</span> <span class="p">{</span> <span class="na">success</span><span class="p">:</span> <span class="p">[]</span> <span class="p">};</span>
+    <span class="nx">setTimeout</span><span class="p">(()</span> <span class="o">=&gt;</span> <span class="p">{</span> <span class="c1">// (A)</span>
+        <span class="k">for</span> <span class="p">(</span><span class="kr">const</span> <span class="nx">handler</span> <span class="nx">of</span> <span class="nx">eventEmitter</span><span class="p">.</span><span class="nx">success</span><span class="p">)</span> <span class="p">{</span>
+            <span class="nx">handler</span><span class="p">(</span><span class="s1">'DONE'</span><span class="p">);</span>
+        <span class="p">}</span>
+    <span class="p">},</span> <span class="mi">100</span><span class="p">);</span>
+    <span class="k">return</span> <span class="nx">eventEmitter</span><span class="p">;</span>
+<span class="p">}</span>
+<span class="nx">asyncFunc</span><span class="p">()</span>
+<span class="p">.</span><span class="nx">success</span><span class="p">.</span><span class="nx">push</span><span class="p">(</span><span class="nx">x</span> <span class="o">=&gt;</span> <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="s1">'Result: '</span><span class="o">+</span><span class="nx">x</span><span class="p">));</span> <span class="c1">// (B)</span>
+</code></pre>
+</div>
+
+<h3 id="producing-a-promise">Producing a Promise</h3>
+
+<div class="language-js highlighter-rouge"><pre class="highlight"><code><span class="kr">const</span> <span class="nx">p</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">Promise</span><span class="p">(</span>
+  <span class="kd">function</span> <span class="p">(</span><span class="nx">resolve</span><span class="p">,</span> <span class="nx">reject</span><span class="p">)</span> <span class="p">{</span> <span class="c1">// (A)</span>
+    <span class="err">···</span>
+    <span class="k">if</span> <span class="p">(</span><span class="err">···</span><span class="p">)</span> <span class="p">{</span>
+        <span class="nx">resolve</span><span class="p">(</span><span class="nx">value</span><span class="p">);</span> <span class="c1">// success</span>
+    <span class="p">}</span> <span class="k">else</span> <span class="p">{</span>
+        <span class="nx">reject</span><span class="p">(</span><span class="nx">reason</span><span class="p">);</span> <span class="c1">// failure</span>
+    <span class="p">}</span>
+<span class="p">});</span>
+</code></pre>
+</div>
+
+<div class="language-js highlighter-rouge"><pre class="highlight"><code><span class="nx">then</span><span class="p">(</span><span class="nx">onFulfilled</span><span class="p">,</span> <span class="nx">onRejected</span><span class="p">)</span> <span class="p">{</span>
+    <span class="kr">const</span> <span class="nx">self</span> <span class="o">=</span> <span class="k">this</span><span class="p">;</span>
+    <span class="kr">const</span> <span class="nx">fulfilledTask</span> <span class="o">=</span> <span class="kd">function</span> <span class="p">()</span> <span class="p">{</span>
+        <span class="nx">onFulfilled</span><span class="p">(</span><span class="nx">self</span><span class="p">.</span><span class="nx">promiseResult</span><span class="p">);</span>
+    <span class="p">};</span>
+    <span class="kr">const</span> <span class="nx">rejectedTask</span> <span class="o">=</span> <span class="kd">function</span> <span class="p">()</span> <span class="p">{</span>
+        <span class="nx">onRejected</span><span class="p">(</span><span class="nx">self</span><span class="p">.</span><span class="nx">promiseResult</span><span class="p">);</span>
+    <span class="p">};</span>
+    <span class="k">switch</span> <span class="p">(</span><span class="k">this</span><span class="p">.</span><span class="nx">promiseState</span><span class="p">)</span> <span class="p">{</span>
+        <span class="k">case</span> <span class="s1">'pending'</span><span class="err">:</span>
+            <span class="k">this</span><span class="p">.</span><span class="nx">fulfillReactions</span><span class="p">.</span><span class="nx">push</span><span class="p">(</span><span class="nx">fulfilledTask</span><span class="p">);</span>
+            <span class="k">this</span><span class="p">.</span><span class="nx">rejectReactions</span><span class="p">.</span><span class="nx">push</span><span class="p">(</span><span class="nx">rejectedTask</span><span class="p">);</span>
+            <span class="k">break</span><span class="p">;</span>
+        <span class="k">case</span> <span class="s1">'fulfilled'</span><span class="err">:</span>
+            <span class="nx">addToTaskQueue</span><span class="p">(</span><span class="nx">fulfilledTask</span><span class="p">);</span>
+            <span class="k">break</span><span class="p">;</span>
+        <span class="k">case</span> <span class="s1">'rejected'</span><span class="err">:</span>
+            <span class="nx">addToTaskQueue</span><span class="p">(</span><span class="nx">rejectedTask</span><span class="p">);</span>
+            <span class="k">break</span><span class="p">;</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+
+<span class="kd">function</span> <span class="nx">addToTaskQueue</span><span class="p">(</span><span class="nx">task</span><span class="p">)</span> <span class="p">{</span>
+    <span class="nx">setTimeout</span><span class="p">(</span><span class="nx">task</span><span class="p">,</span> <span class="mi">0</span><span class="p">);</span>
+<span class="p">}</span>
+</code></pre>
+</div>
+
+  </div>
+
+</article>
+
+      </div>
+    </div>
+
+    <footer class="site-footer">
+
+  <div class="wrapper">
+
+    <h2 class="footer-heading"></h2>
+
+    <div class="footer-col-wrapper">
+      <div class="footer-col footer-col-1">
+        <ul class="contact-list">
+          <li></li>
+          <li><a href="mailto:"></a></li>
+        </ul>
+      </div>
+
+      <div class="footer-col footer-col-2">
+        <ul class="social-media-list">
+          
+
+          
+        </ul>
+      </div>
+
+      <div class="footer-col footer-col-3">
+        <p></p>
+      </div>
+    </div>
+
+  </div>
+
+</footer>
+
+
+  </body>
+
+</html>

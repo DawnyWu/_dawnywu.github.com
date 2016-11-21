@@ -1,0 +1,78 @@
+---
+layout: post
+title:  "closure"
+date:   2016-11-17
+categories: js
+---
+
+### environment
+
+```js
+function myFunction(myParam) {
+    var myVar = 123;
+    return myFloat;
+}
+var myFloat = 1.3;
+// Step 1
+myFunction('abc');  // Step 2
+```
+
+```js
+function createInc(startValue) {
+    return function (step) {
+        startValue += step;
+        return startValue;
+    };
+}
+var inc = createInc(5);
+```
+
+This step takes place before the interaction, and after the evaluation of the function declaration of createInc. An entry for createInc has been added to the global environment (#0) and points to a function object.
+
+This step occurs during the execution of the function call createInc(5). A fresh environment (#1) for createInc is created and pushed onto the stack. Its outer environment is the global environment (the same as createInc.[[Scope]]). The environment holds the parameter startValue.
+
+This step happens after the assignment to inc. After we returned from createInc, the execution context pointing to its environment was removed from the stack, but the environment still exists on the heap, because inc.[[Scope]] refers to it. inc is a closure (function plus birth environment).
+
+This step takes place during the execution of inc(1). A new environment (#1) has been created and an execution context pointing to it has been pushed onto the stack. Its outer environment is the [[Scope]] of inc. The outer environment gives inc access to startValue.
+
+```js
+function f() {
+    var result = [];
+    for (var i=0; i<3; i++) {
+        var func = function () {
+            return i;
+        };
+        result.push(func);
+    }
+    return result;
+}
+console.log(f()[1]());  // 3
+```
+
+要高懂这个很重要的一点是要知道函数内部有外部的变量时，变量的值不是在定义的地方赋值的，而是在执行的时候
+
+```js
+let i = 99
+function shit(){console.log(i)}
+ i = 88
+shit()
+```
+
+上比的func在最后才执行，里边的i在那时候才确定，那是时候是3，所以最后结果是3
+
+```js
+function f() {
+    var result = [];
+    for (var i=0; i<3; i++) {
+        (function () { // step 1: IIFE
+            var pos = i; // step 2: copy
+            var func = function () {
+                return pos;
+            };
+            result.push(func);
+        }());
+    }
+    return result;
+}
+console.log(f()[1]());  // 1
+```

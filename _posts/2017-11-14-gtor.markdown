@@ -1,0 +1,101 @@
+---
+layout: post
+title:  "promise"
+date:   2016-11-14
+categories: js
+---
+
+### what is a Promise?
+
+* Conceptually, invoking asyncFunc() is a blocking function call.
+
+* A Promise is both a container for a value and an event emitter.
+
+
+##### Conceptually: calling a Promise-based function is blocking 
+
+```js
+async function main() {
+    const x = await asyncFunc(); // (A)
+    console.log('Result: '+x); // (B)
+
+    // Same as:
+    // asyncFunc()
+    // .then(x => console.log('Result: '+x));
+}
+main();
+```
+
+#### A Promise is a container for an asynchronously delivered value
+
+```js
+function asyncFunc() {
+    const blank = [];
+    setTimeout(() => blank.push('DONE'), 100);
+    return blank;
+}
+const blank = asyncFunc();
+// Wait until the value has been filled in
+setTimeout(() => {
+    const x = blank[0]; // (A)
+    console.log('Result: '+x);
+}, 200);
+```
+
+#### A Promise is an event emitter
+
+```js
+function asyncFunc() {
+    const eventEmitter = { success: [] };
+    setTimeout(() => { // (A)
+        for (const handler of eventEmitter.success) {
+            handler('DONE');
+        }
+    }, 100);
+    return eventEmitter;
+}
+asyncFunc()
+.success.push(x => console.log('Result: '+x)); // (B)
+```
+
+###  Producing a Promise
+
+```js
+const p = new Promise(
+  function (resolve, reject) { // (A)
+    ···
+    if (···) {
+        resolve(value); // success
+    } else {
+        reject(reason); // failure
+    }
+});
+```
+
+```js
+then(onFulfilled, onRejected) {
+    const self = this;
+    const fulfilledTask = function () {
+        onFulfilled(self.promiseResult);
+    };
+    const rejectedTask = function () {
+        onRejected(self.promiseResult);
+    };
+    switch (this.promiseState) {
+        case 'pending':
+            this.fulfillReactions.push(fulfilledTask);
+            this.rejectReactions.push(rejectedTask);
+            break;
+        case 'fulfilled':
+            addToTaskQueue(fulfilledTask);
+            break;
+        case 'rejected':
+            addToTaskQueue(rejectedTask);
+            break;
+    }
+}
+
+function addToTaskQueue(task) {
+    setTimeout(task, 0);
+}
+```
