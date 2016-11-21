@@ -1,0 +1,220 @@
+<!DOCTYPE html>
+<html>
+
+  <head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  <title>Write Yourself a Scheme</title>
+  <meta name="description" content="symbol :: Parser Charsymbol = oneOf "!$%&amp;|*+-/:&lt;=?&gt;@^_~#"">
+
+  <link rel="stylesheet" href="/css/main.css">
+  <link rel="canonical" href="/haskell/2016/10/20/Write-Yourself-a-Scheme-2.html">
+  <link rel="alternate" type="application/rss+xml" title="" href="/feed.xml">
+</head>
+
+
+  <body>
+
+    <header class="site-header">
+
+  <div class="wrapper">
+
+    <a class="site-title" href="/"></a>
+
+    <nav class="site-nav">
+      <a href="#" class="menu-icon">
+        <svg viewBox="0 0 18 15">
+          <path fill="#424242" d="M18,1.484c0,0.82-0.665,1.484-1.484,1.484H1.484C0.665,2.969,0,2.304,0,1.484l0,0C0,0.665,0.665,0,1.484,0 h15.031C17.335,0,18,0.665,18,1.484L18,1.484z"/>
+          <path fill="#424242" d="M18,7.516C18,8.335,17.335,9,16.516,9H1.484C0.665,9,0,8.335,0,7.516l0,0c0-0.82,0.665-1.484,1.484-1.484 h15.031C17.335,6.031,18,6.696,18,7.516L18,7.516z"/>
+          <path fill="#424242" d="M18,13.516C18,14.335,17.335,15,16.516,15H1.484C0.665,15,0,14.335,0,13.516l0,0 c0-0.82,0.665-1.484,1.484-1.484h15.031C17.335,12.031,18,12.696,18,13.516L18,13.516z"/>
+        </svg>
+      </a>
+
+      <div class="trigger">
+        
+          
+          <a class="page-link" href="/about/">About</a>
+          
+        
+          
+        
+          
+        
+          
+        
+      </div>
+    </nav>
+
+  </div>
+
+</header>
+
+
+    <div class="page-content">
+      <div class="wrapper">
+        <article class="post" itemscope itemtype="http://schema.org/BlogPosting">
+
+  <header class="post-header">
+    <h1 class="post-title" itemprop="name headline">Write Yourself a Scheme</h1>
+    <p class="post-meta"><time datetime="2016-10-20T00:00:00+08:00" itemprop="datePublished">Oct 20, 2016</time></p>
+  </header>
+
+  <div class="post-content" itemprop="articleBody">
+    <div class="language-haskell highlighter-rouge"><pre class="highlight"><code><span class="n">symbol</span> <span class="o">::</span> <span class="kt">Parser</span> <span class="kt">Char</span>
+<span class="n">symbol</span> <span class="o">=</span> <span class="n">oneOf</span> <span class="s">"!$%&amp;|*+-/:&lt;=?&gt;@^_~#"</span>
+</code></pre>
+</div>
+
+<div class="language-haskell highlighter-rouge"><pre class="highlight"><code><span class="n">readExpr</span> <span class="o">::</span> <span class="kt">String</span> <span class="o">-&gt;</span> <span class="kt">String</span>
+<span class="n">readExpr</span> <span class="n">input</span> <span class="o">=</span> <span class="kr">case</span> <span class="n">parse</span> <span class="n">symbol</span> <span class="s">"lisp"</span> <span class="n">input</span> <span class="kr">of</span>
+  <span class="kt">Left</span> <span class="n">err</span> <span class="o">-&gt;</span> <span class="s">"No match"</span> <span class="o">++</span> <span class="n">show</span> <span class="n">err</span>
+  <span class="kt">Right</span> <span class="n">val</span> <span class="o">-&gt;</span> <span class="s">"Found value"</span>
+</code></pre>
+</div>
+
+<p>“lisp”是这个parser的名字。。。</p>
+
+<p>在main中调用写好的parser</p>
+
+<div class="language-haskell highlighter-rouge"><pre class="highlight"><code><span class="n">main</span> <span class="o">::</span> <span class="kt">IO</span> <span class="nb">()</span>
+<span class="n">main</span> <span class="o">=</span> <span class="kr">do</span> <span class="n">args</span> <span class="o">&lt;-</span> <span class="n">getArgs</span>
+  <span class="n">putStrLn</span> <span class="p">(</span> <span class="n">readExpr</span> <span class="p">(</span> <span class="n">args</span> <span class="o">!!</span> <span class="mi">0</span><span class="p">)</span> <span class="p">)</span>
+</code></pre>
+</div>
+
+<div class="language-haskell highlighter-rouge"><pre class="highlight"><code><span class="n">spaces</span> <span class="o">::</span> <span class="kt">Parser</span> <span class="nb">()</span> 
+<span class="n">spaces</span> <span class="o">=</span> <span class="n">skipMany1</span> <span class="n">space</span>
+</code></pre>
+</div>
+
+<h3 id="liftm">liftM</h3>
+
+<div class="language-haskell highlighter-rouge"><pre class="highlight"><code><span class="n">parseNumber</span> <span class="o">:</span> <span class="o">:</span> <span class="kt">Parser</span> <span class="kt">LispVal</span>
+<span class="n">parseNumber</span> <span class="o">=</span> <span class="n">liftM</span> <span class="p">(</span><span class="kt">Number</span> <span class="o">.</span> <span class="n">read</span><span class="p">)</span> <span class="o">$</span> <span class="n">many1</span> <span class="n">digit</span>
+</code></pre>
+</div>
+
+<p>the result of many1 digit is actually a <code class="highlighter-rouge">Parser String</code>, so our combined <code class="highlighter-rouge">Number . read</code> still can’t operate on it.</p>
+
+<p>We need a way to tell it to just operate on the value inside the monad, giving us back a <code class="highlighter-rouge">Parser LispVal</code>.</p>
+
+<h3 id="import-monad">import Monad失败的问题</h3>
+
+<div class="language-haskell highlighter-rouge"><pre class="highlight"><code><span class="kr">import</span> <span class="nn">Control.Monad</span>
+</code></pre>
+</div>
+
+<h3 id="section">未解决问题</h3>
+
+<div class="language-haskell highlighter-rouge"><pre class="highlight"><code> <span class="n">parseString</span> <span class="o">::</span> <span class="kt">Parser</span> <span class="kt">LispVal</span>
+ <span class="n">parseString</span> <span class="o">=</span> <span class="kr">do</span> <span class="n">char</span> <span class="sc">'"'</span>
+                  <span class="n">x</span> <span class="o">&lt;-</span> <span class="n">many</span> <span class="p">(</span><span class="n">noneOf</span> <span class="s">"</span><span class="se">\"</span><span class="s">"</span><span class="p">)</span>
+                  <span class="n">char</span> <span class="sc">'"'</span>
+                  <span class="n">return</span> <span class="o">$</span> <span class="kt">String</span> <span class="n">x</span>
+
+<span class="c1">-- compile后</span>
+<span class="o">./</span><span class="n">eval</span> <span class="s">"hello"</span>
+<span class="c1">-- 输出</span>
+<span class="kt">No</span> <span class="n">match</span><span class="s">"lisp"</span> <span class="p">(</span><span class="n">line</span> <span class="mi">1</span><span class="p">,</span> <span class="n">column</span> <span class="mi">1</span><span class="p">)</span><span class="o">:</span>
+<span class="n">unexpected</span> <span class="s">"h"</span>
+<span class="n">expecting</span> <span class="s">"</span><span class="se">\"</span><span class="s">"</span> <span class="n">or</span> <span class="n">digit</span>
+</code></pre>
+</div>
+
+<p>为什么通不过？digit从哪里来的？</p>
+
+<div class="language-haskell highlighter-rouge"><pre class="highlight"><code><span class="err">➜</span>  <span class="mi">03</span><span class="o">-</span><span class="n">evaluation</span> <span class="n">git</span><span class="o">:</span><span class="p">(</span><span class="n">master</span><span class="p">)</span> <span class="err">✗</span> <span class="o">./</span><span class="n">eval</span> <span class="s">"saldkfjlkasjf"</span>
+<span class="kt">No</span> <span class="n">match</span><span class="o">:</span> <span class="s">"lisp"</span> <span class="p">(</span><span class="n">line</span> <span class="mi">1</span><span class="p">,</span> <span class="n">column</span> <span class="mi">1</span><span class="p">)</span><span class="o">:</span>
+<span class="n">unexpected</span> <span class="s">"s"</span>
+<span class="n">expecting</span> <span class="s">"</span><span class="se">\"</span><span class="s">"</span>
+</code></pre>
+</div>
+
+<h3 id="eval">Eval</h3>
+
+<div class="language-haskell highlighter-rouge"><pre class="highlight"><code><span class="n">apply</span> <span class="o">::</span> <span class="kt">String</span> <span class="o">-&gt;</span> <span class="p">[</span> <span class="kt">LispVal</span> <span class="p">]</span> <span class="o">-&gt;</span>  <span class="kt">LispVal</span>
+<span class="n">apply</span> <span class="n">func</span> <span class="n">args</span> <span class="o">=</span> <span class="n">maybe</span> <span class="p">(</span><span class="kt">Bool</span> <span class="kt">False</span><span class="p">)</span> <span class="p">(</span><span class="o">$</span> <span class="n">args</span><span class="p">)</span> <span class="o">$</span> <span class="n">lookup</span> <span class="n">func</span>
+<span class="n">primitives</span>
+
+<span class="n">primitives</span> <span class="o">::</span> <span class="p">[(</span><span class="kt">String</span><span class="p">,</span> <span class="p">[</span><span class="kt">LispVal</span><span class="p">]</span> <span class="o">-&gt;</span> <span class="kt">LispVal</span><span class="p">)]</span>
+<span class="n">primitives</span> <span class="o">::</span> <span class="p">[(</span><span class="s">"+"</span><span class="p">,</span> <span class="n">numericBinop</span> <span class="p">(</span><span class="o">+</span><span class="p">)),</span>
+               <span class="p">(</span><span class="s">"-"</span><span class="p">,</span> <span class="n">numericBinop</span> <span class="p">(</span><span class="o">-</span><span class="p">)),</span>
+               <span class="p">(</span><span class="s">"*"</span><span class="p">,</span> <span class="n">numericBinop</span> <span class="p">(</span><span class="o">*</span><span class="p">))]</span>
+</code></pre>
+</div>
+
+<p>numericBinop : : ( Integer</p>
+
+<h3 id="error">Error</h3>
+
+<div class="language-haskell highlighter-rouge"><pre class="highlight"><code><span class="kr">data</span> <span class="kt">LispError</span> <span class="o">=</span> <span class="kt">NumArgs</span> <span class="kt">Integer</span> <span class="p">[</span><span class="kt">LispVal</span><span class="p">]</span>
+    <span class="o">|</span> <span class="kt">TypeMismatch</span> <span class="kt">String</span> <span class="kt">LispVal</span>
+    <span class="o">|</span> <span class="kt">Parser</span> <span class="kt">ParseError</span>
+    <span class="o">|</span> <span class="kt">BadSpecialForm</span> <span class="kt">String</span> <span class="kt">LispVal</span>
+    <span class="o">|</span> <span class="kt">NotFunction</span> <span class="kt">String</span> <span class="kt">String</span>
+    <span class="o">|</span> <span class="kt">UnboundVar</span> <span class="kt">String</span> <span class="kt">String</span>
+    <span class="o">|</span> <span class="kt">Default</span> <span class="kt">String</span>
+</code></pre>
+</div>
+
+<div class="language-haskell highlighter-rouge"><pre class="highlight"><code><span class="n">showError</span> <span class="o">::</span> <span class="kt">LispError</span> <span class="o">-&gt;</span> <span class="kt">String</span>
+<span class="n">showError</span> <span class="p">(</span><span class="kt">UnboundVar</span> <span class="n">message</span> <span class="n">varname</span><span class="p">)</span>  <span class="o">=</span> <span class="n">message</span> <span class="o">++</span> <span class="s">": "</span> <span class="o">++</span> <span class="n">varname</span>
+<span class="n">showError</span> <span class="p">(</span><span class="kt">BadSpecialForm</span> <span class="n">message</span> <span class="n">form</span><span class="p">)</span> <span class="o">=</span> <span class="n">message</span> <span class="o">++</span> <span class="s">": "</span> <span class="o">++</span> <span class="n">show</span> <span class="n">form</span>
+<span class="n">showError</span> <span class="p">(</span><span class="kt">NotFunction</span> <span class="n">message</span> <span class="n">func</span><span class="p">)</span>    <span class="o">=</span> <span class="n">message</span> <span class="o">++</span> <span class="s">": "</span> <span class="o">++</span> <span class="n">show</span> <span class="n">func</span>
+<span class="n">showError</span> <span class="p">(</span><span class="kt">NumArgs</span> <span class="n">expected</span> <span class="n">found</span><span class="p">)</span>      <span class="o">=</span> <span class="s">"Expected "</span> <span class="o">++</span> <span class="n">show</span> <span class="n">expected</span>
+                                            <span class="o">++</span> <span class="s">" args; found values "</span>
+                                            <span class="o">++</span> <span class="n">unwordsList</span> <span class="n">found</span>
+<span class="n">showError</span> <span class="p">(</span><span class="kt">TypeMismatch</span> <span class="n">expected</span> <span class="n">found</span><span class="p">)</span> <span class="o">=</span> <span class="s">"Invalid type: expected "</span>
+                                            <span class="o">++</span> <span class="n">expected</span>
+                                            <span class="o">++</span> <span class="s">", found "</span>
+                                            <span class="o">++</span> <span class="n">show</span> <span class="n">found</span>
+<span class="n">showError</span> <span class="p">(</span><span class="kt">Parser</span> <span class="n">parseErr</span><span class="p">)</span>             <span class="o">=</span> <span class="s">"Parse error at "</span> <span class="o">++</span> <span class="n">show</span> <span class="n">parseErr</span>
+
+<span class="kr">instance</span> <span class="kt">Show</span> <span class="kt">LispError</span> <span class="kr">where</span> <span class="n">show</span> <span class="o">=</span> <span class="n">showError</span>
+</code></pre>
+</div>
+
+  </div>
+
+</article>
+
+      </div>
+    </div>
+
+    <footer class="site-footer">
+
+  <div class="wrapper">
+
+    <h2 class="footer-heading"></h2>
+
+    <div class="footer-col-wrapper">
+      <div class="footer-col footer-col-1">
+        <ul class="contact-list">
+          <li></li>
+          <li><a href="mailto:"></a></li>
+        </ul>
+      </div>
+
+      <div class="footer-col footer-col-2">
+        <ul class="social-media-list">
+          
+
+          
+        </ul>
+      </div>
+
+      <div class="footer-col footer-col-3">
+        <p></p>
+      </div>
+    </div>
+
+  </div>
+
+</footer>
+
+
+  </body>
+
+</html>

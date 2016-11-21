@@ -1,0 +1,330 @@
+<!DOCTYPE html>
+<html>
+
+  <head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  <title>Haskell Parsec</title>
+  <meta name="description" content="Parsec 全称">
+
+  <link rel="stylesheet" href="/css/main.css">
+  <link rel="canonical" href="/haskell/2016/10/19/parsec-2.html">
+  <link rel="alternate" type="application/rss+xml" title="" href="/feed.xml">
+</head>
+
+
+  <body>
+
+    <header class="site-header">
+
+  <div class="wrapper">
+
+    <a class="site-title" href="/"></a>
+
+    <nav class="site-nav">
+      <a href="#" class="menu-icon">
+        <svg viewBox="0 0 18 15">
+          <path fill="#424242" d="M18,1.484c0,0.82-0.665,1.484-1.484,1.484H1.484C0.665,2.969,0,2.304,0,1.484l0,0C0,0.665,0.665,0,1.484,0 h15.031C17.335,0,18,0.665,18,1.484L18,1.484z"/>
+          <path fill="#424242" d="M18,7.516C18,8.335,17.335,9,16.516,9H1.484C0.665,9,0,8.335,0,7.516l0,0c0-0.82,0.665-1.484,1.484-1.484 h15.031C17.335,6.031,18,6.696,18,7.516L18,7.516z"/>
+          <path fill="#424242" d="M18,13.516C18,14.335,17.335,15,16.516,15H1.484C0.665,15,0,14.335,0,13.516l0,0 c0-0.82,0.665-1.484,1.484-1.484h15.031C17.335,12.031,18,12.696,18,13.516L18,13.516z"/>
+        </svg>
+      </a>
+
+      <div class="trigger">
+        
+          
+          <a class="page-link" href="/about/">About</a>
+          
+        
+          
+        
+          
+        
+          
+        
+      </div>
+    </nav>
+
+  </div>
+
+</header>
+
+
+    <div class="page-content">
+      <div class="wrapper">
+        <article class="post" itemscope itemtype="http://schema.org/BlogPosting">
+
+  <header class="post-header">
+    <h1 class="post-title" itemprop="name headline">Haskell Parsec</h1>
+    <p class="post-meta"><time datetime="2016-10-19T00:00:00+08:00" itemprop="datePublished">Oct 19, 2016</time></p>
+  </header>
+
+  <div class="post-content" itemprop="articleBody">
+    <h3 id="parsec-">Parsec 全称</h3>
+
+<p>Parser Combinators</p>
+
+<h3 id="ghciparsec">在GHCI中使用Parsec</h3>
+
+<h3 id="csv-parser">CSV Parser</h3>
+
+<div class="language-haskell highlighter-rouge"><pre class="highlight"><code><span class="c1">-- file: ch16/csv1.hs</span>
+<span class="kr">import</span> <span class="nn">Text.ParserCombinators.Parsec</span>
+
+<span class="cm">{- A CSV file contains 0 or more lines, each of which is terminated
+   by the end-of-line character (eol). -}</span>
+<span class="n">csvFile</span> <span class="o">::</span> <span class="kt">GenParser</span> <span class="kt">Char</span> <span class="n">st</span> <span class="p">[[</span><span class="kt">String</span><span class="p">]]</span>
+<span class="n">csvFile</span> <span class="o">=</span> 
+    <span class="kr">do</span> <span class="n">result</span> <span class="o">&lt;-</span> <span class="n">many</span> <span class="n">line</span>
+       <span class="n">eof</span>
+       <span class="n">return</span> <span class="n">result</span>
+
+<span class="c1">-- Each line contains 1 or more cells, separated by a comma</span>
+<span class="n">line</span> <span class="o">::</span> <span class="kt">GenParser</span> <span class="kt">Char</span> <span class="n">st</span> <span class="p">[</span><span class="kt">String</span><span class="p">]</span>
+<span class="n">line</span> <span class="o">=</span> 
+    <span class="kr">do</span> <span class="n">result</span> <span class="o">&lt;-</span> <span class="n">cells</span>
+       <span class="n">eol</span>                       <span class="c1">-- end of line</span>
+       <span class="n">return</span> <span class="n">result</span>
+       
+<span class="c1">-- Build up a list of cells.  Try to parse the first cell, then figure out </span>
+<span class="c1">-- what ends the cell.</span>
+<span class="n">cells</span> <span class="o">::</span> <span class="kt">GenParser</span> <span class="kt">Char</span> <span class="n">st</span> <span class="p">[</span><span class="kt">String</span><span class="p">]</span>
+<span class="n">cells</span> <span class="o">=</span> 
+    <span class="kr">do</span> <span class="n">first</span> <span class="o">&lt;-</span> <span class="n">cellContent</span>
+       <span class="n">next</span> <span class="o">&lt;-</span> <span class="n">remainingCells</span>
+       <span class="n">return</span> <span class="p">(</span><span class="n">first</span> <span class="o">:</span> <span class="n">next</span><span class="p">)</span>
+
+<span class="c1">-- The cell either ends with a comma, indicating that 1 or more cells follow,</span>
+<span class="c1">-- or it doesn't, indicating that we're at the end of the cells for this line</span>
+<span class="n">remainingCells</span> <span class="o">::</span> <span class="kt">GenParser</span> <span class="kt">Char</span> <span class="n">st</span> <span class="p">[</span><span class="kt">String</span><span class="p">]</span>
+<span class="n">remainingCells</span> <span class="o">=</span>
+    <span class="p">(</span><span class="n">char</span> <span class="sc">','</span> <span class="o">&gt;&gt;</span> <span class="n">cells</span><span class="p">)</span>            <span class="c1">-- Found comma?  More cells coming</span>
+    <span class="o">&lt;|&gt;</span> <span class="p">(</span><span class="n">return</span> <span class="kt">[]</span><span class="p">)</span>                <span class="c1">-- No comma?  Return [], no more cells</span>
+
+<span class="c1">-- Each cell contains 0 or more characters, which must not be a comma or</span>
+<span class="c1">-- EOL</span>
+<span class="n">cellContent</span> <span class="o">::</span> <span class="kt">GenParser</span> <span class="kt">Char</span> <span class="n">st</span> <span class="kt">String</span>
+<span class="n">cellContent</span> <span class="o">=</span> 
+    <span class="n">many</span> <span class="p">(</span><span class="n">noneOf</span> <span class="s">",</span><span class="se">\n</span><span class="s">"</span><span class="p">)</span>
+       
+
+<span class="c1">-- The end of line character is \n</span>
+<span class="n">eol</span> <span class="o">::</span> <span class="kt">GenParser</span> <span class="kt">Char</span> <span class="n">st</span> <span class="kt">Char</span>
+<span class="n">eol</span> <span class="o">=</span> <span class="n">char</span> <span class="sc">'</span><span class="se">\n</span><span class="sc">'</span><span class="err">
+
+</span><span class="sc">p</span><span class="err">a</span><span class="n">rseCSV</span> <span class="o">::</span> <span class="kt">String</span> <span class="o">-&gt;</span> <span class="kt">Either</span> <span class="kt">ParseError</span> <span class="p">[[</span><span class="kt">String</span><span class="p">]]</span>
+<span class="n">parseCSV</span> <span class="n">input</span> <span class="o">=</span> <span class="n">parse</span> <span class="n">csvFile</span> <span class="s">"(unknown)"</span> <span class="n">input</span>
+</code></pre>
+</div>
+
+<h3 id="the-sepby-and-endby-combinators">The sepBy and endBy Combinators</h3>
+
+<p>可以用<code class="highlighter-rouge">sepBy</code>和<code class="highlighter-rouge">endBy</code>来改进</p>
+
+<div class="language-haskell highlighter-rouge"><pre class="highlight"><code><span class="c1">-- file: ch16/csv2.hs</span>
+<span class="kr">import</span> <span class="nn">Text.ParserCombinators.Parsec</span>
+
+<span class="n">csvFile</span> <span class="o">=</span> <span class="n">endBy</span> <span class="n">line</span> <span class="n">eol</span>
+<span class="n">line</span> <span class="o">=</span> <span class="n">sepBy</span> <span class="n">cell</span> <span class="p">(</span><span class="n">char</span> <span class="sc">','</span><span class="p">)</span>
+<span class="n">cell</span> <span class="o">=</span> <span class="n">many</span> <span class="p">(</span><span class="n">noneOf</span> <span class="s">",</span><span class="se">\n</span><span class="s">"</span><span class="p">)</span>
+<span class="n">eol</span> <span class="o">=</span> <span class="n">char</span> <span class="sc">'</span><span class="se">\n</span><span class="sc">'</span><span class="err">
+
+</span><span class="sc">p</span><span class="err">a</span><span class="n">rseCSV</span> <span class="o">::</span> <span class="kt">String</span> <span class="o">-&gt;</span> <span class="kt">Either</span> <span class="kt">ParseError</span> <span class="p">[[</span><span class="kt">String</span><span class="p">]]</span>
+<span class="n">parseCSV</span> <span class="n">input</span> <span class="o">=</span> <span class="n">parse</span> <span class="n">csvFile</span> <span class="s">"(unknown)"</span> <span class="n">input</span>
+</code></pre>
+</div>
+
+<ul>
+  <li>
+    <p>A CSV file contains 0 or more lines, each of which is terminated by the end-of-line character.</p>
+  </li>
+  <li>
+    <p>A line contains 1 or more cells, separated by a comma.</p>
+  </li>
+  <li>
+    <p>A cell contains 0 or more characters, which must be neither the comma nor the end-of-line character.</p>
+  </li>
+  <li>
+    <p>The end-of-line character is the newline, \n.</p>
+  </li>
+</ul>
+
+<h3 id="choices-and-errors">Choices and Errors</h3>
+
+<ul>
+  <li>
+    <p>Unix/Linux systems, plus Windows in text mode, use simply “\n”.</p>
+  </li>
+  <li>
+    <p>DOS and Windows systems use “\r\n”</p>
+  </li>
+  <li>
+    <p>Macs traditionally used “\r”.</p>
+  </li>
+  <li>
+    <p>We could add in support for “\n\r”</p>
+  </li>
+</ul>
+
+<p>我们先修改成这样</p>
+
+<div class="language-haskell highlighter-rouge"><pre class="highlight"><code><span class="c1">-- file: ch16/csv3.hs</span>
+<span class="c1">-- This function is not correct!</span>
+<span class="n">eol</span> <span class="o">=</span> <span class="n">string</span> <span class="s">"</span><span class="se">\n</span><span class="s">"</span> <span class="o">&lt;|&gt;</span> <span class="n">string</span> <span class="s">"</span><span class="se">\n\r</span><span class="s">"</span>
+</code></pre>
+</div>
+
+<h3 id="lookahead">Lookahead</h3>
+
+<p>try takes one function, a parser. It applies that parser. If the parser doesn’t succeed, try behaves as if it hadn’t consumed any input at all.</p>
+
+<div class="language-haskell highlighter-rouge"><pre class="highlight"><code><span class="c1">-- file: ch16/csv6.hs</span>
+<span class="kr">import</span> <span class="nn">Text.ParserCombinators.Parsec</span>
+
+<span class="n">csvFile</span> <span class="o">=</span> <span class="n">endBy</span> <span class="n">line</span> <span class="n">eol</span>
+<span class="n">line</span> <span class="o">=</span> <span class="n">sepBy</span> <span class="n">cell</span> <span class="p">(</span><span class="n">char</span> <span class="sc">','</span><span class="p">)</span>
+<span class="n">cell</span> <span class="o">=</span> <span class="n">many</span> <span class="p">(</span><span class="n">noneOf</span> <span class="s">",</span><span class="se">\n\r</span><span class="s">"</span><span class="p">)</span>
+
+<span class="n">eol</span> <span class="o">=</span>   <span class="n">try</span> <span class="p">(</span><span class="n">string</span> <span class="s">"</span><span class="se">\n\r</span><span class="s">"</span><span class="p">)</span>
+    <span class="o">&lt;|&gt;</span> <span class="n">try</span> <span class="p">(</span><span class="n">string</span> <span class="s">"</span><span class="se">\r\n</span><span class="s">"</span><span class="p">)</span>
+    <span class="o">&lt;|&gt;</span> <span class="n">string</span> <span class="s">"</span><span class="se">\n</span><span class="s">"</span>
+    <span class="o">&lt;|&gt;</span> <span class="n">string</span> <span class="s">"</span><span class="se">\r</span><span class="s">"</span>
+
+<span class="n">parseCSV</span> <span class="o">::</span> <span class="kt">String</span> <span class="o">-&gt;</span> <span class="kt">Either</span> <span class="kt">ParseError</span> <span class="p">[[</span><span class="kt">String</span><span class="p">]]</span>
+<span class="n">parseCSV</span> <span class="n">input</span> <span class="o">=</span> <span class="n">parse</span> <span class="n">csvFile</span> <span class="s">"(unknown)"</span> <span class="n">input</span>
+</code></pre>
+</div>
+
+<h3 id="error">ERROR</h3>
+
+<div class="language-haskell highlighter-rouge"><pre class="highlight"><code><span class="n">eol</span> <span class="o">=</span>   <span class="n">try</span> <span class="p">(</span><span class="n">string</span> <span class="s">"</span><span class="se">\n\r</span><span class="s">"</span><span class="p">)</span>
+    <span class="o">&lt;|&gt;</span> <span class="n">try</span> <span class="p">(</span><span class="n">string</span> <span class="s">"</span><span class="se">\r\n</span><span class="s">"</span><span class="p">)</span>
+    <span class="o">&lt;|&gt;</span> <span class="n">string</span> <span class="s">"</span><span class="se">\n</span><span class="s">"</span>
+    <span class="o">&lt;|&gt;</span> <span class="n">string</span> <span class="s">"</span><span class="se">\r</span><span class="s">"</span>
+    <span class="o">&lt;|&gt;</span> <span class="n">fail</span> <span class="s">"Couldn't find EOL"</span>
+</code></pre>
+</div>
+
+<p>错误的时候fail的语句会出现在最后</p>
+
+<div class="language-haskell highlighter-rouge"><pre class="highlight"><code><span class="n">ghci</span><span class="o">&gt;</span> <span class="n">parseCSV</span> <span class="s">"line1"</span>
+<span class="kt">Loading</span> <span class="n">package</span> <span class="n">parsec</span><span class="o">-</span><span class="mf">2.1</span><span class="o">.</span><span class="mf">0.0</span> <span class="o">...</span> <span class="n">linking</span> <span class="o">...</span> <span class="n">done</span><span class="o">.</span>
+<span class="kt">Left</span> <span class="s">"(unknown)"</span> <span class="p">(</span><span class="n">line</span> <span class="mi">1</span><span class="p">,</span> <span class="n">column</span> <span class="mi">6</span><span class="p">)</span><span class="o">:</span>
+<span class="n">unexpected</span> <span class="n">end</span> <span class="kr">of</span> <span class="n">input</span>
+<span class="n">expecting</span> <span class="s">","</span><span class="p">,</span> <span class="s">"</span><span class="se">\n\r</span><span class="s">"</span><span class="p">,</span> <span class="s">"</span><span class="se">\r\n</span><span class="s">"</span><span class="p">,</span> <span class="s">"</span><span class="se">\n</span><span class="s">"</span> <span class="n">or</span> <span class="s">"</span><span class="se">\r</span><span class="s">"</span>
+<span class="kt">Couldn't</span> <span class="n">find</span> <span class="kt">EOL</span>
+</code></pre>
+</div>
+
+<p>可是还是打出了<code class="highlighter-rouge">expecting ",", "\n\r", "\r\n", "\n" or "\r"</code>,因为遇到错误后还在尝试后边的parser,可以这样解决</p>
+
+<div class="language-haskell highlighter-rouge"><pre class="highlight"><code><span class="c1">-- file: ch16/csv8.hs</span>
+<span class="n">eol</span> <span class="o">=</span>   <span class="n">try</span> <span class="p">(</span><span class="n">string</span> <span class="s">"</span><span class="se">\n\r</span><span class="s">"</span><span class="p">)</span>
+    <span class="o">&lt;|&gt;</span> <span class="n">try</span> <span class="p">(</span><span class="n">string</span> <span class="s">"</span><span class="se">\r\n</span><span class="s">"</span><span class="p">)</span>
+    <span class="o">&lt;|&gt;</span> <span class="n">string</span> <span class="s">"</span><span class="se">\n</span><span class="s">"</span>
+    <span class="o">&lt;|&gt;</span> <span class="n">string</span> <span class="s">"</span><span class="se">\r</span><span class="s">"</span>
+    <span class="o">&lt;?&gt;</span> <span class="s">"end of line"</span>
+</code></pre>
+</div>
+
+<h3 id="extended-example-full-csv-parser">Extended Example: Full CSV Parser</h3>
+
+<div class="language-haskell highlighter-rouge"><pre class="highlight"><code><span class="c1">-- file: ch16/csv9.hs</span>
+<span class="kr">import</span> <span class="nn">Text.ParserCombinators.Parsec</span>
+
+<span class="n">csvFile</span> <span class="o">=</span> <span class="n">endBy</span> <span class="n">line</span> <span class="n">eol</span>
+<span class="n">line</span> <span class="o">=</span> <span class="n">sepBy</span> <span class="n">cell</span> <span class="p">(</span><span class="n">char</span> <span class="sc">','</span><span class="p">)</span>
+<span class="c1">-- First, a cell may now be either a bare cell or a "quoted" cell.</span>
+<span class="n">cell</span> <span class="o">=</span> <span class="n">quotedCell</span> <span class="o">&lt;|&gt;</span> <span class="n">many</span> <span class="p">(</span><span class="n">noneOf</span> <span class="s">",</span><span class="se">\n\r</span><span class="s">"</span><span class="p">)</span>
+
+<span class="n">quotedCell</span> <span class="o">=</span> 
+    <span class="kr">do</span> <span class="n">char</span> <span class="sc">'"'</span>
+       <span class="n">content</span> <span class="o">&lt;-</span> <span class="n">many</span> <span class="n">quotedChar</span>
+       <span class="n">char</span> <span class="sc">'"'</span> <span class="o">&lt;?&gt;</span> <span class="s">"quote at end of cell"</span>
+       <span class="n">return</span> <span class="n">content</span>
+
+<span class="n">quotedChar</span> <span class="o">=</span>
+        <span class="n">noneOf</span> <span class="s">"</span><span class="se">\"</span><span class="s">"</span>
+    <span class="o">&lt;|&gt;</span> <span class="n">try</span> <span class="p">(</span><span class="n">string</span> <span class="s">"</span><span class="se">\"\"</span><span class="s">"</span> <span class="o">&gt;&gt;</span> <span class="n">return</span> <span class="sc">'"'</span><span class="p">)</span>
+
+<span class="n">eol</span> <span class="o">=</span>   <span class="n">try</span> <span class="p">(</span><span class="n">string</span> <span class="s">"</span><span class="se">\n\r</span><span class="s">"</span><span class="p">)</span>
+    <span class="o">&lt;|&gt;</span> <span class="n">try</span> <span class="p">(</span><span class="n">string</span> <span class="s">"</span><span class="se">\r\n</span><span class="s">"</span><span class="p">)</span>
+    <span class="o">&lt;|&gt;</span> <span class="n">string</span> <span class="s">"</span><span class="se">\n</span><span class="s">"</span>
+    <span class="o">&lt;|&gt;</span> <span class="n">string</span> <span class="s">"</span><span class="se">\r</span><span class="s">"</span>
+    <span class="o">&lt;?&gt;</span> <span class="s">"end of line"</span>
+
+<span class="n">parseCSV</span> <span class="o">::</span> <span class="kt">String</span> <span class="o">-&gt;</span> <span class="kt">Either</span> <span class="kt">ParseError</span> <span class="p">[[</span><span class="kt">String</span><span class="p">]]</span>
+<span class="n">parseCSV</span> <span class="n">input</span> <span class="o">=</span> <span class="n">parse</span> <span class="n">csvFile</span> <span class="s">"(unknown)"</span> <span class="n">input</span>
+
+<span class="n">main</span> <span class="o">=</span>
+    <span class="kr">do</span> <span class="n">c</span> <span class="o">&lt;-</span> <span class="n">getContents</span>
+       <span class="kr">case</span> <span class="n">parse</span> <span class="n">csvFile</span> <span class="s">"(stdin)"</span> <span class="n">c</span> <span class="kr">of</span>
+            <span class="kt">Left</span> <span class="n">e</span> <span class="o">-&gt;</span> <span class="kr">do</span> <span class="n">putStrLn</span> <span class="s">"Error parsing input:"</span>
+                         <span class="n">print</span> <span class="n">e</span>
+            <span class="kt">Right</span> <span class="n">r</span> <span class="o">-&gt;</span> <span class="n">mapM_</span> <span class="n">print</span> <span class="n">r</span>
+</code></pre>
+</div>
+
+<h3 id="liftm2">liftM2</h3>
+
+<div class="language-haskell highlighter-rouge"><pre class="highlight"><code><span class="c1">-- file: ch16/FormParse.hs</span>
+<span class="n">p_pair</span> <span class="o">::</span> <span class="kt">CharParser</span> <span class="nb">()</span> <span class="p">(</span><span class="kt">String</span><span class="p">,</span> <span class="kt">Maybe</span> <span class="kt">String</span><span class="p">)</span>
+<span class="n">p_pair</span> <span class="o">=</span> <span class="kr">do</span>
+  <span class="n">name</span> <span class="o">&lt;-</span> <span class="n">many1</span> <span class="n">p_char</span>
+  <span class="n">value</span> <span class="o">&lt;-</span> <span class="n">optionMaybe</span> <span class="p">(</span><span class="n">char</span> <span class="sc">'='</span> <span class="o">&gt;&gt;</span> <span class="n">many</span> <span class="n">p_char</span><span class="p">)</span>
+  <span class="n">return</span> <span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">value</span><span class="p">)</span>
+</code></pre>
+</div>
+
+<p>可以写成如下样子</p>
+
+<div class="language-haskell highlighter-rouge"><pre class="highlight"><code><span class="c1">-- file: ch16/FormParse.hs</span>
+<span class="n">p_pair_app1</span> <span class="o">=</span>
+    <span class="n">liftM2</span> <span class="p">(,)</span> <span class="p">(</span><span class="n">many1</span> <span class="n">p_char</span><span class="p">)</span> <span class="p">(</span><span class="n">optionMaybe</span> <span class="p">(</span><span class="n">char</span> <span class="sc">'='</span> <span class="o">&gt;&gt;</span> <span class="n">many</span> <span class="n">p_char</span><span class="p">))</span>
+</code></pre>
+</div>
+
+  </div>
+
+</article>
+
+      </div>
+    </div>
+
+    <footer class="site-footer">
+
+  <div class="wrapper">
+
+    <h2 class="footer-heading"></h2>
+
+    <div class="footer-col-wrapper">
+      <div class="footer-col footer-col-1">
+        <ul class="contact-list">
+          <li></li>
+          <li><a href="mailto:"></a></li>
+        </ul>
+      </div>
+
+      <div class="footer-col footer-col-2">
+        <ul class="social-media-list">
+          
+
+          
+        </ul>
+      </div>
+
+      <div class="footer-col footer-col-3">
+        <p></p>
+      </div>
+    </div>
+
+  </div>
+
+</footer>
+
+
+  </body>
+
+</html>
