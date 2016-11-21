@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html>
+
+  <head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  <title>300ms delay</title>
+  <meta name="description" content="http://developer.telerik.com/featured/300-ms-click-delay-ios-8/">
+
+  <link rel="stylesheet" href="/css/main.css">
+  <link rel="canonical" href="http://localhost:4000/mobile/2016/11/03/300ms-click.html">
+  <link rel="alternate" type="application/rss+xml" title="" href="http://localhost:4000/feed.xml">
+</head>
+
+
+  <body>
+
+    <header class="site-header">
+
+  <div class="wrapper">
+
+    <a class="site-title" href="/"></a>
+
+    <nav class="site-nav">
+      <a href="#" class="menu-icon">
+        <svg viewBox="0 0 18 15">
+          <path fill="#424242" d="M18,1.484c0,0.82-0.665,1.484-1.484,1.484H1.484C0.665,2.969,0,2.304,0,1.484l0,0C0,0.665,0.665,0,1.484,0 h15.031C17.335,0,18,0.665,18,1.484L18,1.484z"/>
+          <path fill="#424242" d="M18,7.516C18,8.335,17.335,9,16.516,9H1.484C0.665,9,0,8.335,0,7.516l0,0c0-0.82,0.665-1.484,1.484-1.484 h15.031C17.335,6.031,18,6.696,18,7.516L18,7.516z"/>
+          <path fill="#424242" d="M18,13.516C18,14.335,17.335,15,16.516,15H1.484C0.665,15,0,14.335,0,13.516l0,0 c0-0.82,0.665-1.484,1.484-1.484h15.031C17.335,12.031,18,12.696,18,13.516L18,13.516z"/>
+        </svg>
+      </a>
+
+      <div class="trigger">
+        
+          
+          <a class="page-link" href="/about/">About</a>
+          
+        
+          
+        
+          
+        
+          
+        
+      </div>
+    </nav>
+
+  </div>
+
+</header>
+
+
+    <div class="page-content">
+      <div class="wrapper">
+        <article class="post" itemscope itemtype="http://schema.org/BlogPosting">
+
+  <header class="post-header">
+    <h1 class="post-title" itemprop="name headline">300ms delay</h1>
+    <p class="post-meta"><time datetime="2016-11-03T00:00:00+08:00" itemprop="datePublished">Nov 3, 2016</time></p>
+  </header>
+
+  <div class="post-content" itemprop="articleBody">
+    <p>http://developer.telerik.com/featured/300-ms-click-delay-ios-8/</p>
+
+<h3 id="section">原因</h3>
+
+<p>原因是为了侦测double click事件</p>
+
+<h3 id="android-">android 解决办法</h3>
+
+<p><strong><em>CHROME AND FIREFOX</em></strong></p>
+
+<p>在你设置了viewport之后，不会有300ms的延迟的</p>
+
+<p>在chrome v36和firefox v29后，同下边的IE解决办法一样， 也都支持了touch-action属性，所以IE的解决办法同样适用</p>
+
+<p><strong><em>INTERNET EXPLORER</em></strong></p>
+
+<p>为点击的element添加touch-action属性</p>
+
+<div class="language-html highlighter-rouge"><pre class="highlight"><code><span class="nt">&lt;style&gt;</span>
+  <span class="nt">html</span> <span class="p">{</span> <span class="py">touch-action</span><span class="p">:</span> <span class="n">manipulation</span><span class="p">;</span> <span class="p">}</span>
+<span class="nt">&lt;/style&gt;</span>
+</code></pre>
+</div>
+
+<h3 id="ios-">iOS 解决办法</h3>
+
+<p><code class="highlighter-rouge">tap</code>分为<code class="highlighter-rouge">fast tap</code>和<code class="highlighter-rouge">slow tap</code></p>
+
+<h4 id="fast-tap-slow-tap">什么是fast tap slow tap</h4>
+
+<p>determined by how long your finger is on the screen, or more specifically, the difference between the touchstart and touchend events.</p>
+
+<p>Taps where your finger is on the screen for <code class="highlighter-rouge">&lt; ~125 milliseconds</code> are considered <code class="highlighter-rouge">fast</code>, and the delay is maintained;</p>
+
+<p>tap很快的时候，300ms是存在的，因为很可能是double click</p>
+
+<p>taps where your finger is on the screen for <code class="highlighter-rouge">&gt; ~125 milliseconds</code> are considered <code class="highlighter-rouge">slow</code>, and the delay is removed.</p>
+
+<p>tap 很慢的时候，没有300ms，认为是单独的click</p>
+
+<h4 id="the-uiwebview-caveat">The UIWebView caveat</h4>
+
+<p>the new iOS 8 heuristics are only present in iOS 8 Safari and iOS’s new WKWebView class. The heuristics are not present in the legacy UIWebView class, and they’re also not present for apps running as home screen web apps.</p>
+
+<h4 id="section-1">不行就用库。。。</h4>
+
+<p>Kendo UI Mobile, FastClick, or Tappy</p>
+
+<h3 id="react">react解决办法</h3>
+
+<p>https://github.com/zilverline/react-tap-event-plugin</p>
+
+<h3 id="section-2">查看延迟时间代码</h3>
+
+<div class="language-js highlighter-rouge"><pre class="highlight"><code><span class="o">&lt;</span><span class="nx">button</span><span class="o">&gt;</span><span class="nx">Click</span><span class="o">&lt;</span><span class="sr">/button</span><span class="err">&gt;
+</span><span class="o">&lt;</span><span class="nx">p</span><span class="o">&gt;</span><span class="nx">Delay</span> <span class="nx">was</span> <span class="o">&lt;</span><span class="nx">span</span><span class="o">&gt;&lt;</span><span class="sr">/span&gt; milliseconds.&lt;/</span><span class="nx">p</span><span class="o">&gt;</span>
+<span class="o">&lt;</span><span class="nx">script</span><span class="o">&gt;</span>
+    <span class="kd">var</span> <span class="nx">button</span> <span class="o">=</span> <span class="nb">document</span><span class="p">.</span><span class="nx">querySelector</span><span class="p">(</span> <span class="s2">"button"</span> <span class="p">),</span>
+        <span class="nx">span</span> <span class="o">=</span> <span class="nb">document</span><span class="p">.</span><span class="nx">querySelector</span><span class="p">(</span> <span class="s2">"span"</span> <span class="p">),</span>
+        <span class="nx">delay</span><span class="p">;</span>
+    <span class="c1">// 点后触发touchend</span>
+    <span class="nx">button</span><span class="p">.</span><span class="nx">addEventListener</span><span class="p">(</span> <span class="s2">"touchend"</span><span class="p">,</span> <span class="kd">function</span><span class="p">()</span> <span class="p">{</span>
+        <span class="nx">delay</span> <span class="o">=</span> <span class="nb">Date</span><span class="p">.</span><span class="nx">now</span><span class="p">();</span>
+    <span class="p">});</span>
+    <span class="c1">// 过了一段时间，触发click</span>
+    <span class="nx">button</span><span class="p">.</span><span class="nx">addEventListener</span><span class="p">(</span> <span class="s2">"click"</span><span class="p">,</span> <span class="kd">function</span><span class="p">()</span> <span class="p">{</span>
+        <span class="nx">span</span><span class="p">.</span><span class="nx">innerHTML</span> <span class="o">=</span> <span class="nb">Date</span><span class="p">.</span><span class="nx">now</span><span class="p">()</span> <span class="o">-</span> <span class="nx">delay</span><span class="p">;</span>
+    <span class="p">});</span>
+<span class="o">&lt;</span><span class="sr">/script</span><span class="err">&gt;
+</span></code></pre>
+</div>
+
+  </div>
+
+</article>
+
+      </div>
+    </div>
+
+    <footer class="site-footer">
+
+  <div class="wrapper">
+
+    <h2 class="footer-heading"></h2>
+
+    <div class="footer-col-wrapper">
+      <div class="footer-col footer-col-1">
+        <ul class="contact-list">
+          <li></li>
+          <li><a href="mailto:"></a></li>
+        </ul>
+      </div>
+
+      <div class="footer-col footer-col-2">
+        <ul class="social-media-list">
+          
+
+          
+        </ul>
+      </div>
+
+      <div class="footer-col footer-col-3">
+        <p></p>
+      </div>
+    </div>
+
+  </div>
+
+</footer>
+
+
+  </body>
+
+</html>

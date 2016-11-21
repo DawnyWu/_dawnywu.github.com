@@ -1,0 +1,435 @@
+<!DOCTYPE html>
+<html>
+
+  <head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  <title>Redux Middleware</title>
+  <meta name="description" content="What Middleware">
+
+  <link rel="stylesheet" href="/css/main.css">
+  <link rel="canonical" href="http://localhost:4000/js/2016/10/31/redux-middleware.html">
+  <link rel="alternate" type="application/rss+xml" title="" href="http://localhost:4000/feed.xml">
+</head>
+
+
+  <body>
+
+    <header class="site-header">
+
+  <div class="wrapper">
+
+    <a class="site-title" href="/"></a>
+
+    <nav class="site-nav">
+      <a href="#" class="menu-icon">
+        <svg viewBox="0 0 18 15">
+          <path fill="#424242" d="M18,1.484c0,0.82-0.665,1.484-1.484,1.484H1.484C0.665,2.969,0,2.304,0,1.484l0,0C0,0.665,0.665,0,1.484,0 h15.031C17.335,0,18,0.665,18,1.484L18,1.484z"/>
+          <path fill="#424242" d="M18,7.516C18,8.335,17.335,9,16.516,9H1.484C0.665,9,0,8.335,0,7.516l0,0c0-0.82,0.665-1.484,1.484-1.484 h15.031C17.335,6.031,18,6.696,18,7.516L18,7.516z"/>
+          <path fill="#424242" d="M18,13.516C18,14.335,17.335,15,16.516,15H1.484C0.665,15,0,14.335,0,13.516l0,0 c0-0.82,0.665-1.484,1.484-1.484h15.031C17.335,12.031,18,12.696,18,13.516L18,13.516z"/>
+        </svg>
+      </a>
+
+      <div class="trigger">
+        
+          
+          <a class="page-link" href="/about/">About</a>
+          
+        
+          
+        
+          
+        
+          
+        
+      </div>
+    </nav>
+
+  </div>
+
+</header>
+
+
+    <div class="page-content">
+      <div class="wrapper">
+        <article class="post" itemscope itemtype="http://schema.org/BlogPosting">
+
+  <header class="post-header">
+    <h1 class="post-title" itemprop="name headline">Redux Middleware</h1>
+    <p class="post-meta"><time datetime="2016-10-31T00:00:00+08:00" itemprop="datePublished">Oct 31, 2016</time></p>
+  </header>
+
+  <div class="post-content" itemprop="articleBody">
+    <h3 id="what-middleware">What Middleware</h3>
+
+<p>It provides a third-party extension point between <code class="highlighter-rouge">dispatching an action</code>, and <code class="highlighter-rouge">the moment it reaches the reducer</code>.</p>
+
+<h3 id="logging">尝试解决Logging问题</h3>
+
+<h4 id="attempt-1">Attempt 1</h4>
+
+<p>手动一个一个加log</p>
+
+<div class="language-js highlighter-rouge"><pre class="highlight"><code><span class="nx">store</span><span class="p">.</span><span class="nx">dispatch</span><span class="p">(</span><span class="nx">action</span><span class="p">)</span>
+<span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="s1">'next state'</span><span class="p">,</span> <span class="nx">store</span><span class="p">.</span><span class="nx">getState</span><span class="p">())</span>
+</code></pre>
+</div>
+
+<h4 id="attempt-2">Attempt 2</h4>
+
+<p>写一个把action和log封在一起的函数</p>
+
+<div class="language-js highlighter-rouge"><pre class="highlight"><code><span class="kd">function</span> <span class="nx">dispatchAndLog</span><span class="p">(</span><span class="nx">store</span><span class="p">,</span> <span class="nx">action</span><span class="p">)</span> <span class="p">{</span>
+  <span class="nx">store</span><span class="p">.</span><span class="nx">dispatch</span><span class="p">(</span><span class="nx">action</span><span class="p">)</span>
+  <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="s1">'next state'</span><span class="p">,</span> <span class="nx">store</span><span class="p">.</span><span class="nx">getState</span><span class="p">())</span>
+<span class="p">}</span>
+</code></pre>
+</div>
+
+<h3 id="attempt-3">Attempt 3</h3>
+
+<p>类似ruby,monkeyPatch dispath 函数</p>
+
+<div class="language-js highlighter-rouge"><pre class="highlight"><code><span class="c1">// 保存原本的dispath方法</span>
+<span class="kd">let</span> <span class="nx">next</span> <span class="o">=</span> <span class="nx">store</span><span class="p">.</span><span class="nx">dispatch</span>
+
+<span class="c1">// 覆盖原本的dispath方法</span>
+<span class="nx">store</span><span class="p">.</span><span class="nx">dispatch</span> <span class="o">=</span> <span class="kd">function</span> <span class="nx">dispatchAndLog</span><span class="p">(</span><span class="nx">action</span><span class="p">)</span> <span class="p">{</span>
+  <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="s1">'dispatching'</span><span class="p">,</span> <span class="nx">action</span><span class="p">)</span>
+  <span class="c1">//  原本的dispath</span>
+  <span class="kd">let</span> <span class="nx">result</span> <span class="o">=</span> <span class="nx">next</span><span class="p">(</span><span class="nx">action</span><span class="p">)</span>
+  <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="s1">'next state'</span><span class="p">,</span> <span class="nx">store</span><span class="p">.</span><span class="nx">getState</span><span class="p">())</span>
+  <span class="k">return</span> <span class="nx">result</span>
+<span class="p">}</span>
+</code></pre>
+</div>
+
+<h3 id="monkeypatch">可以其他需求还需要monkeyPatch</h3>
+
+<p>function patchStoreToAddLogging(store) {
+  let next = store.dispatch
+  store.dispatch = function dispatchAndLog(action) {
+    console.log(‘dispatching’, action)
+    let result = next(action)
+    console.log(‘next state’, store.getState())
+    return result
+  }
+}</p>
+
+<p>function patchStoreToAddCrashReporting(store) {
+  let next = store.dispatch
+  store.dispatch = function dispatchAndReportErrors(action) {
+    try {
+      return next(action)
+    } catch (err) {
+      console.error(‘Caught an exception!’, err)
+      Raven.captureException(err, {
+        extra: {
+          action,
+          state: store.getState()
+        }
+      })
+      throw err
+    }
+  }
+}</p>
+
+<div class="language-js highlighter-rouge"><pre class="highlight"><code><span class="nx">patchStoreToAddLogging</span><span class="p">(</span><span class="nx">store</span><span class="p">)</span>
+<span class="nx">patchStoreToAddCrashReporting</span><span class="p">(</span><span class="nx">store</span><span class="p">)</span>
+</code></pre>
+</div>
+
+<h3 id="attempt-4">Attempt 4</h3>
+
+<p>之前都是覆盖掉了原来的dispath函数，所以叫monkeyPatch…</p>
+
+<p>现在我们不覆盖掉，而是返回一个新的增强版的dispach函数</p>
+
+<div class="language-js highlighter-rouge"><pre class="highlight"><code><span class="kd">function</span> <span class="nx">logger</span><span class="p">(</span><span class="nx">store</span><span class="p">)</span> <span class="p">{</span>
+  <span class="kd">let</span> <span class="nx">next</span> <span class="o">=</span> <span class="nx">store</span><span class="p">.</span><span class="nx">dispatch</span>
+
+  <span class="c1">// Previously:</span>
+  <span class="c1">// store.dispatch = function dispatchAndLog(action) {</span>
+
+  <span class="k">return</span> <span class="kd">function</span> <span class="nx">dispatchAndLog</span><span class="p">(</span><span class="nx">action</span><span class="p">)</span> <span class="p">{</span>
+    <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="s1">'dispatching'</span><span class="p">,</span> <span class="nx">action</span><span class="p">)</span>
+    <span class="kd">let</span> <span class="nx">result</span> <span class="o">=</span> <span class="nx">next</span><span class="p">(</span><span class="nx">action</span><span class="p">)</span>
+    <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="s1">'next state'</span><span class="p">,</span> <span class="nx">store</span><span class="p">.</span><span class="nx">getState</span><span class="p">())</span>
+    <span class="k">return</span> <span class="nx">result</span>
+  <span class="p">}</span>
+<span class="p">}</span>
+</code></pre>
+</div>
+
+<div class="language-js highlighter-rouge"><pre class="highlight"><code><span class="c1">//applyMiddlewareByMonkeypatching(store, [ logger, crashReporter ])</span>
+<span class="kd">function</span> <span class="nx">applyMiddlewareByMonkeypatching</span><span class="p">(</span><span class="nx">store</span><span class="p">,</span> <span class="nx">middlewares</span><span class="p">)</span> <span class="p">{</span>
+  <span class="nx">middlewares</span> <span class="o">=</span> <span class="nx">middlewares</span><span class="p">.</span><span class="nx">slice</span><span class="p">()</span>
+  <span class="nx">middlewares</span><span class="p">.</span><span class="nx">reverse</span><span class="p">()</span>
+
+  <span class="c1">// Transform dispatch function with each middleware.</span>
+  <span class="nx">middlewares</span><span class="p">.</span><span class="nx">forEach</span><span class="p">(</span><span class="nx">middleware</span> <span class="o">=&gt;</span>
+    <span class="nx">store</span><span class="p">.</span><span class="nx">dispatch</span> <span class="o">=</span> <span class="nx">middleware</span><span class="p">(</span><span class="nx">store</span><span class="p">)</span>
+  <span class="p">)</span>
+<span class="p">}</span>
+</code></pre>
+</div>
+
+<h3 id="attempt-5">Attempt 5</h3>
+
+<p>上边还是有monkeypatch, <code class="highlighter-rouge">store.dispatch = middleware(store)</code>, 我们覆盖掉了原本的dispatch
+而且我们不覆盖的话，<code class="highlighter-rouge">let next = store.dispatch</code>得到的dispatch就会是旧的，会有问题</p>
+
+<p>我们有解决的办法</p>
+
+<div class="language-js highlighter-rouge"><pre class="highlight"><code><span class="kd">function</span> <span class="nx">logger</span><span class="p">(</span><span class="nx">store</span><span class="p">)</span> <span class="p">{</span>
+  <span class="k">return</span> <span class="kd">function</span> <span class="nx">wrapDispatchToAddLogging</span><span class="p">(</span><span class="nx">next</span><span class="p">)</span> <span class="p">{</span>
+    <span class="k">return</span> <span class="kd">function</span> <span class="nx">dispatchAndLog</span><span class="p">(</span><span class="nx">action</span><span class="p">)</span> <span class="p">{</span>
+      <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="s1">'dispatching'</span><span class="p">,</span> <span class="nx">action</span><span class="p">)</span>
+      <span class="kd">let</span> <span class="nx">result</span> <span class="o">=</span> <span class="nx">next</span><span class="p">(</span><span class="nx">action</span><span class="p">)</span>
+      <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="s1">'next state'</span><span class="p">,</span> <span class="nx">store</span><span class="p">.</span><span class="nx">getState</span><span class="p">())</span>
+      <span class="k">return</span> <span class="nx">result</span>
+    <span class="p">}</span>
+  <span class="p">}</span>
+<span class="p">}</span>
+</code></pre>
+</div>
+
+<p><code class="highlighter-rouge">next(action)</code> 等于 <code class="highlighter-rouge">store.dispach(action)</code></p>
+
+<p>这个<code class="highlighter-rouge">dispatch</code>是当前<code class="highlighter-rouge">middleware</code>修改之前的<code class="highlighter-rouge">dispatch</code></p>
+
+<div class="language-js highlighter-rouge"><pre class="highlight"><code><span class="kr">const</span> <span class="nx">logger</span> <span class="o">=</span> <span class="nx">store</span> <span class="o">=&gt;</span> <span class="nx">next</span> <span class="o">=&gt;</span> <span class="nx">action</span> <span class="o">=&gt;</span> <span class="p">{</span>
+  <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="s1">'dispatching'</span><span class="p">,</span> <span class="nx">action</span><span class="p">)</span>
+  <span class="kd">let</span> <span class="nx">result</span> <span class="o">=</span> <span class="nx">next</span><span class="p">(</span><span class="nx">action</span><span class="p">)</span>
+  <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="s1">'next state'</span><span class="p">,</span> <span class="nx">store</span><span class="p">.</span><span class="nx">getState</span><span class="p">())</span>
+  <span class="k">return</span> <span class="nx">result</span>
+<span class="p">}</span>
+
+<span class="kr">const</span> <span class="nx">crashReporter</span> <span class="o">=</span> <span class="nx">store</span> <span class="o">=&gt;</span> <span class="nx">next</span> <span class="o">=&gt;</span> <span class="nx">action</span> <span class="o">=&gt;</span> <span class="p">{</span>
+  <span class="k">try</span> <span class="p">{</span>
+    <span class="k">return</span> <span class="nx">next</span><span class="p">(</span><span class="nx">action</span><span class="p">)</span>
+  <span class="p">}</span> <span class="k">catch</span> <span class="p">(</span><span class="nx">err</span><span class="p">)</span> <span class="p">{</span>
+    <span class="nx">console</span><span class="p">.</span><span class="nx">error</span><span class="p">(</span><span class="s1">'Caught an exception!'</span><span class="p">,</span> <span class="nx">err</span><span class="p">)</span>
+    <span class="nx">Raven</span><span class="p">.</span><span class="nx">captureException</span><span class="p">(</span><span class="nx">err</span><span class="p">,</span> <span class="p">{</span>
+      <span class="na">extra</span><span class="p">:</span> <span class="p">{</span>
+        <span class="nx">action</span><span class="p">,</span>
+        <span class="na">state</span><span class="p">:</span> <span class="nx">store</span><span class="p">.</span><span class="nx">getState</span><span class="p">()</span>
+      <span class="p">}</span>
+    <span class="p">})</span>
+    <span class="k">throw</span> <span class="nx">err</span>
+  <span class="p">}</span>
+<span class="p">}</span>
+</code></pre>
+</div>
+
+<p>Now middleware takes the <code class="highlighter-rouge">next() dispatch function</code>, and returns a <code class="highlighter-rouge">dispatch function</code>, which in turn serves as <code class="highlighter-rouge">next()</code> to the middleware to the left, and so on.</p>
+
+<p>It’s still useful to have access to some store methods like <code class="highlighter-rouge">getState()</code>, so store stays available as the top-level argument.</p>
+
+<div class="language-js highlighter-rouge"><pre class="highlight"><code><span class="c1">// Warning: Naïve implementation!</span>
+<span class="c1">// That's *not* Redux API.</span>
+
+<span class="kd">function</span> <span class="nx">applyMiddleware</span><span class="p">(</span><span class="nx">store</span><span class="p">,</span> <span class="nx">middlewares</span><span class="p">)</span> <span class="p">{</span>
+  <span class="nx">middlewares</span> <span class="o">=</span> <span class="nx">middlewares</span><span class="p">.</span><span class="nx">slice</span><span class="p">()</span>
+  <span class="nx">middlewares</span><span class="p">.</span><span class="nx">reverse</span><span class="p">()</span>
+
+  <span class="kd">let</span> <span class="nx">dispatch</span> <span class="o">=</span> <span class="nx">store</span><span class="p">.</span><span class="nx">dispatch</span>
+  <span class="nx">middlewares</span><span class="p">.</span><span class="nx">forEach</span><span class="p">(</span><span class="nx">middleware</span> <span class="o">=&gt;</span> 
+    <span class="nx">dispatch</span> <span class="o">=</span> <span class="nx">middleware</span><span class="p">(</span><span class="nx">store</span><span class="p">)(</span><span class="nx">dispatch</span><span class="p">)</span>
+  <span class="p">)</span>
+
+  <span class="k">return</span> <span class="nb">Object</span><span class="p">.</span><span class="nx">assign</span><span class="p">({},</span> <span class="nx">store</span><span class="p">,</span> <span class="p">{</span> <span class="nx">dispatch</span> <span class="p">})</span>
+<span class="p">}</span>
+</code></pre>
+</div>
+
+<h3 id="middleware-examples">7 middleware examples</h3>
+
+<div class="language-js highlighter-rouge"><pre class="highlight"><code><span class="cm">/**
+ * Logs all actions and states after they are dispatched.
+ */</span>
+<span class="kr">const</span> <span class="nx">logger</span> <span class="o">=</span> <span class="nx">store</span> <span class="o">=&gt;</span> <span class="nx">next</span> <span class="o">=&gt;</span> <span class="nx">action</span> <span class="o">=&gt;</span> <span class="p">{</span>
+  <span class="nx">console</span><span class="p">.</span><span class="nx">group</span><span class="p">(</span><span class="nx">action</span><span class="p">.</span><span class="nx">type</span><span class="p">)</span>
+  <span class="nx">console</span><span class="p">.</span><span class="nx">info</span><span class="p">(</span><span class="s1">'dispatching'</span><span class="p">,</span> <span class="nx">action</span><span class="p">)</span>
+  <span class="kd">let</span> <span class="nx">result</span> <span class="o">=</span> <span class="nx">next</span><span class="p">(</span><span class="nx">action</span><span class="p">)</span>
+  <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="s1">'next state'</span><span class="p">,</span> <span class="nx">store</span><span class="p">.</span><span class="nx">getState</span><span class="p">())</span>
+  <span class="nx">console</span><span class="p">.</span><span class="nx">groupEnd</span><span class="p">(</span><span class="nx">action</span><span class="p">.</span><span class="nx">type</span><span class="p">)</span>
+  <span class="k">return</span> <span class="nx">result</span>
+<span class="p">}</span>
+
+<span class="cm">/**
+ * Sends crash reports as state is updated and listeners are notified.
+ */</span>
+<span class="kr">const</span> <span class="nx">crashReporter</span> <span class="o">=</span> <span class="nx">store</span> <span class="o">=&gt;</span> <span class="nx">next</span> <span class="o">=&gt;</span> <span class="nx">action</span> <span class="o">=&gt;</span> <span class="p">{</span>
+  <span class="k">try</span> <span class="p">{</span>
+    <span class="k">return</span> <span class="nx">next</span><span class="p">(</span><span class="nx">action</span><span class="p">)</span>
+  <span class="p">}</span> <span class="k">catch</span> <span class="p">(</span><span class="nx">err</span><span class="p">)</span> <span class="p">{</span>
+    <span class="nx">console</span><span class="p">.</span><span class="nx">error</span><span class="p">(</span><span class="s1">'Caught an exception!'</span><span class="p">,</span> <span class="nx">err</span><span class="p">)</span>
+    <span class="nx">Raven</span><span class="p">.</span><span class="nx">captureException</span><span class="p">(</span><span class="nx">err</span><span class="p">,</span> <span class="p">{</span>
+      <span class="na">extra</span><span class="p">:</span> <span class="p">{</span>
+        <span class="nx">action</span><span class="p">,</span>
+        <span class="na">state</span><span class="p">:</span> <span class="nx">store</span><span class="p">.</span><span class="nx">getState</span><span class="p">()</span>
+      <span class="p">}</span>
+    <span class="p">})</span>
+    <span class="k">throw</span> <span class="nx">err</span>
+  <span class="p">}</span>
+<span class="p">}</span>
+
+<span class="cm">/**
+ * Schedules actions with { meta: { delay: N } } to be delayed by N milliseconds.
+ * Makes `dispatch` return a function to cancel the timeout in this case.
+ */</span>
+<span class="kr">const</span> <span class="nx">timeoutScheduler</span> <span class="o">=</span> <span class="nx">store</span> <span class="o">=&gt;</span> <span class="nx">next</span> <span class="o">=&gt;</span> <span class="nx">action</span> <span class="o">=&gt;</span> <span class="p">{</span>
+  <span class="k">if</span> <span class="p">(</span><span class="o">!</span><span class="nx">action</span><span class="p">.</span><span class="nx">meta</span> <span class="o">||</span> <span class="o">!</span><span class="nx">action</span><span class="p">.</span><span class="nx">meta</span><span class="p">.</span><span class="nx">delay</span><span class="p">)</span> <span class="p">{</span>
+    <span class="k">return</span> <span class="nx">next</span><span class="p">(</span><span class="nx">action</span><span class="p">)</span>
+  <span class="p">}</span>
+
+  <span class="kd">let</span> <span class="nx">timeoutId</span> <span class="o">=</span> <span class="nx">setTimeout</span><span class="p">(</span>
+    <span class="p">()</span> <span class="o">=&gt;</span> <span class="nx">next</span><span class="p">(</span><span class="nx">action</span><span class="p">),</span>
+    <span class="nx">action</span><span class="p">.</span><span class="nx">meta</span><span class="p">.</span><span class="nx">delay</span>
+  <span class="p">)</span>
+
+  <span class="k">return</span> <span class="kd">function</span> <span class="nx">cancel</span><span class="p">()</span> <span class="p">{</span>
+    <span class="nx">clearTimeout</span><span class="p">(</span><span class="nx">timeoutId</span><span class="p">)</span>
+  <span class="p">}</span>
+<span class="p">}</span>
+
+<span class="cm">/**
+ * Schedules actions with { meta: { raf: true } } to be dispatched inside a rAF loop
+ * frame.  Makes `dispatch` return a function to remove the action from the queue in
+ * this case.
+ */</span>
+<span class="kr">const</span> <span class="nx">rafScheduler</span> <span class="o">=</span> <span class="nx">store</span> <span class="o">=&gt;</span> <span class="nx">next</span> <span class="o">=&gt;</span> <span class="p">{</span>
+  <span class="kd">let</span> <span class="nx">queuedActions</span> <span class="o">=</span> <span class="p">[]</span>
+  <span class="kd">let</span> <span class="nx">frame</span> <span class="o">=</span> <span class="kc">null</span>
+
+  <span class="kd">function</span> <span class="nx">loop</span><span class="p">()</span> <span class="p">{</span>
+    <span class="nx">frame</span> <span class="o">=</span> <span class="kc">null</span>
+    <span class="k">try</span> <span class="p">{</span>
+      <span class="k">if</span> <span class="p">(</span><span class="nx">queuedActions</span><span class="p">.</span><span class="nx">length</span><span class="p">)</span> <span class="p">{</span>
+        <span class="nx">next</span><span class="p">(</span><span class="nx">queuedActions</span><span class="p">.</span><span class="nx">shift</span><span class="p">())</span>
+      <span class="p">}</span>
+    <span class="p">}</span> <span class="k">finally</span> <span class="p">{</span>
+      <span class="nx">maybeRaf</span><span class="p">()</span>
+    <span class="p">}</span>
+  <span class="p">}</span>
+
+  <span class="kd">function</span> <span class="nx">maybeRaf</span><span class="p">()</span> <span class="p">{</span>
+    <span class="k">if</span> <span class="p">(</span><span class="nx">queuedActions</span><span class="p">.</span><span class="nx">length</span> <span class="o">&amp;&amp;</span> <span class="o">!</span><span class="nx">frame</span><span class="p">)</span> <span class="p">{</span>
+      <span class="nx">frame</span> <span class="o">=</span> <span class="nx">requestAnimationFrame</span><span class="p">(</span><span class="nx">loop</span><span class="p">)</span>
+    <span class="p">}</span>
+  <span class="p">}</span>
+
+  <span class="k">return</span> <span class="nx">action</span> <span class="o">=&gt;</span> <span class="p">{</span>
+    <span class="k">if</span> <span class="p">(</span><span class="o">!</span><span class="nx">action</span><span class="p">.</span><span class="nx">meta</span> <span class="o">||</span> <span class="o">!</span><span class="nx">action</span><span class="p">.</span><span class="nx">meta</span><span class="p">.</span><span class="nx">raf</span><span class="p">)</span> <span class="p">{</span>
+      <span class="k">return</span> <span class="nx">next</span><span class="p">(</span><span class="nx">action</span><span class="p">)</span>
+    <span class="p">}</span>
+
+    <span class="nx">queuedActions</span><span class="p">.</span><span class="nx">push</span><span class="p">(</span><span class="nx">action</span><span class="p">)</span>
+    <span class="nx">maybeRaf</span><span class="p">()</span>
+
+    <span class="k">return</span> <span class="kd">function</span> <span class="nx">cancel</span><span class="p">()</span> <span class="p">{</span>
+      <span class="nx">queuedActions</span> <span class="o">=</span> <span class="nx">queuedActions</span><span class="p">.</span><span class="nx">filter</span><span class="p">(</span><span class="nx">a</span> <span class="o">=&gt;</span> <span class="nx">a</span> <span class="o">!==</span> <span class="nx">action</span><span class="p">)</span>
+    <span class="p">}</span>
+  <span class="p">}</span>
+<span class="p">}</span>
+
+<span class="cm">/**
+ * Lets you dispatch promises in addition to actions.
+ * If the promise is resolved, its result will be dispatched as an action.
+ * The promise is returned from `dispatch` so the caller may handle rejection.
+ */</span>
+<span class="kr">const</span> <span class="nx">vanillaPromise</span> <span class="o">=</span> <span class="nx">store</span> <span class="o">=&gt;</span> <span class="nx">next</span> <span class="o">=&gt;</span> <span class="nx">action</span> <span class="o">=&gt;</span> <span class="p">{</span>
+  <span class="k">if</span> <span class="p">(</span><span class="k">typeof</span> <span class="nx">action</span><span class="p">.</span><span class="nx">then</span> <span class="o">!==</span> <span class="s1">'function'</span><span class="p">)</span> <span class="p">{</span>
+    <span class="k">return</span> <span class="nx">next</span><span class="p">(</span><span class="nx">action</span><span class="p">)</span>
+  <span class="p">}</span>
+
+  <span class="k">return</span> <span class="nx">Promise</span><span class="p">.</span><span class="nx">resolve</span><span class="p">(</span><span class="nx">action</span><span class="p">).</span><span class="nx">then</span><span class="p">(</span><span class="nx">store</span><span class="p">.</span><span class="nx">dispatch</span><span class="p">)</span>
+<span class="p">}</span>
+
+<span class="cm">/**
+ * Lets you dispatch special actions with a { promise } field.
+ *
+ * This middleware will turn them into a single action at the beginning,
+ * and a single success (or failure) action when the `promise` resolves.
+ *
+ * For convenience, `dispatch` will return the promise so the caller can wait.
+ */</span>
+<span class="kr">const</span> <span class="nx">readyStatePromise</span> <span class="o">=</span> <span class="nx">store</span> <span class="o">=&gt;</span> <span class="nx">next</span> <span class="o">=&gt;</span> <span class="nx">action</span> <span class="o">=&gt;</span> <span class="p">{</span>
+  <span class="k">if</span> <span class="p">(</span><span class="o">!</span><span class="nx">action</span><span class="p">.</span><span class="nx">promise</span><span class="p">)</span> <span class="p">{</span>
+    <span class="k">return</span> <span class="nx">next</span><span class="p">(</span><span class="nx">action</span><span class="p">)</span>
+  <span class="p">}</span>
+
+  <span class="kd">function</span> <span class="nx">makeAction</span><span class="p">(</span><span class="nx">ready</span><span class="p">,</span> <span class="nx">data</span><span class="p">)</span> <span class="p">{</span>
+    <span class="kd">let</span> <span class="nx">newAction</span> <span class="o">=</span> <span class="nb">Object</span><span class="p">.</span><span class="nx">assign</span><span class="p">({},</span> <span class="nx">action</span><span class="p">,</span> <span class="p">{</span> <span class="nx">ready</span> <span class="p">},</span> <span class="nx">data</span><span class="p">)</span>
+    <span class="k">delete</span> <span class="nx">newAction</span><span class="p">.</span><span class="nx">promise</span>
+    <span class="k">return</span> <span class="nx">newAction</span>
+  <span class="p">}</span>
+
+  <span class="nx">next</span><span class="p">(</span><span class="nx">makeAction</span><span class="p">(</span><span class="kc">false</span><span class="p">))</span>
+  <span class="k">return</span> <span class="nx">action</span><span class="p">.</span><span class="nx">promise</span><span class="p">.</span><span class="nx">then</span><span class="p">(</span>
+    <span class="nx">result</span> <span class="o">=&gt;</span> <span class="nx">next</span><span class="p">(</span><span class="nx">makeAction</span><span class="p">(</span><span class="kc">true</span><span class="p">,</span> <span class="p">{</span> <span class="nx">result</span> <span class="p">})),</span>
+    <span class="nx">error</span> <span class="o">=&gt;</span> <span class="nx">next</span><span class="p">(</span><span class="nx">makeAction</span><span class="p">(</span><span class="kc">true</span><span class="p">,</span> <span class="p">{</span> <span class="nx">error</span> <span class="p">}))</span>
+  <span class="p">)</span>
+<span class="p">}</span>
+
+<span class="cm">/**
+ * Lets you dispatch a function instead of an action.
+ * This function will receive `dispatch` and `getState` as arguments.
+ *
+ * Useful for early exits (conditions over `getState()`), as well
+ * as for async control flow (it can `dispatch()` something else).
+ *
+ * `dispatch` will return the return value of the dispatched function.
+ */</span>
+<span class="kr">const</span> <span class="nx">thunk</span> <span class="o">=</span> <span class="nx">store</span> <span class="o">=&gt;</span> <span class="nx">next</span> <span class="o">=&gt;</span> <span class="nx">action</span> <span class="o">=&gt;</span>
+  <span class="k">typeof</span> <span class="nx">action</span> <span class="o">===</span> <span class="s1">'function'</span> <span class="p">?</span>
+    <span class="nx">action</span><span class="p">(</span><span class="nx">store</span><span class="p">.</span><span class="nx">dispatch</span><span class="p">,</span> <span class="nx">store</span><span class="p">.</span><span class="nx">getState</span><span class="p">)</span> <span class="p">:</span>
+    <span class="nx">next</span><span class="p">(</span><span class="nx">action</span><span class="p">)</span>
+</code></pre>
+</div>
+
+  </div>
+
+</article>
+
+      </div>
+    </div>
+
+    <footer class="site-footer">
+
+  <div class="wrapper">
+
+    <h2 class="footer-heading"></h2>
+
+    <div class="footer-col-wrapper">
+      <div class="footer-col footer-col-1">
+        <ul class="contact-list">
+          <li></li>
+          <li><a href="mailto:"></a></li>
+        </ul>
+      </div>
+
+      <div class="footer-col footer-col-2">
+        <ul class="social-media-list">
+          
+
+          
+        </ul>
+      </div>
+
+      <div class="footer-col footer-col-3">
+        <p></p>
+      </div>
+    </div>
+
+  </div>
+
+</footer>
+
+
+  </body>
+
+</html>

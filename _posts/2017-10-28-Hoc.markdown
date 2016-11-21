@@ -1,0 +1,87 @@
+---
+layout: post
+title:  "Hoc"
+date:   2016-10-28
+categories: react
+---
+
+### what pure component
+
+* They do not have any state.
+* They do not use any React lifecycle methods (such as componentWillMount()).
+* They only define the render method and nothing more.
+
+```js
+var App = React.createClass({
+      render: function() {
+                return <p>My name is { this.props.name }</p>;
+              }
+});
+// 可以写成这样
+var App = function(props) {
+      return <p>My name is {<Plug>PeepOpenrops.name }</p>;
+}
+```
+
+一个简单的Hoc，可是有问题，它限制了可传递props
+
+```js
+var AppLink = React.createClass({  
+  render: function() {  
+      return (
+        <Link to={this.props.to} activeClassName="active-link">
+                {this.props.children}
+        </Link>;
+      );
+  }
+});
+```
+
+可以使用`...`props修改成下边的样子
+
+```js
+var AppLink = function(props) {
+  return <Link {...props} activeClassName="active-link" />;
+}
+```
+
+这样写还是有点问题，我们不能覆盖掉 activeClassName   
+
+```js
+return <Link activeClassName="active-link" {...props} />;
+```
+
+这样就可以了
+
+### Function as Child Components
+
+```js
+class MyComponent extends React.Component { 
+  render() {
+    return (
+      <div>
+        {this.props.children('Scuba Steve')}
+      </div>
+    );
+  }
+}
+MyComponent.propTypes = {
+      children: React.PropTypes.func.isRequired,
+};
+```
+
+使用组件的时候就可以写成这个样子,传入的是func
+
+```js
+<MyComponent>
+  {(name) => (
+      <div>{name}</div>
+   )}
+</MyComponent>
+
+<MyComponent>
+  {(name) => (
+    <img src=’/scuba-steves-picture.jpg’ alt={name} />
+  )}
+</MyComponent>
+```

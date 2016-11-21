@@ -1,0 +1,18 @@
+---
+layout: post
+title:  "Vim"
+date:   2016-10-26
+categories: vim
+---
+
+### Fold
+
+Vim的Fold有几种模式
+
+v选中，然后zf折叠,za展开
+
+`zf5j`  下边5行折叠
+
+`zR` unfold all
+
+窗口之间跳来跳去 `Ctrl-ww`

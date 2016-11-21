@@ -1,0 +1,64 @@
+---
+layout: post
+title:  "Loadmore"
+date:   2016-11-02
+categories: js
+---
+
+### window height document hegiht
+
+window height是能看到的内容高度， document是html整个的高度
+
+在chrome console中
+
+```js
+$(window).height()
+209
+$(document).height()
+4973
+// 加大console区域
+$(window).height()
+90
+$(document).height()
+4973
+```
+
+### scrollTop
+
+出现滑动条的时候，`$(document).scrollTop(0)`滚到顶端，`$(document).scrollTop(XXXX)`滚到底端
+
+$(document).scroll()获得滚动了多少距离，滚动到的位置
+
+### when to load
+
+```js
+$(window).scroll(function(){
+  if  ($(window).scrollTop() == $(document).height() - $(window).height()){
+        // run our call for pagination
+  }
+});
+```
+
+由于目的是要实现infinite load,开始的时候document的高度并不是完全形态的高度,当window到达目前document底部尽头的时候，相当于：
+
+```js
+$(window).scrollTop() + $(window).height() = $(document).height()
+```
+
+有时候我们不想到尽头再加载，要到接近尽头的时候加载，相当于：
+
+```js
+$(window).scrollTop() + $(window).height() + XXX = $(document).height()
+```
+
+### clientHeight
+
+一个div出现滚动条后，你能看到的区域高度就是clientHeight,是框住部分的高度，和浏览器的window.height()有点像
+
+### offsetHeight
+
+是出现滚动条后，框的高度，不包括margin的，总之就是肉眼能看到的框的高度
+
+### scrollHeight
+
+是出现滚动条后，里边内容的高度，挡住的和没挡住的都算上的，有点类似$(document).height(),当然padding是包括的了，但不会包括scrollBar
