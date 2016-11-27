@@ -5,6 +5,63 @@ date:   2016-11-20
 categories: js
 ---
 
+### Class expressions
+
+```js
+const MyClass = class {
+    ···
+};
+const inst = new MyClass();
+```
+
+```js
+const MyClass = class Me {
+    getClassName() {
+        return Me.name;
+    }
+};
+const inst = new MyClass();
+
+console.log(inst.getClassName()); // Me
+console.log(Me.name); // ReferenceError: Me is not defined
+```
+
+### constructor
+
+```js
+Foo === Foo.prototype.constructor
+// true
+
+typeof Foo
+// 'function'
+```
+
+### Static data properties
+
+`MyClass.prop // => 'shit'` 的效果
+
+```js
+class Point {
+    constructor(x, y) {
+        this.x = x;
+        this.y = y;
+    }
+}
+Point.ZERO = new Point(0, 0);
+
+
+class Point {
+    constructor(x, y) {
+        this.x = x;
+        this.y = y;
+    }
+    static get ZERO() {
+        return new Point(0, 0);
+    }
+}
+```
+
+
 ### area()前边的get是什么？
 
 叫 Prototype methods

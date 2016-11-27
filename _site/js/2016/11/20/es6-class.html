@@ -7,7 +7,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
 
   <title>es6 class</title>
-  <meta name="description" content="area()前边的get是什么？">
+  <meta name="description" content="Class expressions">
 
   <link rel="stylesheet" href="/css/main.css">
   <link rel="canonical" href="http://localhost:4000/js/2016/11/20/es6-class.html">
@@ -62,7 +62,63 @@
   </header>
 
   <div class="post-content" itemprop="articleBody">
-    <h3 id="areaget">area()前边的get是什么？</h3>
+    <h3 id="class-expressions">Class expressions</h3>
+
+<div class="language-js highlighter-rouge"><pre class="highlight"><code><span class="kr">const</span> <span class="nx">MyClass</span> <span class="o">=</span> <span class="kr">class</span> <span class="p">{</span>
+    <span class="err">···</span>
+<span class="p">};</span>
+<span class="kr">const</span> <span class="nx">inst</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">MyClass</span><span class="p">();</span>
+</code></pre>
+</div>
+
+<div class="language-js highlighter-rouge"><pre class="highlight"><code><span class="kr">const</span> <span class="nx">MyClass</span> <span class="o">=</span> <span class="kr">class</span> <span class="nx">Me</span> <span class="p">{</span>
+    <span class="nx">getClassName</span><span class="p">()</span> <span class="p">{</span>
+        <span class="k">return</span> <span class="nx">Me</span><span class="p">.</span><span class="nx">name</span><span class="p">;</span>
+    <span class="p">}</span>
+<span class="p">};</span>
+<span class="kr">const</span> <span class="nx">inst</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">MyClass</span><span class="p">();</span>
+
+<span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="nx">inst</span><span class="p">.</span><span class="nx">getClassName</span><span class="p">());</span> <span class="c1">// Me</span>
+<span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="nx">Me</span><span class="p">.</span><span class="nx">name</span><span class="p">);</span> <span class="c1">// ReferenceError: Me is not defined</span>
+</code></pre>
+</div>
+
+<h3 id="constructor">constructor</h3>
+
+<div class="language-js highlighter-rouge"><pre class="highlight"><code><span class="nx">Foo</span> <span class="o">===</span> <span class="nx">Foo</span><span class="p">.</span><span class="nx">prototype</span><span class="p">.</span><span class="nx">constructor</span>
+<span class="c1">// true</span>
+
+<span class="k">typeof</span> <span class="nx">Foo</span>
+<span class="c1">// 'function'</span>
+</code></pre>
+</div>
+
+<h3 id="static-data-properties">Static data properties</h3>
+
+<p><code class="highlighter-rouge">MyClass.prop // =&gt; 'shit'</code> 的效果</p>
+
+<div class="language-js highlighter-rouge"><pre class="highlight"><code><span class="kr">class</span> <span class="nx">Point</span> <span class="p">{</span>
+    <span class="nx">constructor</span><span class="p">(</span><span class="nx">x</span><span class="p">,</span> <span class="nx">y</span><span class="p">)</span> <span class="p">{</span>
+        <span class="k">this</span><span class="p">.</span><span class="nx">x</span> <span class="o">=</span> <span class="nx">x</span><span class="p">;</span>
+        <span class="k">this</span><span class="p">.</span><span class="nx">y</span> <span class="o">=</span> <span class="nx">y</span><span class="p">;</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+<span class="nx">Point</span><span class="p">.</span><span class="nx">ZERO</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">Point</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">);</span>
+
+
+<span class="kr">class</span> <span class="nx">Point</span> <span class="p">{</span>
+    <span class="nx">constructor</span><span class="p">(</span><span class="nx">x</span><span class="p">,</span> <span class="nx">y</span><span class="p">)</span> <span class="p">{</span>
+        <span class="k">this</span><span class="p">.</span><span class="nx">x</span> <span class="o">=</span> <span class="nx">x</span><span class="p">;</span>
+        <span class="k">this</span><span class="p">.</span><span class="nx">y</span> <span class="o">=</span> <span class="nx">y</span><span class="p">;</span>
+    <span class="p">}</span>
+    <span class="kr">static</span> <span class="nx">get</span> <span class="nx">ZERO</span><span class="p">()</span> <span class="p">{</span>
+        <span class="k">return</span> <span class="k">new</span> <span class="nx">Point</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">);</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+</code></pre>
+</div>
+
+<h3 id="areaget">area()前边的get是什么？</h3>
 
 <p>叫 Prototype methods</p>
 

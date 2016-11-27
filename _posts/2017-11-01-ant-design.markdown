@@ -22,6 +22,12 @@ categories: js
 </FormItem>
 ```
 
+*** 动态为一个field赋值
+
+```js
+this.props.form.setFieldsValue({ skuId: '', skuPieceCount: '', promotionTemplateId: '' });
+```
+
 ### Table
 
 columns的dataIndex对应数据{key1: "data", key2: "data"}

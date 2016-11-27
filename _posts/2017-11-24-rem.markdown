@@ -1,0 +1,83 @@
+---
+layout: post
+title:  "rem"
+date:   2016-11-24
+categories: js
+---
+
+### 前提
+
+设计稿的宽度为640px，即：`designWidth = 640`，同时设定在640px屏宽下 1rem=100px ，即：`rem2px = 100`。
+
+### 方案
+
+***方案一***
+
+```js
+@media screen and (min-width: 320px) {html{font-size:50px;}}
+@media screen and (min-width: 360px) {html{font-size:56.25px;}}
+@media screen and (min-width: 375px) {html{font-size:58.59375px;}}
+@media screen and (min-width: 400px) {html{font-size:62.5px;}}
+@media screen and (min-width: 414px) {html{font-size:64.6875px;}}
+@media screen and (min-width: 440px) {html{font-size:68.75px;}}
+@media screen and (min-width: 480px) {html{font-size:75px;}}
+@media screen and (min-width: 520px) {html{font-size:81.25px;}}
+@media screen and (min-width: 560px) {html{font-size:87.5px;}}
+@media screen and (min-width: 600px) {html{font-size:93.75px;}}
+// 640时候设置字体为100px
+@media screen and (min-width: 640px) {html{font-size:100px;}}
+@media screen and (min-width: 680px) {html{font-size:106.25px;}}
+@media screen and (min-width: 720px) {html{font-size:112.5px;}}
+@media screen and (min-width: 760px) {html{font-size:118.75px;}}
+@media screen and (min-width: 800px) {html{font-size:125px;}}
+@media screen and (min-width: 960px) {html{font-size:150px;}}
+```
+
+***方案二***
+
+1rem = 100px = 16px * 6.25 = 16px * 625%
+
+```js
+@media screen and (min-width: 320px) {html{font-size:312.5%;}}
+@media screen and (min-width: 360px) {html{font-size:351.5625%;}}
+@media screen and (min-width: 375px) {html{font-size:366.211%;}}
+@media screen and (min-width: 400px) {html{font-size:390.625%;}}
+@media screen and (min-width: 414px) {html{font-size:404.2969%;}}
+@media screen and (min-width: 440px) {html{font-size:429.6875%;}}
+@media screen and (min-width: 480px) {html{font-size:468.75%;}}
+@media screen and (min-width: 520px) {html{font-size:507.8125%;}}
+@media screen and (min-width: 560px) {html{font-size:546.875%;}}
+@media screen and (min-width: 600px) {html{font-size:585.9375%;}}
+// 640的时候给font-size设置一个比例 625%
+@media screen and (min-width: 640px) {html{font-size:625%;}}
+@media screen and (min-width: 680px) {html{font-size:664.0625%;}}
+@media screen and (min-width: 720px) {html{font-size:703.125%;}}
+@media screen and (min-width: 760px) {html{font-size:742.1875%;}}
+@media screen and (min-width: 800px) {html{font-size:781.25%;}}
+@media screen and (min-width: 960px) {html{font-size:937.5%;}}
+```
+
+***方案三***
+
+`window.innerWidth`是不算scrollbar的
+
+640的时候 ~ 100px 正相关
+
+window的时候 ~ Y
+
+```js
+var designWidth = 640, rem2px = 100;
+document.documentElement.style.fontSize = 
+  ((window.innerWidth / designWidth) * rem2px) + 'px';
+```  
+
+***方案四***
+
+类似方案二，按比例而已
+
+```js
+var designWidth = 640, rem2px = 100;
+document.documentElement.style.fontSize = 
+  ((((window.innerWidth / designWidth) * rem2px) / 16) * 100) + '%';
+```
+

@@ -72,6 +72,29 @@
 
 <h3 id="offsettop">offsetTop是什么？</h3>
 
+<p>the distance of the current element relative to the top of the <code class="highlighter-rouge">offsetParent</code> node.</p>
+
+<h3 id="offsetparent">offsetParent是什么？</h3>
+
+<p>reference to the object which is the closest (nearest in the containment hierarchy) <code class="highlighter-rouge">positioned</code> containing element.</p>
+
+<p>If the element is <code class="highlighter-rouge">non-positioned</code>, the nearest table cell or root element (html in standards compliant mode; body in quirks rendering mode)</p>
+
+<h3 id="quirks-rendering-mode">quirks rendering mode是什么？</h3>
+
+<ul>
+  <li>In quirks mode, layout emulates nonstandard behavior in Navigator 4 and Internet Explorer 5. This is essential in order to support websites that were built before the widespread adoption of web standards.</li>
+  <li>In full standards mode, the behavior is (hopefully) the behavior described by the HTML and CSS specifications.</li>
+  <li>In almost standards mode, there are only a very small number of quirks implemented.</li>
+</ul>
+
+<p><strong><em>浏览器怎么知道用哪种mode呢？</em></strong></p>
+
+<p>根据doctype</p>
+
+<p>开头是这样的<code class="highlighter-rouge"><span class="cp">&lt;!DOCTYPE html&gt;</span></code>是<code class="highlighter-rouge">full standards mode</code></p>
+
+<p>In HTML5, the only purpose of the DOCTYPE is to activate full standards mode.</p>
 
   </div>
 

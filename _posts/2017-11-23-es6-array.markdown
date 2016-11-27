@@ -1,0 +1,47 @@
+---
+layout: post
+title:  "es6 array"
+date:   2016-11-23
+categories: js
+---
+
+### Array from
+
+* Array-like values, which have a property `length` and `indexed` elements. Examples include the results of DOM operations such as `document.getElementsByClassName()`.
+
+* Iterable values, whose contents can be retrieved one element at a time. Strings and Arrays are iterable, as are ECMAScript’s new data structures Map and Set.
+
+***examples***
+
+`const arrayLike = { length: 2, 0: 'a', 1: 'b' };`这样的obj本不可以`for...of`的
+
+```js
+// for-of only works with iterable values
+for (const x of arrayLike) { // TypeError
+    console.log(x);
+}
+
+const arr = Array.from(arrayLike);
+for (const x of arr) { // OK, iterable
+    console.log(x);
+}
+// Output:
+// a
+// b
+```
+
+document.querySelectorAll等类似的方法得到的是类似数组的类型，对他们是不可以用map方法的，我们可以用`Array.from`转换后再map处理，还可以一步完成
+
+```js
+const spans = document.querySelectorAll('span.name');
+
+// map(), generically:
+const names1 = Array.prototype.map.call(spans, s => s.textContent);
+
+// Array.from():
+const names2 = Array.from(spans, s => s.textContent);
+```
+
+### es5中
+
+在es5中类似的方法是`[].slice.call`

@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html>
+
+  <head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  <title>rem</title>
+  <meta name="description" content="前提">
+
+  <link rel="stylesheet" href="/css/main.css">
+  <link rel="canonical" href="http://localhost:4000/js/2016/11/24/rem.html">
+  <link rel="alternate" type="application/rss+xml" title="" href="http://localhost:4000/feed.xml">
+</head>
+
+
+  <body>
+
+    <header class="site-header">
+
+  <div class="wrapper">
+
+    <a class="site-title" href="/"></a>
+
+    <nav class="site-nav">
+      <a href="#" class="menu-icon">
+        <svg viewBox="0 0 18 15">
+          <path fill="#424242" d="M18,1.484c0,0.82-0.665,1.484-1.484,1.484H1.484C0.665,2.969,0,2.304,0,1.484l0,0C0,0.665,0.665,0,1.484,0 h15.031C17.335,0,18,0.665,18,1.484L18,1.484z"/>
+          <path fill="#424242" d="M18,7.516C18,8.335,17.335,9,16.516,9H1.484C0.665,9,0,8.335,0,7.516l0,0c0-0.82,0.665-1.484,1.484-1.484 h15.031C17.335,6.031,18,6.696,18,7.516L18,7.516z"/>
+          <path fill="#424242" d="M18,13.516C18,14.335,17.335,15,16.516,15H1.484C0.665,15,0,14.335,0,13.516l0,0 c0-0.82,0.665-1.484,1.484-1.484h15.031C17.335,12.031,18,12.696,18,13.516L18,13.516z"/>
+        </svg>
+      </a>
+
+      <div class="trigger">
+        
+          
+          <a class="page-link" href="/about/">About</a>
+          
+        
+          
+        
+          
+        
+          
+        
+      </div>
+    </nav>
+
+  </div>
+
+</header>
+
+
+    <div class="page-content">
+      <div class="wrapper">
+        <article class="post" itemscope itemtype="http://schema.org/BlogPosting">
+
+  <header class="post-header">
+    <h1 class="post-title" itemprop="name headline">rem</h1>
+    <p class="post-meta"><time datetime="2016-11-24T00:00:00+08:00" itemprop="datePublished">Nov 24, 2016</time></p>
+  </header>
+
+  <div class="post-content" itemprop="articleBody">
+    <h3 id="section">前提</h3>
+
+<p>设计稿的宽度为640px，即：<code class="highlighter-rouge">designWidth = 640</code>，同时设定在640px屏宽下 1rem=100px ，即：<code class="highlighter-rouge">rem2px = 100</code>。</p>
+
+<h3 id="section-1">方案</h3>
+
+<p><strong><em>方案一</em></strong></p>
+
+<div class="language-js highlighter-rouge"><pre class="highlight"><code><span class="err">@</span><span class="nx">media</span> <span class="nx">screen</span> <span class="nx">and</span> <span class="p">(</span><span class="nx">min</span><span class="o">-</span><span class="nx">width</span><span class="err">:</span> <span class="mi">320</span><span class="nx">px</span><span class="p">)</span> <span class="p">{</span><span class="nx">html</span><span class="p">{</span><span class="nx">font</span><span class="o">-</span><span class="nx">size</span><span class="err">:</span><span class="mi">50</span><span class="nx">px</span><span class="p">;}}</span>
+<span class="err">@</span><span class="nx">media</span> <span class="nx">screen</span> <span class="nx">and</span> <span class="p">(</span><span class="nx">min</span><span class="o">-</span><span class="nx">width</span><span class="err">:</span> <span class="mi">360</span><span class="nx">px</span><span class="p">)</span> <span class="p">{</span><span class="nx">html</span><span class="p">{</span><span class="nx">font</span><span class="o">-</span><span class="nx">size</span><span class="err">:</span><span class="mf">56.25</span><span class="nx">px</span><span class="p">;}}</span>
+<span class="err">@</span><span class="nx">media</span> <span class="nx">screen</span> <span class="nx">and</span> <span class="p">(</span><span class="nx">min</span><span class="o">-</span><span class="nx">width</span><span class="err">:</span> <span class="mi">375</span><span class="nx">px</span><span class="p">)</span> <span class="p">{</span><span class="nx">html</span><span class="p">{</span><span class="nx">font</span><span class="o">-</span><span class="nx">size</span><span class="err">:</span><span class="mf">58.59375</span><span class="nx">px</span><span class="p">;}}</span>
+<span class="err">@</span><span class="nx">media</span> <span class="nx">screen</span> <span class="nx">and</span> <span class="p">(</span><span class="nx">min</span><span class="o">-</span><span class="nx">width</span><span class="err">:</span> <span class="mi">400</span><span class="nx">px</span><span class="p">)</span> <span class="p">{</span><span class="nx">html</span><span class="p">{</span><span class="nx">font</span><span class="o">-</span><span class="nx">size</span><span class="err">:</span><span class="mf">62.5</span><span class="nx">px</span><span class="p">;}}</span>
+<span class="err">@</span><span class="nx">media</span> <span class="nx">screen</span> <span class="nx">and</span> <span class="p">(</span><span class="nx">min</span><span class="o">-</span><span class="nx">width</span><span class="err">:</span> <span class="mi">414</span><span class="nx">px</span><span class="p">)</span> <span class="p">{</span><span class="nx">html</span><span class="p">{</span><span class="nx">font</span><span class="o">-</span><span class="nx">size</span><span class="err">:</span><span class="mf">64.6875</span><span class="nx">px</span><span class="p">;}}</span>
+<span class="err">@</span><span class="nx">media</span> <span class="nx">screen</span> <span class="nx">and</span> <span class="p">(</span><span class="nx">min</span><span class="o">-</span><span class="nx">width</span><span class="err">:</span> <span class="mi">440</span><span class="nx">px</span><span class="p">)</span> <span class="p">{</span><span class="nx">html</span><span class="p">{</span><span class="nx">font</span><span class="o">-</span><span class="nx">size</span><span class="err">:</span><span class="mf">68.75</span><span class="nx">px</span><span class="p">;}}</span>
+<span class="err">@</span><span class="nx">media</span> <span class="nx">screen</span> <span class="nx">and</span> <span class="p">(</span><span class="nx">min</span><span class="o">-</span><span class="nx">width</span><span class="err">:</span> <span class="mi">480</span><span class="nx">px</span><span class="p">)</span> <span class="p">{</span><span class="nx">html</span><span class="p">{</span><span class="nx">font</span><span class="o">-</span><span class="nx">size</span><span class="err">:</span><span class="mi">75</span><span class="nx">px</span><span class="p">;}}</span>
+<span class="err">@</span><span class="nx">media</span> <span class="nx">screen</span> <span class="nx">and</span> <span class="p">(</span><span class="nx">min</span><span class="o">-</span><span class="nx">width</span><span class="err">:</span> <span class="mi">520</span><span class="nx">px</span><span class="p">)</span> <span class="p">{</span><span class="nx">html</span><span class="p">{</span><span class="nx">font</span><span class="o">-</span><span class="nx">size</span><span class="err">:</span><span class="mf">81.25</span><span class="nx">px</span><span class="p">;}}</span>
+<span class="err">@</span><span class="nx">media</span> <span class="nx">screen</span> <span class="nx">and</span> <span class="p">(</span><span class="nx">min</span><span class="o">-</span><span class="nx">width</span><span class="err">:</span> <span class="mi">560</span><span class="nx">px</span><span class="p">)</span> <span class="p">{</span><span class="nx">html</span><span class="p">{</span><span class="nx">font</span><span class="o">-</span><span class="nx">size</span><span class="err">:</span><span class="mf">87.5</span><span class="nx">px</span><span class="p">;}}</span>
+<span class="err">@</span><span class="nx">media</span> <span class="nx">screen</span> <span class="nx">and</span> <span class="p">(</span><span class="nx">min</span><span class="o">-</span><span class="nx">width</span><span class="err">:</span> <span class="mi">600</span><span class="nx">px</span><span class="p">)</span> <span class="p">{</span><span class="nx">html</span><span class="p">{</span><span class="nx">font</span><span class="o">-</span><span class="nx">size</span><span class="err">:</span><span class="mf">93.75</span><span class="nx">px</span><span class="p">;}}</span>
+<span class="c1">// 640时候设置字体为100px</span>
+<span class="err">@</span><span class="nx">media</span> <span class="nx">screen</span> <span class="nx">and</span> <span class="p">(</span><span class="nx">min</span><span class="o">-</span><span class="nx">width</span><span class="err">:</span> <span class="mi">640</span><span class="nx">px</span><span class="p">)</span> <span class="p">{</span><span class="nx">html</span><span class="p">{</span><span class="nx">font</span><span class="o">-</span><span class="nx">size</span><span class="err">:</span><span class="mi">100</span><span class="nx">px</span><span class="p">;}}</span>
+<span class="err">@</span><span class="nx">media</span> <span class="nx">screen</span> <span class="nx">and</span> <span class="p">(</span><span class="nx">min</span><span class="o">-</span><span class="nx">width</span><span class="err">:</span> <span class="mi">680</span><span class="nx">px</span><span class="p">)</span> <span class="p">{</span><span class="nx">html</span><span class="p">{</span><span class="nx">font</span><span class="o">-</span><span class="nx">size</span><span class="err">:</span><span class="mf">106.25</span><span class="nx">px</span><span class="p">;}}</span>
+<span class="err">@</span><span class="nx">media</span> <span class="nx">screen</span> <span class="nx">and</span> <span class="p">(</span><span class="nx">min</span><span class="o">-</span><span class="nx">width</span><span class="err">:</span> <span class="mi">720</span><span class="nx">px</span><span class="p">)</span> <span class="p">{</span><span class="nx">html</span><span class="p">{</span><span class="nx">font</span><span class="o">-</span><span class="nx">size</span><span class="err">:</span><span class="mf">112.5</span><span class="nx">px</span><span class="p">;}}</span>
+<span class="err">@</span><span class="nx">media</span> <span class="nx">screen</span> <span class="nx">and</span> <span class="p">(</span><span class="nx">min</span><span class="o">-</span><span class="nx">width</span><span class="err">:</span> <span class="mi">760</span><span class="nx">px</span><span class="p">)</span> <span class="p">{</span><span class="nx">html</span><span class="p">{</span><span class="nx">font</span><span class="o">-</span><span class="nx">size</span><span class="err">:</span><span class="mf">118.75</span><span class="nx">px</span><span class="p">;}}</span>
+<span class="err">@</span><span class="nx">media</span> <span class="nx">screen</span> <span class="nx">and</span> <span class="p">(</span><span class="nx">min</span><span class="o">-</span><span class="nx">width</span><span class="err">:</span> <span class="mi">800</span><span class="nx">px</span><span class="p">)</span> <span class="p">{</span><span class="nx">html</span><span class="p">{</span><span class="nx">font</span><span class="o">-</span><span class="nx">size</span><span class="err">:</span><span class="mi">125</span><span class="nx">px</span><span class="p">;}}</span>
+<span class="err">@</span><span class="nx">media</span> <span class="nx">screen</span> <span class="nx">and</span> <span class="p">(</span><span class="nx">min</span><span class="o">-</span><span class="nx">width</span><span class="err">:</span> <span class="mi">960</span><span class="nx">px</span><span class="p">)</span> <span class="p">{</span><span class="nx">html</span><span class="p">{</span><span class="nx">font</span><span class="o">-</span><span class="nx">size</span><span class="err">:</span><span class="mi">150</span><span class="nx">px</span><span class="p">;}}</span>
+</code></pre>
+</div>
+
+<p><strong><em>方案二</em></strong></p>
+
+<p>1rem = 100px = 16px * 6.25 = 16px * 625%</p>
+
+<div class="language-js highlighter-rouge"><pre class="highlight"><code><span class="err">@</span><span class="nx">media</span> <span class="nx">screen</span> <span class="nx">and</span> <span class="p">(</span><span class="nx">min</span><span class="o">-</span><span class="nx">width</span><span class="err">:</span> <span class="mi">320</span><span class="nx">px</span><span class="p">)</span> <span class="p">{</span><span class="nx">html</span><span class="p">{</span><span class="nx">font</span><span class="o">-</span><span class="nx">size</span><span class="err">:</span><span class="mf">312.5</span><span class="o">%</span><span class="p">;}}</span>
+<span class="err">@</span><span class="nx">media</span> <span class="nx">screen</span> <span class="nx">and</span> <span class="p">(</span><span class="nx">min</span><span class="o">-</span><span class="nx">width</span><span class="err">:</span> <span class="mi">360</span><span class="nx">px</span><span class="p">)</span> <span class="p">{</span><span class="nx">html</span><span class="p">{</span><span class="nx">font</span><span class="o">-</span><span class="nx">size</span><span class="err">:</span><span class="mf">351.5625</span><span class="o">%</span><span class="p">;}}</span>
+<span class="err">@</span><span class="nx">media</span> <span class="nx">screen</span> <span class="nx">and</span> <span class="p">(</span><span class="nx">min</span><span class="o">-</span><span class="nx">width</span><span class="err">:</span> <span class="mi">375</span><span class="nx">px</span><span class="p">)</span> <span class="p">{</span><span class="nx">html</span><span class="p">{</span><span class="nx">font</span><span class="o">-</span><span class="nx">size</span><span class="err">:</span><span class="mf">366.211</span><span class="o">%</span><span class="p">;}}</span>
+<span class="err">@</span><span class="nx">media</span> <span class="nx">screen</span> <span class="nx">and</span> <span class="p">(</span><span class="nx">min</span><span class="o">-</span><span class="nx">width</span><span class="err">:</span> <span class="mi">400</span><span class="nx">px</span><span class="p">)</span> <span class="p">{</span><span class="nx">html</span><span class="p">{</span><span class="nx">font</span><span class="o">-</span><span class="nx">size</span><span class="err">:</span><span class="mf">390.625</span><span class="o">%</span><span class="p">;}}</span>
+<span class="err">@</span><span class="nx">media</span> <span class="nx">screen</span> <span class="nx">and</span> <span class="p">(</span><span class="nx">min</span><span class="o">-</span><span class="nx">width</span><span class="err">:</span> <span class="mi">414</span><span class="nx">px</span><span class="p">)</span> <span class="p">{</span><span class="nx">html</span><span class="p">{</span><span class="nx">font</span><span class="o">-</span><span class="nx">size</span><span class="err">:</span><span class="mf">404.2969</span><span class="o">%</span><span class="p">;}}</span>
+<span class="err">@</span><span class="nx">media</span> <span class="nx">screen</span> <span class="nx">and</span> <span class="p">(</span><span class="nx">min</span><span class="o">-</span><span class="nx">width</span><span class="err">:</span> <span class="mi">440</span><span class="nx">px</span><span class="p">)</span> <span class="p">{</span><span class="nx">html</span><span class="p">{</span><span class="nx">font</span><span class="o">-</span><span class="nx">size</span><span class="err">:</span><span class="mf">429.6875</span><span class="o">%</span><span class="p">;}}</span>
+<span class="err">@</span><span class="nx">media</span> <span class="nx">screen</span> <span class="nx">and</span> <span class="p">(</span><span class="nx">min</span><span class="o">-</span><span class="nx">width</span><span class="err">:</span> <span class="mi">480</span><span class="nx">px</span><span class="p">)</span> <span class="p">{</span><span class="nx">html</span><span class="p">{</span><span class="nx">font</span><span class="o">-</span><span class="nx">size</span><span class="err">:</span><span class="mf">468.75</span><span class="o">%</span><span class="p">;}}</span>
+<span class="err">@</span><span class="nx">media</span> <span class="nx">screen</span> <span class="nx">and</span> <span class="p">(</span><span class="nx">min</span><span class="o">-</span><span class="nx">width</span><span class="err">:</span> <span class="mi">520</span><span class="nx">px</span><span class="p">)</span> <span class="p">{</span><span class="nx">html</span><span class="p">{</span><span class="nx">font</span><span class="o">-</span><span class="nx">size</span><span class="err">:</span><span class="mf">507.8125</span><span class="o">%</span><span class="p">;}}</span>
+<span class="err">@</span><span class="nx">media</span> <span class="nx">screen</span> <span class="nx">and</span> <span class="p">(</span><span class="nx">min</span><span class="o">-</span><span class="nx">width</span><span class="err">:</span> <span class="mi">560</span><span class="nx">px</span><span class="p">)</span> <span class="p">{</span><span class="nx">html</span><span class="p">{</span><span class="nx">font</span><span class="o">-</span><span class="nx">size</span><span class="err">:</span><span class="mf">546.875</span><span class="o">%</span><span class="p">;}}</span>
+<span class="err">@</span><span class="nx">media</span> <span class="nx">screen</span> <span class="nx">and</span> <span class="p">(</span><span class="nx">min</span><span class="o">-</span><span class="nx">width</span><span class="err">:</span> <span class="mi">600</span><span class="nx">px</span><span class="p">)</span> <span class="p">{</span><span class="nx">html</span><span class="p">{</span><span class="nx">font</span><span class="o">-</span><span class="nx">size</span><span class="err">:</span><span class="mf">585.9375</span><span class="o">%</span><span class="p">;}}</span>
+<span class="c1">// 640的时候给font-size设置一个比例 625%</span>
+<span class="err">@</span><span class="nx">media</span> <span class="nx">screen</span> <span class="nx">and</span> <span class="p">(</span><span class="nx">min</span><span class="o">-</span><span class="nx">width</span><span class="err">:</span> <span class="mi">640</span><span class="nx">px</span><span class="p">)</span> <span class="p">{</span><span class="nx">html</span><span class="p">{</span><span class="nx">font</span><span class="o">-</span><span class="nx">size</span><span class="err">:</span><span class="mi">625</span><span class="o">%</span><span class="p">;}}</span>
+<span class="err">@</span><span class="nx">media</span> <span class="nx">screen</span> <span class="nx">and</span> <span class="p">(</span><span class="nx">min</span><span class="o">-</span><span class="nx">width</span><span class="err">:</span> <span class="mi">680</span><span class="nx">px</span><span class="p">)</span> <span class="p">{</span><span class="nx">html</span><span class="p">{</span><span class="nx">font</span><span class="o">-</span><span class="nx">size</span><span class="err">:</span><span class="mf">664.0625</span><span class="o">%</span><span class="p">;}}</span>
+<span class="err">@</span><span class="nx">media</span> <span class="nx">screen</span> <span class="nx">and</span> <span class="p">(</span><span class="nx">min</span><span class="o">-</span><span class="nx">width</span><span class="err">:</span> <span class="mi">720</span><span class="nx">px</span><span class="p">)</span> <span class="p">{</span><span class="nx">html</span><span class="p">{</span><span class="nx">font</span><span class="o">-</span><span class="nx">size</span><span class="err">:</span><span class="mf">703.125</span><span class="o">%</span><span class="p">;}}</span>
+<span class="err">@</span><span class="nx">media</span> <span class="nx">screen</span> <span class="nx">and</span> <span class="p">(</span><span class="nx">min</span><span class="o">-</span><span class="nx">width</span><span class="err">:</span> <span class="mi">760</span><span class="nx">px</span><span class="p">)</span> <span class="p">{</span><span class="nx">html</span><span class="p">{</span><span class="nx">font</span><span class="o">-</span><span class="nx">size</span><span class="err">:</span><span class="mf">742.1875</span><span class="o">%</span><span class="p">;}}</span>
+<span class="err">@</span><span class="nx">media</span> <span class="nx">screen</span> <span class="nx">and</span> <span class="p">(</span><span class="nx">min</span><span class="o">-</span><span class="nx">width</span><span class="err">:</span> <span class="mi">800</span><span class="nx">px</span><span class="p">)</span> <span class="p">{</span><span class="nx">html</span><span class="p">{</span><span class="nx">font</span><span class="o">-</span><span class="nx">size</span><span class="err">:</span><span class="mf">781.25</span><span class="o">%</span><span class="p">;}}</span>
+<span class="err">@</span><span class="nx">media</span> <span class="nx">screen</span> <span class="nx">and</span> <span class="p">(</span><span class="nx">min</span><span class="o">-</span><span class="nx">width</span><span class="err">:</span> <span class="mi">960</span><span class="nx">px</span><span class="p">)</span> <span class="p">{</span><span class="nx">html</span><span class="p">{</span><span class="nx">font</span><span class="o">-</span><span class="nx">size</span><span class="err">:</span><span class="mf">937.5</span><span class="o">%</span><span class="p">;}}</span>
+</code></pre>
+</div>
+
+<p><strong><em>方案三</em></strong></p>
+
+<p><code class="highlighter-rouge">window.innerWidth</code>是不算scrollbar的</p>
+
+<p>640的时候 ~ 100px 正相关</p>
+
+<p>window的时候 ~ Y</p>
+
+<div class="language-js highlighter-rouge"><pre class="highlight"><code><span class="kd">var</span> <span class="nx">designWidth</span> <span class="o">=</span> <span class="mi">640</span><span class="p">,</span> <span class="nx">rem2px</span> <span class="o">=</span> <span class="mi">100</span><span class="p">;</span>
+<span class="nb">document</span><span class="p">.</span><span class="nx">documentElement</span><span class="p">.</span><span class="nx">style</span><span class="p">.</span><span class="nx">fontSize</span> <span class="o">=</span> 
+  <span class="p">((</span><span class="nb">window</span><span class="p">.</span><span class="nx">innerWidth</span> <span class="o">/</span> <span class="nx">designWidth</span><span class="p">)</span> <span class="o">*</span> <span class="nx">rem2px</span><span class="p">)</span> <span class="o">+</span> <span class="s1">'px'</span><span class="p">;</span>
+</code></pre>
+</div>
+
+<p><strong><em>方案四</em></strong></p>
+
+<p>类似方案二，按比例而已</p>
+
+<div class="language-js highlighter-rouge"><pre class="highlight"><code><span class="kd">var</span> <span class="nx">designWidth</span> <span class="o">=</span> <span class="mi">640</span><span class="p">,</span> <span class="nx">rem2px</span> <span class="o">=</span> <span class="mi">100</span><span class="p">;</span>
+<span class="nb">document</span><span class="p">.</span><span class="nx">documentElement</span><span class="p">.</span><span class="nx">style</span><span class="p">.</span><span class="nx">fontSize</span> <span class="o">=</span> 
+  <span class="p">((((</span><span class="nb">window</span><span class="p">.</span><span class="nx">innerWidth</span> <span class="o">/</span> <span class="nx">designWidth</span><span class="p">)</span> <span class="o">*</span> <span class="nx">rem2px</span><span class="p">)</span> <span class="o">/</span> <span class="mi">16</span><span class="p">)</span> <span class="o">*</span> <span class="mi">100</span><span class="p">)</span> <span class="o">+</span> <span class="s1">'%'</span><span class="p">;</span>
+</code></pre>
+</div>
+
+
+  </div>
+
+</article>
+
+      </div>
+    </div>
+
+    <footer class="site-footer">
+
+  <div class="wrapper">
+
+    <h2 class="footer-heading"></h2>
+
+    <div class="footer-col-wrapper">
+      <div class="footer-col footer-col-1">
+        <ul class="contact-list">
+          <li></li>
+          <li><a href="mailto:"></a></li>
+        </ul>
+      </div>
+
+      <div class="footer-col footer-col-2">
+        <ul class="social-media-list">
+          
+
+          
+        </ul>
+      </div>
+
+      <div class="footer-col footer-col-3">
+        <p></p>
+      </div>
+    </div>
+
+  </div>
+
+</footer>
+
+
+  </body>
+
+</html>

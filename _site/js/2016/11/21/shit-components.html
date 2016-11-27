@@ -1,0 +1,265 @@
+<!DOCTYPE html>
+<html>
+
+  <head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  <title>狗日的组件研究</title>
+  <meta name="description" content="getStylePrefix">
+
+  <link rel="stylesheet" href="/css/main.css">
+  <link rel="canonical" href="http://localhost:4000/js/2016/11/21/shit-components.html">
+  <link rel="alternate" type="application/rss+xml" title="" href="http://localhost:4000/feed.xml">
+</head>
+
+
+  <body>
+
+    <header class="site-header">
+
+  <div class="wrapper">
+
+    <a class="site-title" href="/"></a>
+
+    <nav class="site-nav">
+      <a href="#" class="menu-icon">
+        <svg viewBox="0 0 18 15">
+          <path fill="#424242" d="M18,1.484c0,0.82-0.665,1.484-1.484,1.484H1.484C0.665,2.969,0,2.304,0,1.484l0,0C0,0.665,0.665,0,1.484,0 h15.031C17.335,0,18,0.665,18,1.484L18,1.484z"/>
+          <path fill="#424242" d="M18,7.516C18,8.335,17.335,9,16.516,9H1.484C0.665,9,0,8.335,0,7.516l0,0c0-0.82,0.665-1.484,1.484-1.484 h15.031C17.335,6.031,18,6.696,18,7.516L18,7.516z"/>
+          <path fill="#424242" d="M18,13.516C18,14.335,17.335,15,16.516,15H1.484C0.665,15,0,14.335,0,13.516l0,0 c0-0.82,0.665-1.484,1.484-1.484h15.031C17.335,12.031,18,12.696,18,13.516L18,13.516z"/>
+        </svg>
+      </a>
+
+      <div class="trigger">
+        
+          
+          <a class="page-link" href="/about/">About</a>
+          
+        
+          
+        
+          
+        
+          
+        
+      </div>
+    </nav>
+
+  </div>
+
+</header>
+
+
+    <div class="page-content">
+      <div class="wrapper">
+        <article class="post" itemscope itemtype="http://schema.org/BlogPosting">
+
+  <header class="post-header">
+    <h1 class="post-title" itemprop="name headline">狗日的组件研究</h1>
+    <p class="post-meta"><time datetime="2016-11-21T00:00:00+08:00" itemprop="datePublished">Nov 21, 2016</time></p>
+  </header>
+
+  <div class="post-content" itemprop="articleBody">
+    <p><strong><em>getStylePrefix</em></strong></p>
+
+<p>为了为style获取正确的prefix,因为不同系统下prefix不一样,以后可以考虑用autoprefix</p>
+
+<div class="language-js highlighter-rouge"><pre class="highlight"><code><span class="kr">export</span> <span class="kr">const</span> <span class="nx">getStylePrefix</span> <span class="o">=</span> <span class="p">(</span><span class="nx">style</span><span class="p">)</span> <span class="o">=&gt;</span> <span class="p">{</span>
+    <span class="kr">const</span> <span class="nx">prefixs</span> <span class="o">=</span> <span class="p">[</span> <span class="s1">'webkit'</span><span class="p">,</span> <span class="s1">'Moz'</span><span class="p">,</span> <span class="s1">'ms'</span><span class="p">,</span> <span class="s1">'O'</span> <span class="p">];</span>
+    <span class="c1">// 获取一个div所有的默认css，都是空</span>
+    <span class="kr">const</span> <span class="nx">dom</span> <span class="o">=</span> <span class="nb">document</span><span class="p">.</span><span class="nx">createElement</span><span class="p">(</span><span class="s1">'div'</span><span class="p">).</span><span class="nx">style</span><span class="p">;</span>
+    <span class="c1">// 样式在其中，返回''</span>
+    <span class="k">if</span> <span class="p">(</span><span class="nx">style</span> <span class="k">in</span> <span class="nx">dom</span><span class="p">)</span> <span class="k">return</span> <span class="s1">''</span><span class="p">;</span>
+    <span class="kr">const</span> <span class="nx">newStyle</span> <span class="o">=</span> <span class="nx">style</span><span class="p">.</span><span class="nx">replace</span><span class="p">(</span><span class="s1">'-'</span><span class="p">,</span> <span class="s1">' '</span><span class="p">).</span><span class="nx">replace</span><span class="p">(</span><span class="sr">/</span><span class="se">(</span><span class="sr">^|</span><span class="se">\s</span><span class="sr">+</span><span class="se">)\w</span><span class="sr">/g</span><span class="p">,</span> <span class="nx">s</span> <span class="o">=&gt;</span> <span class="nx">s</span><span class="p">.</span><span class="nx">toUpperCase</span><span class="p">()).</span><span class="nx">replace</span><span class="p">(</span><span class="s1">' '</span><span class="p">,</span> <span class="s1">''</span><span class="p">);</span>
+    <span class="k">for</span> <span class="p">(</span><span class="kr">const</span> <span class="nx">prefix</span> <span class="nx">of</span> <span class="nx">prefixs</span><span class="p">)</span> <span class="p">{</span>
+        <span class="k">if</span> <span class="p">((</span><span class="nx">prefix</span> <span class="o">+</span> <span class="nx">newStyle</span><span class="p">)</span> <span class="k">in</span> <span class="nx">dom</span><span class="p">)</span> <span class="p">{</span>
+            <span class="k">return</span> <span class="nx">prefix</span><span class="p">;</span>
+        <span class="p">}</span>
+    <span class="p">}</span>
+    <span class="k">return</span> <span class="kc">null</span><span class="p">;</span>
+<span class="p">};</span>
+</code></pre>
+</div>
+
+<h3 id="scrolltagsthispropschildren">scrollTags的this.props.children是干什么的？?</h3>
+
+<p>这个他妈的没搞错吧。。。。没搞错，就要这么一层层叠加计算</p>
+
+<p>http://stackoverflow.com/questions/5598743/finding-elements-position-relative-to-the-document</p>
+
+<div class="language-js highlighter-rouge"><pre class="highlight"><code><span class="c1">// 获取距离Body顶部的高度</span>
+<span class="kr">export</span> <span class="kr">const</span> <span class="nx">getOffsetTop</span> <span class="o">=</span> <span class="p">(</span><span class="nx">element</span><span class="p">)</span> <span class="o">=&gt;</span> <span class="p">{</span>
+  <span class="k">if</span> <span class="p">(</span><span class="o">!</span><span class="nx">element</span><span class="p">)</span> <span class="k">return</span> <span class="mi">0</span><span class="p">;</span>
+  <span class="kd">let</span> <span class="nx">offsetTop</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
+  <span class="kd">let</span> <span class="nx">el</span> <span class="o">=</span> <span class="nx">element</span><span class="p">;</span>
+  <span class="k">while</span> <span class="p">(</span><span class="nx">el</span><span class="p">.</span><span class="nx">offsetParent</span><span class="p">)</span> <span class="p">{</span>
+    <span class="nx">offsetTop</span> <span class="o">+=</span> <span class="nx">el</span><span class="p">.</span><span class="nx">offsetTop</span><span class="p">;</span>
+    <span class="nx">el</span> <span class="o">=</span> <span class="nx">el</span><span class="p">.</span><span class="nx">offsetParent</span><span class="p">;</span>
+  <span class="p">}</span>
+  <span class="k">return</span> <span class="nx">offsetTop</span><span class="p">;</span>
+<span class="p">};</span>
+</code></pre>
+</div>
+
+<h3 id="animate">牛逼的animate函数</h3>
+
+<div class="language-js highlighter-rouge"><pre class="highlight"><code><span class="c1">// 使用</span>
+<span class="nx">animate</span><span class="p">(</span><span class="nx">node</span><span class="p">.</span><span class="nx">scrollLeft</span><span class="p">,</span> <span class="nx">offset</span><span class="p">,</span> <span class="mi">300</span><span class="p">,</span> <span class="p">(</span><span class="nx">scrollLeft</span><span class="p">)</span> <span class="o">=&gt;</span> <span class="p">{</span>
+  <span class="nx">node</span><span class="p">.</span><span class="nx">scrollLeft</span> <span class="o">=</span> <span class="nx">scrollLeft</span><span class="p">;</span>
+<span class="p">});</span>
+
+
+<span class="c1">// 使用的时候node是 `.zhilin-scroll-wrap`</span>
+
+<span class="kr">export</span> <span class="kr">const</span> <span class="nx">animate</span> <span class="o">=</span> <span class="p">(</span><span class="nx">begin</span><span class="p">,</span> <span class="nx">end</span><span class="p">,</span> <span class="nx">duration</span><span class="p">,</span> <span class="nx">onProgress</span><span class="p">,</span> <span class="nx">onEnd</span><span class="p">,</span> <span class="nx">curver</span> <span class="o">=</span> <span class="s1">'easeInOut'</span><span class="p">)</span> <span class="o">=&gt;</span> <span class="p">{</span>
+  <span class="c1">// s是函数运行最开始start time, 形似1479885176139</span>
+  <span class="kr">const</span> <span class="nx">s</span> <span class="o">=</span> <span class="p">(</span><span class="k">new</span> <span class="nb">Date</span><span class="p">()).</span><span class="nx">getTime</span><span class="p">();</span>
+
+  <span class="c1">// const isObject = typeof begin === 'object' &amp;&amp; !isArray(begin);</span>
+  <span class="kr">const</span> <span class="nx">isNumber</span> <span class="o">=</span> <span class="k">typeof</span> <span class="nx">begin</span> <span class="o">===</span> <span class="s1">'number'</span><span class="p">;</span>
+
+  <span class="kr">const</span> <span class="nx">b</span> <span class="o">=</span> <span class="nx">begin</span><span class="p">;</span>
+  <span class="kd">let</span> <span class="nx">c</span><span class="p">;</span>
+  <span class="kd">let</span> <span class="nx">keys</span><span class="p">;</span>
+  <span class="k">if</span> <span class="p">(</span><span class="nx">isNumber</span><span class="p">)</span> <span class="p">{</span>
+    <span class="nx">c</span> <span class="o">=</span> <span class="nx">end</span> <span class="o">-</span> <span class="nx">b</span><span class="p">;</span> <span class="c1">// change</span>
+  <span class="p">}</span> <span class="k">else</span> <span class="p">{</span>
+    <span class="nx">keys</span> <span class="o">=</span> <span class="nb">Object</span><span class="p">.</span><span class="nx">keys</span><span class="p">(</span><span class="nx">end</span><span class="p">);</span>
+    <span class="nx">c</span> <span class="o">=</span> <span class="p">{};</span>
+    <span class="k">for</span> <span class="p">(</span><span class="kr">const</span> <span class="nx">key</span> <span class="nx">of</span> <span class="nx">keys</span><span class="p">)</span> <span class="p">{</span>
+      <span class="nx">c</span><span class="p">[</span><span class="nx">key</span><span class="p">]</span> <span class="o">=</span> <span class="nx">end</span><span class="p">[</span><span class="nx">key</span><span class="p">]</span> <span class="o">-</span> <span class="nx">b</span><span class="p">[</span><span class="nx">key</span><span class="p">];</span>
+    <span class="p">}</span>
+  <span class="p">}</span>
+  <span class="kr">const</span> <span class="nx">d</span> <span class="o">=</span> <span class="nx">duration</span> <span class="o">||</span> <span class="mi">500</span><span class="p">;</span>
+
+  <span class="c1">// t是过了多少时间</span>
+  <span class="c1">// b是begin的数值</span>
+  <span class="c1">// c是end 减去 begin</span>
+  <span class="c1">// d是duration</span>
+  <span class="c1">// 返回计算后动画进行中的值</span>
+  <span class="kr">const</span> <span class="nx">calc</span> <span class="o">=</span> <span class="p">(</span><span class="nx">t</span><span class="p">)</span> <span class="o">=&gt;</span> <span class="p">{</span>
+    <span class="k">if</span> <span class="p">(</span><span class="k">typeof</span> <span class="nx">curver</span> <span class="o">===</span> <span class="s1">'function'</span><span class="p">)</span> <span class="k">return</span> <span class="nx">curver</span><span class="p">(</span><span class="nx">t</span><span class="p">,</span> <span class="nx">b</span><span class="p">,</span> <span class="nx">c</span><span class="p">,</span> <span class="nx">d</span><span class="p">);</span>
+    <span class="c1">// begin isNumber</span>
+    <span class="k">if</span> <span class="p">(</span><span class="nx">isNumber</span><span class="p">)</span> <span class="k">return</span> <span class="nx">tween</span><span class="p">(</span><span class="nx">curver</span><span class="p">,</span> <span class="nx">t</span><span class="p">,</span> <span class="nx">b</span><span class="p">,</span> <span class="nx">c</span><span class="p">,</span> <span class="nx">d</span><span class="p">);</span>
+    <span class="kr">const</span> <span class="nx">r</span> <span class="o">=</span> <span class="p">{};</span>
+    <span class="k">for</span> <span class="p">(</span><span class="kr">const</span> <span class="nx">key</span> <span class="nx">of</span> <span class="nx">keys</span><span class="p">)</span> <span class="p">{</span>
+      <span class="nx">r</span><span class="p">[</span><span class="nx">key</span><span class="p">]</span> <span class="o">=</span> <span class="nx">tween</span><span class="p">(</span><span class="nx">curver</span><span class="p">,</span> <span class="nx">t</span><span class="p">,</span> <span class="nx">b</span><span class="p">[</span><span class="nx">key</span><span class="p">],</span> <span class="nx">c</span><span class="p">[</span><span class="nx">key</span><span class="p">],</span> <span class="nx">d</span><span class="p">);</span>
+    <span class="p">}</span>
+    <span class="k">return</span> <span class="nx">r</span><span class="p">;</span>
+  <span class="p">};</span>
+
+  <span class="p">(</span><span class="kd">function</span> <span class="nx">execute</span><span class="p">()</span> <span class="p">{</span>
+      <span class="c1">// 现在的时间-开始的时间, t 是过了多少时间</span>
+      <span class="kd">let</span> <span class="nx">t</span> <span class="o">=</span> <span class="p">(</span><span class="k">new</span> <span class="nb">Date</span><span class="p">()).</span><span class="nx">getTime</span><span class="p">()</span> <span class="o">-</span> <span class="nx">s</span><span class="p">;</span>
+      <span class="k">if</span> <span class="p">(</span><span class="nx">t</span> <span class="o">&gt;</span> <span class="nx">d</span><span class="p">)</span> <span class="p">{</span>
+          <span class="nx">t</span> <span class="o">=</span> <span class="nx">d</span><span class="p">;</span>
+          <span class="c1">// 调用onProgress callback</span>
+          <span class="nx">onProgress</span> <span class="o">&amp;&amp;</span> <span class="nx">onProgress</span><span class="p">(</span><span class="nx">calc</span><span class="p">(</span><span class="nx">t</span><span class="p">));</span>
+          <span class="c1">// 调用onEnd callback</span>
+          <span class="nx">onEnd</span> <span class="o">&amp;&amp;</span> <span class="nx">onEnd</span><span class="p">();</span>
+          <span class="k">return</span><span class="p">;</span>
+      <span class="p">}</span>
+      <span class="c1">//  (scrollLeft) =&gt; { node.scrollLeft = scrollLeft }</span>
+      <span class="nx">onProgress</span> <span class="o">&amp;&amp;</span> <span class="nx">onProgress</span><span class="p">(</span><span class="nx">calc</span><span class="p">(</span><span class="nx">t</span><span class="p">));</span>
+      <span class="c1">// getRAF当然就是为了找到对应浏览器版本的requestAnimationFrame</span>
+      <span class="nx">getRAF</span><span class="p">(</span><span class="nx">execute</span><span class="p">);</span>
+  <span class="p">})();</span>
+<span class="p">};</span>
+</code></pre>
+</div>
+
+<h3 id="github-google-chrome--getraf">github google chrome 的 getRAF等</h3>
+
+<div class="language-js highlighter-rouge"><pre class="highlight"><code><span class="kd">function</span> <span class="nx">getRAF</span><span class="p">(</span><span class="nx">w</span><span class="p">)</span> <span class="p">{</span>
+  <span class="nx">w</span> <span class="o">=</span> <span class="nx">w</span> <span class="o">||</span> <span class="nb">window</span><span class="p">;</span>
+  <span class="k">if</span> <span class="p">(</span><span class="nx">w</span><span class="p">.</span><span class="nx">requestAnimationFrame</span><span class="p">)</span>
+    <span class="k">return</span> <span class="nx">w</span><span class="p">.</span><span class="nx">requestAnimationFrame</span><span class="p">;</span>
+  <span class="k">if</span> <span class="p">(</span><span class="nx">w</span><span class="p">.</span><span class="nx">webkitRequestAnimationFrame</span><span class="p">)</span>
+    <span class="k">return</span> <span class="nx">w</span><span class="p">.</span><span class="nx">webkitRequestAnimationFrame</span><span class="p">;</span>
+  <span class="k">if</span> <span class="p">(</span><span class="nx">w</span><span class="p">.</span><span class="nx">mozRequestAnimationFrame</span><span class="p">)</span>
+    <span class="k">return</span> <span class="nx">w</span><span class="p">.</span><span class="nx">mozRequestAnimationFrame</span><span class="p">;</span>
+  <span class="k">if</span> <span class="p">(</span><span class="nx">w</span><span class="p">.</span><span class="nx">oRequestAnimationFrame</span><span class="p">)</span>
+    <span class="k">return</span> <span class="nx">w</span><span class="p">.</span><span class="nx">oRequestAnimationFrame</span><span class="p">;</span>
+  <span class="k">if</span> <span class="p">(</span><span class="nx">w</span><span class="p">.</span><span class="nx">msRequestAnimationFrame</span><span class="p">)</span>
+    <span class="k">return</span> <span class="nx">w</span><span class="p">.</span><span class="nx">msRequestAnimationFrame</span><span class="p">;</span>
+  <span class="k">return</span> <span class="kc">undefined</span><span class="p">;</span>
+<span class="p">}</span>
+
+<span class="kd">function</span> <span class="nx">getVisibilityState</span><span class="p">(</span><span class="nx">d</span><span class="p">)</span> <span class="p">{</span>
+  <span class="nx">d</span> <span class="o">=</span> <span class="nx">d</span> <span class="o">||</span> <span class="nb">window</span><span class="p">;</span>
+  <span class="k">if</span> <span class="p">(</span><span class="nx">d</span><span class="p">.</span><span class="nx">visibilityState</span><span class="p">)</span>
+    <span class="k">return</span> <span class="nx">d</span><span class="p">.</span><span class="nx">visibilityState</span><span class="p">;</span>
+  <span class="k">if</span> <span class="p">(</span><span class="nx">d</span><span class="p">.</span><span class="nx">webkitVisibilityState</span><span class="p">)</span>
+    <span class="k">return</span> <span class="nx">d</span><span class="p">.</span><span class="nx">webkitVisibilityState</span><span class="p">;</span>
+  <span class="k">if</span> <span class="p">(</span><span class="nx">d</span><span class="p">.</span><span class="nx">mozVisibilityState</span><span class="p">)</span>
+    <span class="k">return</span> <span class="nx">d</span><span class="p">.</span><span class="nx">mozVisibilityState</span><span class="p">;</span>
+  <span class="k">if</span> <span class="p">(</span><span class="nx">d</span><span class="p">.</span><span class="nx">oVisibilityState</span><span class="p">)</span>
+    <span class="k">return</span> <span class="nx">d</span><span class="p">.</span><span class="nx">oVisibilityState</span><span class="p">;</span>
+  <span class="k">if</span> <span class="p">(</span><span class="nx">d</span><span class="p">.</span><span class="nx">msVisibilityState</span><span class="p">)</span>
+    <span class="k">return</span> <span class="nx">d</span><span class="p">.</span><span class="nx">msVisibilityState</span><span class="p">;</span>
+  <span class="k">return</span> <span class="kc">undefined</span><span class="p">;</span>
+<span class="p">}</span>        
+</code></pre>
+</div>
+
+<p>对比</p>
+
+<div class="language-js highlighter-rouge"><pre class="highlight"><code><span class="c1">// 获取requestAnimationFrame</span>
+<span class="kr">export</span> <span class="kr">const</span> <span class="nx">getRAF</span> <span class="o">=</span> <span class="p">(</span><span class="nx">func</span><span class="p">)</span> <span class="o">=&gt;</span> <span class="p">{</span>
+  <span class="kr">const</span> <span class="nx">w</span> <span class="o">=</span> <span class="nb">window</span><span class="p">;</span>
+  <span class="kr">const</span> <span class="nx">prefixs</span> <span class="o">=</span> <span class="p">[</span> <span class="s1">'r'</span><span class="p">,</span> <span class="s1">'webkitR'</span><span class="p">,</span> <span class="s1">'mozR'</span><span class="p">,</span> <span class="s1">'msR'</span><span class="p">,</span> <span class="s1">'oR'</span> <span class="p">];</span>
+  <span class="c1">// for(let i = 0; i &lt; prefixs.length; i++){</span>
+  <span class="k">for</span> <span class="p">(</span><span class="kd">let</span> <span class="nx">prefix</span> <span class="nx">of</span> <span class="nx">prefixs</span><span class="p">)</span> <span class="p">{</span>
+    <span class="nx">prefix</span> <span class="o">=</span> <span class="err">`</span><span class="nx">$</span><span class="p">{</span><span class="nx">prefix</span><span class="p">}</span><span class="nx">equestAnimationFrame</span><span class="err">`</span><span class="p">;</span>
+    <span class="k">if</span> <span class="p">(</span><span class="nx">prefix</span> <span class="k">in</span> <span class="nx">w</span><span class="p">)</span> <span class="k">return</span> <span class="nx">w</span><span class="p">[</span><span class="nx">prefix</span><span class="p">](</span><span class="nx">func</span><span class="p">);</span>
+  <span class="p">}</span>
+  <span class="k">return</span> <span class="nx">setTimeout</span><span class="p">(</span><span class="nx">func</span><span class="p">,</span> <span class="mi">1</span><span class="nx">e3</span> <span class="o">/</span> <span class="mi">60</span><span class="p">);</span>
+<span class="p">};</span>
+</code></pre>
+</div>
+
+
+  </div>
+
+</article>
+
+      </div>
+    </div>
+
+    <footer class="site-footer">
+
+  <div class="wrapper">
+
+    <h2 class="footer-heading"></h2>
+
+    <div class="footer-col-wrapper">
+      <div class="footer-col footer-col-1">
+        <ul class="contact-list">
+          <li></li>
+          <li><a href="mailto:"></a></li>
+        </ul>
+      </div>
+
+      <div class="footer-col footer-col-2">
+        <ul class="social-media-list">
+          
+
+          
+        </ul>
+      </div>
+
+      <div class="footer-col footer-col-3">
+        <p></p>
+      </div>
+    </div>
+
+  </div>
+
+</footer>
+
+
+  </body>
+
+</html>

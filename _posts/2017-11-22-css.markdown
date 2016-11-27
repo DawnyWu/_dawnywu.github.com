@@ -1,0 +1,10 @@
+---
+layout: post
+title:  "css"
+date:   2016-11-22
+categories: css
+---
+
+### translate 和 position: relative 区别
+
+当单位是百分比的时候，position是依据父元素，translate是依据自己
