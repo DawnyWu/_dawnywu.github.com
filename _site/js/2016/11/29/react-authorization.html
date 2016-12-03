@@ -1,0 +1,256 @@
+<!DOCTYPE html>
+<html>
+
+  <head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  <title>react authorization</title>
+  <meta name="description" content="&lt;Router history={history}&gt;  &lt;Route component={MainContainer} path="/"&gt;    &lt;IndexRoute authorize={['employee', 'admin']} component={Home} /&gt;...">
+
+  <link rel="stylesheet" href="/css/main.css">
+  <link rel="canonical" href="http://localhost:4000/js/2016/11/29/react-authorization.html">
+  <link rel="alternate" type="application/rss+xml" title="" href="http://localhost:4000/feed.xml">
+</head>
+
+
+  <body>
+
+    <header class="site-header">
+
+  <div class="wrapper">
+
+    <a class="site-title" href="/"></a>
+
+    <nav class="site-nav">
+      <a href="#" class="menu-icon">
+        <svg viewBox="0 0 18 15">
+          <path fill="#424242" d="M18,1.484c0,0.82-0.665,1.484-1.484,1.484H1.484C0.665,2.969,0,2.304,0,1.484l0,0C0,0.665,0.665,0,1.484,0 h15.031C17.335,0,18,0.665,18,1.484L18,1.484z"/>
+          <path fill="#424242" d="M18,7.516C18,8.335,17.335,9,16.516,9H1.484C0.665,9,0,8.335,0,7.516l0,0c0-0.82,0.665-1.484,1.484-1.484 h15.031C17.335,6.031,18,6.696,18,7.516L18,7.516z"/>
+          <path fill="#424242" d="M18,13.516C18,14.335,17.335,15,16.516,15H1.484C0.665,15,0,14.335,0,13.516l0,0 c0-0.82,0.665-1.484,1.484-1.484h15.031C17.335,12.031,18,12.696,18,13.516L18,13.516z"/>
+        </svg>
+      </a>
+
+      <div class="trigger">
+        
+          
+          <a class="page-link" href="/about/">About</a>
+          
+        
+          
+        
+          
+        
+          
+        
+      </div>
+    </nav>
+
+  </div>
+
+</header>
+
+
+    <div class="page-content">
+      <div class="wrapper">
+        <article class="post" itemscope itemtype="http://schema.org/BlogPosting">
+
+  <header class="post-header">
+    <h1 class="post-title" itemprop="name headline">react authorization</h1>
+    <p class="post-meta"><time datetime="2016-11-29T00:00:00+08:00" itemprop="datePublished">Nov 29, 2016</time></p>
+  </header>
+
+  <div class="post-content" itemprop="articleBody">
+    <div class="language-html highlighter-rouge"><pre class="highlight"><code><span class="nt">&lt;Router</span> <span class="na">history=</span><span class="s">{history}</span><span class="nt">&gt;</span>
+  <span class="nt">&lt;Route</span> <span class="na">component=</span><span class="s">{MainContainer}</span> <span class="na">path=</span><span class="s">"/"</span><span class="nt">&gt;</span>
+    <span class="nt">&lt;IndexRoute</span> <span class="na">authorize=</span><span class="s">{['employee',</span> <span class="err">'</span><span class="na">admin</span><span class="err">']}</span> <span class="na">component=</span><span class="s">{Home}</span> <span class="nt">/&gt;</span>
+    <span class="nt">&lt;Route</span> <span class="na">authorize=</span><span class="s">{['employee']}</span> <span class="na">component=</span><span class="s">{Profile}</span><span class="nt">&gt;</span>
+      <span class="nt">&lt;Route</span> <span class="na">component=</span><span class="s">{PhotosList}</span> <span class="na">path=</span><span class="s">"/profile/photos"</span> <span class="nt">/&gt;</span>
+    <span class="nt">&lt;/Route&gt;</span>
+    <span class="nt">&lt;Route</span> <span class="na">authorize=</span><span class="s">{['admin']}</span> <span class="na">component=</span><span class="s">{EmployeesManagement}</span><span class="nt">&gt;</span>
+      <span class="nt">&lt;Route</span> <span class="na">component=</span><span class="s">{EmployeesList}</span> <span class="na">path=</span><span class="s">"/employees/list"</span> <span class="nt">/&gt;</span>
+      <span class="nt">&lt;Route</span> <span class="na">component=</span><span class="s">{EmployeeAdd}</span> <span class="na">path=</span><span class="s">"/employees/add"</span> <span class="nt">/&gt;</span>
+    <span class="nt">&lt;/Route&gt;</span>
+  <span class="nt">&lt;/Route&gt;</span>
+<span class="nt">&lt;/Router&gt;</span>
+</code></pre>
+</div>
+
+<div class="language-js highlighter-rouge"><pre class="highlight"><code><span class="kr">import</span> <span class="nx">React</span><span class="p">,</span> <span class="p">{</span> <span class="nx">PropTypes</span> <span class="p">}</span> <span class="nx">from</span> <span class="s1">'react'</span><span class="p">;</span>
+<span class="kr">import</span> <span class="nx">_</span> <span class="nx">from</span> <span class="s1">'lodash'</span><span class="p">;</span>
+ 
+<span class="kr">class</span> <span class="nx">AuthorizedComponent</span> <span class="kr">extends</span> <span class="nx">React</span><span class="p">.</span><span class="nx">Component</span> <span class="p">{</span>
+  <span class="kr">static</span> <span class="nx">propTypes</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="na">routes</span><span class="p">:</span> <span class="nx">PropTypes</span><span class="p">.</span><span class="nx">array</span><span class="p">.</span><span class="nx">isRequired</span>
+  <span class="p">};</span>
+ 
+  <span class="kr">static</span> <span class="nx">contextTypes</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="na">router</span><span class="p">:</span> <span class="nx">PropTypes</span><span class="p">.</span><span class="nx">object</span><span class="p">.</span><span class="nx">isRequired</span>
+  <span class="p">};</span>
+ 
+  <span class="nx">componentWillMount</span><span class="p">()</span> <span class="p">{</span>
+    <span class="kr">const</span> <span class="p">{</span> <span class="nx">routes</span> <span class="p">}</span> <span class="o">=</span> <span class="k">this</span><span class="p">.</span><span class="nx">props</span><span class="p">;</span> <span class="c1">// array of routes</span>
+    <span class="kr">const</span> <span class="p">{</span> <span class="nx">router</span> <span class="p">}</span> <span class="o">=</span> <span class="k">this</span><span class="p">.</span><span class="nx">context</span><span class="p">;</span>
+ 
+    <span class="c1">// check if user data available</span>
+    <span class="kr">const</span> <span class="nx">user</span> <span class="o">=</span> <span class="nx">JSON</span><span class="p">.</span><span class="nx">parse</span><span class="p">(</span><span class="nx">localStorage</span><span class="p">.</span><span class="nx">getItem</span><span class="p">(</span><span class="s1">'user'</span><span class="p">));</span>
+    <span class="k">if</span> <span class="p">(</span><span class="o">!</span><span class="nx">user</span><span class="p">)</span> <span class="p">{</span>
+      <span class="c1">// redirect to login if not</span>
+      <span class="nx">router</span><span class="p">.</span><span class="nx">push</span><span class="p">(</span><span class="s1">'/login'</span><span class="p">);</span>
+    <span class="p">}</span>
+ 
+    <span class="c1">// get all roles available for this route</span>
+    <span class="kr">const</span> <span class="nx">routeRoles</span> <span class="o">=</span> <span class="nx">_</span><span class="p">.</span><span class="nx">chain</span><span class="p">(</span><span class="nx">routes</span><span class="p">)</span>
+      <span class="p">.</span><span class="nx">filter</span><span class="p">(</span><span class="nx">item</span> <span class="o">=&gt;</span> <span class="nx">item</span><span class="p">.</span><span class="nx">authorize</span><span class="p">)</span> <span class="c1">// access to custom attribute</span>
+      <span class="p">.</span><span class="nx">map</span><span class="p">(</span><span class="nx">item</span> <span class="o">=&gt;</span> <span class="nx">item</span><span class="p">.</span><span class="nx">authorize</span><span class="p">)</span>
+      <span class="p">.</span><span class="nx">flattenDeep</span><span class="p">()</span>
+      <span class="p">.</span><span class="nx">value</span><span class="p">();</span>
+ 
+    <span class="c1">// compare routes with user data</span>
+    <span class="k">if</span> <span class="p">(</span><span class="nx">_</span><span class="p">.</span><span class="nx">intersection</span><span class="p">(</span><span class="nx">routeRoles</span><span class="p">,</span> <span class="nx">user</span><span class="p">.</span><span class="nx">roles</span><span class="p">).</span><span class="nx">length</span> <span class="o">===</span> <span class="mi">0</span><span class="p">)</span> <span class="p">{</span>
+      <span class="nx">router</span><span class="p">.</span><span class="nx">push</span><span class="p">(</span><span class="s1">'/not-authorized'</span><span class="p">);</span>
+    <span class="p">}</span>
+  <span class="p">}</span>
+<span class="p">}</span>
+ 
+<span class="kr">export</span> <span class="k">default</span> <span class="nx">AuthorizedComponent</span><span class="p">;</span>
+</code></pre>
+</div>
+
+<h3 id="section">思考</h3>
+
+<p>目前是基于人的，可以获得每个人的能或不能</p>
+
+<p>{“result”:{“success”:true,”errorCode”:null,”errorMsg”:null},”data”:{“model”:[]},”extra”:null}</p>
+
+<p>调用的权限的接口是这个：</p>
+
+<p>http://srv.test.pajkdc.com/diving/resource/findResourcesByUser?relegationName=overwatch</p>
+
+<p>a = response</p>
+
+<!-- 如果成功 -->
+<p>a.data.model[0] 是健康圈菜单</p>
+
+<p>a.data.model[1] 是夺宝菜单</p>
+
+<p>a.data.model[1].subResources 是夺宝菜单</p>
+
+<h3 id="react-router-hook">react router 的几个hook</h3>
+
+<p>onChange(prevState, nextState, replace, callback?)</p>
+
+<p>onLeave(prevState)</p>
+
+<p>onEnter(nextState, replace, callback?)</p>
+
+<p>setRouteLeaveHook(route, hook)</p>
+
+<h3 id="section-1">小布的代码</h3>
+
+<div class="language-js highlighter-rouge"><pre class="highlight"><code>  <span class="kd">function</span> <span class="nx">checkRights</span><span class="p">(</span><span class="nx">route</span><span class="p">,</span> <span class="nx">replace</span><span class="p">)</span> <span class="p">{</span>
+    <span class="kr">const</span> <span class="nx">state</span> <span class="o">=</span> <span class="nx">store</span><span class="p">.</span><span class="nx">getState</span><span class="p">();</span>
+    <span class="kr">const</span> <span class="nx">rights</span> <span class="o">=</span> <span class="nx">state</span><span class="p">.</span><span class="nx">common</span><span class="p">.</span><span class="nx">getIn</span><span class="p">([</span> <span class="s1">'userInfo'</span><span class="p">,</span> <span class="s1">'rights'</span> <span class="p">]);</span>
+    <span class="kr">const</span> <span class="nx">routeRights</span> <span class="o">=</span> <span class="nx">state</span><span class="p">.</span><span class="nx">common</span><span class="p">.</span><span class="nx">get</span><span class="p">(</span><span class="s1">'routeRights'</span><span class="p">);</span>
+    <span class="kr">const</span> <span class="nx">paths</span> <span class="o">=</span> <span class="nx">route</span><span class="p">.</span><span class="nx">location</span><span class="p">.</span><span class="nx">pathname</span><span class="p">.</span><span class="nx">split</span><span class="p">(</span><span class="s1">'/'</span><span class="p">).</span><span class="nx">filter</span><span class="p">(</span><span class="nx">a</span> <span class="o">=&gt;</span> <span class="nx">a</span><span class="p">);</span>
+    <span class="k">for</span> <span class="p">(</span><span class="kr">const</span> <span class="nx">path</span> <span class="nx">of</span> <span class="nx">paths</span><span class="p">)</span> <span class="p">{</span>
+      <span class="k">if</span> <span class="p">(</span><span class="nx">path</span> <span class="k">in</span> <span class="nx">routeRights</span><span class="p">)</span> <span class="p">{</span>
+        <span class="k">if</span> <span class="p">(</span><span class="o">!</span><span class="p">(</span><span class="nx">routeRights</span><span class="p">[</span><span class="nx">path</span><span class="p">]</span> <span class="k">in</span> <span class="nx">rights</span><span class="p">))</span> <span class="p">{</span>
+          <span class="nx">replace</span><span class="p">(</span><span class="s1">'/withoutAuth'</span><span class="p">);</span>
+        <span class="p">}</span>
+      <span class="p">}</span>
+    <span class="p">}</span>
+  <span class="p">}</span>
+  <span class="k">return</span> <span class="p">{</span>
+    <span class="na">path</span><span class="p">:</span> <span class="s1">'/'</span><span class="p">,</span>
+    <span class="na">component</span><span class="p">:</span> <span class="nx">App</span><span class="p">,</span>
+    <span class="na">onChange</span><span class="p">:</span> <span class="p">(</span><span class="nx">prev</span><span class="p">,</span> <span class="nx">next</span><span class="p">,</span> <span class="nx">replace</span><span class="cm">/* , callback */</span><span class="p">)</span> <span class="o">=&gt;</span> <span class="p">{</span>
+      <span class="c1">// [TODO] initial route?</span>
+      <span class="nx">checkRights</span><span class="p">(</span><span class="nx">next</span><span class="p">,</span> <span class="nx">replace</span><span class="p">);</span>
+    <span class="p">},</span>
+</code></pre>
+</div>
+
+<p>后天配置path要加<code class="highlighter-rouge">/</code></p>
+
+<p>export function getAuthorization(params) {
+  return (dispatch) =&gt; 
+    Api.getAuth(‘diving/resource/findResourcesByUser?relegationName=overwatch’)
+      .then(data =&gt; {
+        if (data.content.result.success) {
+          const resources_codes = data.content.data.model.map((menu) =&gt; {
+            return menu.subResources.map((item) =&gt; {return item.code})
+          })
+          const code_array = flatten(resources_codes)
+          // console.log(‘code_array:’, code_array)
+          // co   nsole.log(code_array.indexOf(‘overwatch.global’) !== -1)
+          if (code_array.indexOf(‘duobao-config’) !== -1) {
+            return true
+          }
+        }
+        return false;
+      });
+}</p>
+
+<p>to copy
+```js
+export function getAuthInfo() {
+  return (dispatch) =&gt;
+    getAuthorization()
+      .then( res =&gt; { if (res.result.success) { return res.data } else { alert(‘error’) } })
+      .then( data =&gt; (‘data:’, flatten( data.model.map( (item) =&gt; {return item.subResources} ))))
+      .then( items =&gt; {items.map((i) =&gt; {return i.resourceUrl})})
+      .then( path_array =&gt; {dispatch({
+        type: ‘getUserAuth’,
+        content: path_array || []
+      })})
+}</p>
+
+<p>const flatten = list =&gt; list.reduce(
+  (a, b) =&gt; a.concat(Array.isArray(b) ? flatten(b) : b), []
+);
+```</p>
+
+  </div>
+
+</article>
+
+      </div>
+    </div>
+
+    <footer class="site-footer">
+
+  <div class="wrapper">
+
+    <h2 class="footer-heading"></h2>
+
+    <div class="footer-col-wrapper">
+      <div class="footer-col footer-col-1">
+        <ul class="contact-list">
+          <li></li>
+          <li><a href="mailto:"></a></li>
+        </ul>
+      </div>
+
+      <div class="footer-col footer-col-2">
+        <ul class="social-media-list">
+          
+
+          
+        </ul>
+      </div>
+
+      <div class="footer-col footer-col-3">
+        <p></p>
+      </div>
+    </div>
+
+  </div>
+
+</footer>
+
+
+  </body>
+
+</html>

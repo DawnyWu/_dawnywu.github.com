@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html>
+
+  <head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  <title>ninja dom</title>
+  <meta name="description" content="DOM Level Event Model">
+
+  <link rel="stylesheet" href="/css/main.css">
+  <link rel="canonical" href="http://localhost:4000/js/2016/11/28/ninja-dom.html">
+  <link rel="alternate" type="application/rss+xml" title="" href="http://localhost:4000/feed.xml">
+</head>
+
+
+  <body>
+
+    <header class="site-header">
+
+  <div class="wrapper">
+
+    <a class="site-title" href="/"></a>
+
+    <nav class="site-nav">
+      <a href="#" class="menu-icon">
+        <svg viewBox="0 0 18 15">
+          <path fill="#424242" d="M18,1.484c0,0.82-0.665,1.484-1.484,1.484H1.484C0.665,2.969,0,2.304,0,1.484l0,0C0,0.665,0.665,0,1.484,0 h15.031C17.335,0,18,0.665,18,1.484L18,1.484z"/>
+          <path fill="#424242" d="M18,7.516C18,8.335,17.335,9,16.516,9H1.484C0.665,9,0,8.335,0,7.516l0,0c0-0.82,0.665-1.484,1.484-1.484 h15.031C17.335,6.031,18,6.696,18,7.516L18,7.516z"/>
+          <path fill="#424242" d="M18,13.516C18,14.335,17.335,15,16.516,15H1.484C0.665,15,0,14.335,0,13.516l0,0 c0-0.82,0.665-1.484,1.484-1.484h15.031C17.335,12.031,18,12.696,18,13.516L18,13.516z"/>
+        </svg>
+      </a>
+
+      <div class="trigger">
+        
+          
+          <a class="page-link" href="/about/">About</a>
+          
+        
+          
+        
+          
+        
+          
+        
+      </div>
+    </nav>
+
+  </div>
+
+</header>
+
+
+    <div class="page-content">
+      <div class="wrapper">
+        <article class="post" itemscope itemtype="http://schema.org/BlogPosting">
+
+  <header class="post-header">
+    <h1 class="post-title" itemprop="name headline">ninja dom</h1>
+    <p class="post-meta"><time datetime="2016-11-28T00:00:00+08:00" itemprop="datePublished">Nov 28, 2016</time></p>
+  </header>
+
+  <div class="post-content" itemprop="articleBody">
+    <h3 id="dom-level-event-model">DOM Level Event Model</h3>
+
+<p><code class="highlighter-rouge">DOM Level 0 Event Model</code> in which the event handlers are established via element properties or attributes.</p>
+
+<p><code class="highlighter-rouge">&lt;body onload="doSomething()"&gt;</code>或<code class="highlighter-rouge">window.onload = doSomething;</code></p>
+
+<p>there was no event model introduced with DOM Level 1</p>
+
+<p><code class="highlighter-rouge">The DOM Level 2 Event Model</code> provides a more robust API, but its use is problematic as it’s unavailable in IE browsers prior to IE 9.</p>
+
+<h3 id="dom-level-2-event-handler">DOM Level 2 Event Handler</h3>
+
+<p><code class="highlighter-rouge">addEventListener()</code> and <code class="highlighter-rouge">removeEventListener()</code> methods for modern DOM compliant browsers</p>
+
+<p><code class="highlighter-rouge">attachEvent()</code> and <code class="highlighter-rouge">detachEvent()</code> methods in legacy versions of Internet Explorer (those prior to IE 9).</p>
+
+<h3 id="event-bubbling-and-capturing">event bubbling and capturing</h3>
+
+<p>https://javascript.info/tutorial/bubbling-and-capturing</p>
+
+<p><strong><em>Bubbling</em></strong></p>
+
+<p><code class="highlighter-rouge">event.target/srcElement</code> - remains the same originating element.</p>
+
+<p><code class="highlighter-rouge">this</code> - is the current element, the one event has bubbled to, the one which runs the handler.</p>
+
+<blockquote>
+  <p>In W3C-compliant browsers <code class="highlighter-rouge">this</code> is also available as <code class="highlighter-rouge">event.currentTarget</code>.</p>
+</blockquote>
+
+<blockquote>
+  <p><code class="highlighter-rouge">attachEvent</code> does not pass this or event.currentTarget at all.</p>
+</blockquote>
+
+<p><img src="https://javascript.info/files/tutorial/browser/events/event-order-bubbling-target.png" alt="shit?" /></p>
+
+<p><strong><em>Capturing</em></strong></p>
+
+<p>Using <code class="highlighter-rouge">addEventListener</code> with last argument <code class="highlighter-rouge">true</code> is only the way to catch the event at capturing.</p>
+
+<p><code class="highlighter-rouge">elem.addEventListener( type, handler, phase )</code></p>
+
+<p><code class="highlighter-rouge">phase = true</code>, The handler is set on the capturing phase.</p>
+
+<p><code class="highlighter-rouge">phase = false</code>, The handler is set on the bubbling phase.</p>
+
+<p>比如说 div1&gt;div2,他触发的效果不是click div1, alert(div1), alert(div2)</p>
+
+<p>下边这句话说得很好：</p>
+
+<p>when <code class="highlighter-rouge">an event occurs in an element inside another element</code>, and <code class="highlighter-rouge">both elements have registered a handle for that event</code>. <code class="highlighter-rouge">The event propagation mode determines</code> in which <code class="highlighter-rouge">order</code> the elements receive the event.</p>
+
+<p><code class="highlighter-rouge">The event propagation mode</code>决定的是当两个element嵌套并且都监听相同的事件的时候，点击内部元素时，event触发的顺序</p>
+
+<p>单独点击outer的时候，不会是想想的那种，事件会传到里边去。你没有点inner,所以根本不会触发inner</p>
+
+<p>是点inner的时候，alert outer, alert inner</p>
+
+
+  </div>
+
+</article>
+
+      </div>
+    </div>
+
+    <footer class="site-footer">
+
+  <div class="wrapper">
+
+    <h2 class="footer-heading"></h2>
+
+    <div class="footer-col-wrapper">
+      <div class="footer-col footer-col-1">
+        <ul class="contact-list">
+          <li></li>
+          <li><a href="mailto:"></a></li>
+        </ul>
+      </div>
+
+      <div class="footer-col footer-col-2">
+        <ul class="social-media-list">
+          
+
+          
+        </ul>
+      </div>
+
+      <div class="footer-col footer-col-3">
+        <p></p>
+      </div>
+    </div>
+
+  </div>
+
+</footer>
+
+
+  </body>
+
+</html>

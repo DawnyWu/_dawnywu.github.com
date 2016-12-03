@@ -1,0 +1,65 @@
+---
+layout: post
+title:  "ninja dom"
+date:   2016-11-28
+categories: js
+---
+
+### DOM Level Event Model
+
+ `DOM Level 0 Event Model` in which the event handlers are established via element properties or attributes.
+
+ 
+ `<body onload="doSomething()">`或`window.onload = doSomething;`
+
+there was no event model introduced with DOM Level 1
+
+
+`The DOM Level 2 Event Model` provides a more robust API, but its use is problematic as it’s unavailable in IE browsers prior to IE 9. 
+
+### DOM Level 2 Event Handler
+
+`addEventListener()` and `removeEventListener()` methods for modern DOM compliant browsers
+
+`attachEvent()` and `detachEvent()` methods in legacy versions of Internet Explorer (those prior to IE 9).
+
+### event bubbling and capturing
+
+https://javascript.info/tutorial/bubbling-and-capturing
+
+***Bubbling***
+
+`event.target/srcElement` - remains the same originating element.
+
+`this` - is the current element, the one event has bubbled to, the one which runs the handler.
+
+> In W3C-compliant browsers `this` is also available as `event.currentTarget`.
+
+> `attachEvent` does not pass this or event.currentTarget at all. 
+
+![shit?](https://javascript.info/files/tutorial/browser/events/event-order-bubbling-target.png)
+
+***Capturing***
+
+Using `addEventListener` with last argument `true` is only the way to catch the event at capturing.
+
+`elem.addEventListener( type, handler, phase )`
+
+`phase = true`, The handler is set on the capturing phase.
+
+`phase = false`, The handler is set on the bubbling phase.
+ 
+ 比如说 div1>div2,他触发的效果不是click div1, alert(div1), alert(div2)
+
+下边这句话说得很好：
+
+when `an event occurs in an element inside another element`, and `both elements have registered a handle for that event`. `The event propagation mode determines` in which `order` the elements receive the event.
+
+`The event propagation mode`决定的是当两个element嵌套并且都监听相同的事件的时候，点击内部元素时，event触发的顺序
+
+单独点击outer的时候，不会是想想的那种，事件会传到里边去。你没有点inner,所以根本不会触发inner
+
+是点inner的时候，alert outer, alert inner
+
+
+
