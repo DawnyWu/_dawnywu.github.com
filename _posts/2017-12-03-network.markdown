@@ -1,0 +1,156 @@
+---
+layout: post
+title:  "linux network commands"
+date:   2016-12-03
+categories: python
+---
+
+### ping
+
+`ping -c3` 发三个包
+
+### printf 
+
+
+`printf 'hello\r\n'`
+
+`echo`会把`\r\n`原样打出来
+
+`printf`会处理
+
+### nc netcat
+
+nc localhost 8888
+
+连接到一个端口,nc只是连接上，它并不知道应对各种协议如何交流
+
+a thin wrapper over tcp
+
+`nc -l 3456` listen port 3456 
+
+两个shell通过tcp直接全双工交流
+
+```shell
+// 一个shell
+nc localhost 3456
+
+// 另一个shell
+nc -l 3456
+```
+
+***port的范围***
+
+nc port的范围 1024 ~ 65536
+
+***两个nc listen同一个 port 会怎样***
+
+会报错`nc: Address already in use`
+
+nc 只能处理一个connection
+
+
+### lsof 
+
+lsof -i 列出端口对应的pid等，看1024以下端口要加sudo
+
+## DNS
+
+### host
+
+通过dns查看ip
+
+```shell
+host google.com
+```
+
+查看a record 获得 ipv4 地址
+
+```shell
+host -t a google.com
+```
+
+### dig
+
+host的返回结果人性化，dig就更像代码,也提供更多的信息
+
+### DNS record types
+
+`A` IPV4 record
+
+`CNAME` canonical name,别名而已
+
+`AAAA` IPV6 record, 是个joke,因为ipv6是ipv4长度的4倍
+
+`NS` DNS name server
+
+
+### ip
+
+`ip addr show`
+
+显示所有的`internet iterfaces`
+
+### 找到默认的网关
+
+```shell
+ip route show default
+// or
+netstat -nr
+```
+
+### private address netblocks
+
+10.0.0.0/8
+
+172.16.0.0/12
+
+192.168.0.0/16
+
+### tcmdump
+
+这名字起得有点问题，他不单单可以查看tcp,还可以看其他的
+
+可以显示package
+
+```shell
+sudo tcpdump -n host 8.8.8.8
+sudo tcpdump -n port 53
+```
+
+
+### traceroute
+
+package要经历很多节点到终点，可以用traceroute来查看
+
+***TTL***
+
+time to live
+
+package经过一个router，TTL - 1，为0的时候，router发送一个error message回来
+
+traceroute原理就是发送TTL=0 TTL=1。。。。的包
+
+
+### mtr
+
+和上边的类似
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+`printf 'HEAD / HTTP/1.1\r\nHost: en.wikipedia.org\r\n\r\n' | nc en.wikipedia.org 80`

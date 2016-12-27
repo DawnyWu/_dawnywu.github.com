@@ -6,7 +6,7 @@
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
   <meta name="viewport" content="width=device-width, initial-scale=1">
 
-  <title>java string</title>
+  <title>java</title>
   <meta name="description" content="string">
 
   <link rel="stylesheet" href="/css/main.css">
@@ -35,6 +35,10 @@
       <div class="trigger">
         
           
+          <a class="page-link" href="/2017-12-13-java-exception.html">VDOM</a>
+          
+        
+          
           <a class="page-link" href="/about/">About</a>
           
         
@@ -57,7 +61,7 @@
         <article class="post" itemscope itemtype="http://schema.org/BlogPosting">
 
   <header class="post-header">
-    <h1 class="post-title" itemprop="name headline">java string</h1>
+    <h1 class="post-title" itemprop="name headline">java</h1>
     <p class="post-meta"><time datetime="2016-12-01T00:00:00+08:00" itemprop="datePublished">Dec 1, 2016</time></p>
   </header>
 
@@ -179,6 +183,389 @@
 <span class="kt">int</span><span class="o">[]</span> <span class="n">testScores</span> <span class="o">=</span> <span class="k">new</span> <span class="kt">int</span><span class="o">[</span><span class="mi">4</span><span class="o">];</span>
 </code></pre>
 </div>
+
+<h3 id="section">” ” 和 ‘’ 区别</h3>
+
+<p>”” 字符串
+‘’ character</p>
+
+<h3 id="string-1">string</h3>
+
+<p><code class="highlighter-rouge">StringBuilder</code> is not thread safe.</p>
+
+<p>Sun recommends that you use <code class="highlighter-rouge">StringBuilder</code> instead of <code class="highlighter-rouge">StringBuffer</code> whenever possible because <code class="highlighter-rouge">StringBuilder</code> will run faster (and perhaps jump higher)</p>
+
+<h3 id="file">File</h3>
+
+<p><code class="highlighter-rouge">new File("foo")</code>并不创建file文件,下边的可以</p>
+
+<div class="language-java highlighter-rouge"><pre class="highlight"><code><span class="n">File</span> <span class="n">file</span> <span class="o">=</span> <span class="k">new</span> <span class="n">File</span><span class="o">(</span><span class="s">"foo"</span><span class="o">);</span> <span class="c1">// no file yet </span>
+<span class="n">file</span><span class="o">.</span><span class="na">createNewFile</span><span class="o">();</span> <span class="c1">// make a file, "foo" which is assigned to 'file'</span>
+</code></pre>
+</div>
+
+<div class="language-java highlighter-rouge"><pre class="highlight"><code><span class="n">File</span> <span class="n">file</span> <span class="o">=</span> <span class="k">new</span> <span class="n">File</span><span class="o">(</span><span class="s">"foo"</span><span class="o">);</span> <span class="c1">// no file yet </span>
+<span class="n">PrintWriter</span> <span class="n">pw</span> <span class="o">=</span> <span class="n">newPrintWriter</span><span class="o">(</span><span class="n">file</span><span class="o">);</span>
+</code></pre>
+</div>
+
+<p><strong><em>directory</em></strong></p>
+
+<div class="language-java highlighter-rouge"><pre class="highlight"><code><span class="n">File</span> <span class="n">myDir</span> <span class="o">=</span> <span class="k">new</span> <span class="n">File</span><span class="o">(</span><span class="s">"mydir"</span><span class="o">);</span>   <span class="c1">// create an object</span>
+<span class="n">myDir</span><span class="o">.</span><span class="na">mkdir</span><span class="o">();</span>                    <span class="c1">// create an actual directory</span>
+</code></pre>
+</div>
+
+<h3 id="thread">Thread</h3>
+
+<p>两种方式，集成或者implement interface</p>
+
+<p><strong><em>run()</em></strong></p>
+
+<p>你可以随意overload run() method,可是Thread Class不会为你调用这个方法。</p>
+
+<p>哪怕是你自己自己调用了run(String s)方法，你只是调用了一个普通的方法而已，并没有新开一个线程，拥有一个新的call stack。</p>
+
+<p><strong><em>怎么让线程跑起来</em></strong></p>
+
+<p>如果是集成的，比较简单</p>
+
+<div class="language-java highlighter-rouge"><pre class="highlight"><code><span class="n">MyThread</span> <span class="n">t</span> <span class="o">=</span> <span class="k">new</span> <span class="n">MyThread</span><span class="o">()</span>
+</code></pre>
+</div>
+
+<p>如果是实现runnable接口，稍微麻烦一点点</p>
+
+<div class="language-java highlighter-rouge"><pre class="highlight"><code><span class="n">MyRunnable</span> <span class="n">r</span> <span class="o">=</span> <span class="k">new</span> <span class="n">MyRunnable</span><span class="o">();</span>
+<span class="n">Thread</span> <span class="n">t</span> <span class="o">=</span> <span class="k">new</span> <span class="n">Thread</span><span class="o">(</span><span class="n">r</span><span class="o">);</span>  <span class="c1">// Pass your Runnable to the Thread</span>
+</code></pre>
+</div>
+
+<p><strong><em>顺序</em></strong></p>
+
+<p>你可以按顺序启动各个线程，可是运行的时候，执行的先后顺序就不一定了</p>
+
+<p>thread can not be restarted,只能运行一次就完了</p>
+
+<h3 id="thread-states">thread states</h3>
+
+<p><strong><em>Waiting/blocked/sleeping</em></strong></p>
+
+<p>The important point is that one thread does not tell another thread to block.</p>
+
+<p>Note also that a thread in a blocked state is still considered to be alive.</p>
+
+<p><strong><em>Dead</em></strong></p>
+
+<p>Once a thread is dead, it can never be brought back to life!</p>
+
+<p><code class="highlighter-rouge">sleep()</code>是static method,一个线程没有办法让另一个线程sleep</p>
+
+<p>###priority</p>
+
+<p>main thread生成another thread,他们的优先级一样</p>
+
+<p>###Thread.yield()</p>
+
+<p>What <code class="highlighter-rouge">yield()</code> is supposed to do is make the currently running thread head back to runnable to allow other threads of the same priority to get their turn. So the intention is to use <code class="highlighter-rouge">yield()</code> to promote graceful turn-taking among equal-priority threads</p>
+
+<p>In reality, though, the yield() method isn’t guaranteed to do what it claims</p>
+
+<p>A <code class="highlighter-rouge">yield()</code> won’t ever cause a thread to go to the <code class="highlighter-rouge">waiting/sleeping/ blocking</code> state. At most, a <code class="highlighter-rouge">yield()</code> will cause a thread to go from running to runnable, but again, it might have no effect at all.</p>
+
+<h3 id="join">join()</h3>
+
+<p>这个方法不是<code class="highlighter-rouge">static</code>的</p>
+
+<p>t.join() t先挤进来运行</p>
+
+<p><code class="highlighter-rouge">t.join()</code> means “Join me (the current thread) to the end of t, so that t must finish before I (the current thread) can run again.”</p>
+
+<h3 id="inner-class">Inner Class</h3>
+<p>From inside the outer class instance code, use the inner class name in the normal way:</p>
+
+<div class="language-java highlighter-rouge"><pre class="highlight"><code><span class="n">MyInner</span> <span class="n">mi</span> <span class="o">=</span> <span class="k">new</span> <span class="n">MyInner</span><span class="o">();</span>
+</code></pre>
+</div>
+
+<p>From outside the outer class instance code (including static method code within the outer class), the inner class name must now include the outer class’s name:</p>
+
+<div class="language-java highlighter-rouge"><pre class="highlight"><code><span class="n">MyOuter</span><span class="o">.</span><span class="na">MyInner</span>
+</code></pre>
+</div>
+<p>To instantiate it, you must use a reference to the outer class:</p>
+
+<div class="language-java highlighter-rouge"><pre class="highlight"><code><span class="k">new</span> <span class="n">MyOuter</span><span class="o">().</span><span class="na">new</span> <span class="n">MyInner</span><span class="o">();</span>
+<span class="n">outerObjRef</span><span class="o">.</span><span class="na">new</span> <span class="nf">MyInner</span><span class="o">();</span>
+</code></pre>
+</div>
+
+<p>if you already have an instance of the outer class.</p>
+
+<p><strong><em>this的问题</em></strong></p>
+
+<ul>
+  <li>
+    <p>To reference the inner class instance itself, from within the inner class code,
+use this.</p>
+  </li>
+  <li>
+    <p>To reference the “outer this” (the outer class instance) from within the inner class code, use NameOfOuterClass.this (example, MyOuter.this).</p>
+  </li>
+</ul>
+
+<p><strong><em>Method-Local Inner Classes</em></strong></p>
+
+<div class="language-java highlighter-rouge"><pre class="highlight"><code><span class="kd">class</span> <span class="nc">MyOuter2</span> <span class="o">{</span>
+  <span class="kd">private</span> <span class="n">String</span> <span class="n">x</span> <span class="o">=</span> <span class="s">"Outer2"</span><span class="o">;</span>
+  <span class="kt">void</span> <span class="nf">doStuff</span><span class="o">()</span> <span class="o">{</span>
+    <span class="c1">// 创建了一个class</span>
+    <span class="kd">class</span> <span class="nc">MyInner</span> <span class="o">{</span>
+      <span class="kd">public</span> <span class="kt">void</span> <span class="nf">seeOuter</span><span class="o">()</span> <span class="o">{</span>
+        <span class="n">System</span><span class="o">.</span><span class="na">out</span><span class="o">.</span><span class="na">println</span><span class="o">(</span><span class="s">"Outer x is "</span> <span class="o">+</span> <span class="n">x</span><span class="o">);</span>
+      <span class="o">}</span> <span class="c1">// close inner class method</span>
+    <span class="o">}</span> <span class="c1">// close inner class definition</span>
+    <span class="n">MyInner</span> <span class="n">mi</span> <span class="o">=</span> <span class="k">new</span> <span class="n">MyInner</span><span class="o">();</span>
+    <span class="c1">// 创建了类，实例化后调用方法</span>
+    <span class="n">mi</span><span class="o">.</span><span class="na">seeOuter</span><span class="o">();</span>
+  <span class="o">}</span> <span class="c1">// close outer class method doStuff()</span>
+<span class="o">}</span> <span class="c1">// close outer class</span>
+</code></pre>
+</div>
+<p><strong><em>the inner class object cannot use the local variables of the method the inner class is in.</em></strong></p>
+
+<div class="language-java highlighter-rouge"><pre class="highlight"><code><span class="kd">class</span> <span class="nc">MyOuter2</span> <span class="o">{</span>
+  <span class="kd">private</span> <span class="n">String</span> <span class="n">x</span> <span class="o">=</span> <span class="s">"Outer2"</span><span class="o">;</span>
+  <span class="kt">void</span> <span class="nf">doStuff</span><span class="o">()</span> <span class="o">{</span>
+    <span class="n">String</span> <span class="n">z</span> <span class="o">=</span> <span class="s">"local variable"</span><span class="o">;</span>
+    <span class="kd">class</span> <span class="nc">MyInner</span> <span class="o">{</span> 
+      <span class="kd">public</span> <span class="kt">void</span> <span class="nf">seeOuter</span><span class="o">()</span> <span class="o">{</span>
+        <span class="n">System</span><span class="o">.</span><span class="na">out</span><span class="o">.</span><span class="na">println</span><span class="o">(</span><span class="s">"Outer x is "</span> <span class="o">+</span> <span class="n">x</span><span class="o">);</span> 
+        <span class="c1">// 调用z报错</span>
+        <span class="n">System</span><span class="o">.</span><span class="na">out</span><span class="o">.</span><span class="na">println</span><span class="o">(</span><span class="s">"Localvariablezis"</span><span class="o">+</span><span class="n">z</span><span class="o">);</span> <span class="c1">//Won'tCompile!</span>
+      <span class="o">}</span> <span class="c1">// close inner class method</span>
+    <span class="o">}</span> <span class="c1">// close inner class definition</span>
+  <span class="o">}</span> <span class="c1">// close outer class method doStuff()</span>
+<span class="o">}</span> <span class="c1">// close outer class</span>
+</code></pre>
+</div>
+
+<p>因为method local variable在method结束后，从栈中灰飞湮灭。而instance很有可能还在堆中存活</p>
+
+<p>在method local variable前面用final可以解决这个问题</p>
+
+<h3 id="anonymous-inner-class">anonymous inner class</h3>
+
+<p><strong><em>flavor one</em></strong></p>
+
+<div class="language-java highlighter-rouge"><pre class="highlight"><code><span class="kd">class</span> <span class="nc">Popcorn</span> <span class="o">{</span>
+  <span class="kd">public</span> <span class="kt">void</span> <span class="nf">pop</span><span class="o">()</span> <span class="o">{</span>
+  <span class="n">System</span><span class="o">.</span><span class="na">out</span><span class="o">.</span><span class="na">println</span><span class="o">(</span><span class="s">"popcorn"</span><span class="o">);</span>
+  <span class="o">}</span>
+<span class="o">}</span>
+
+<span class="kd">class</span> <span class="nc">Food</span> <span class="o">{</span>
+  <span class="c1">// 这里subclass</span>
+  <span class="n">Popcorn</span> <span class="n">p</span> <span class="o">=</span> <span class="k">new</span> <span class="n">Popcorn</span><span class="o">()</span> <span class="o">{</span>
+    <span class="kd">public</span> <span class="kt">void</span> <span class="nf">pop</span><span class="o">()</span> <span class="o">{</span>
+      <span class="n">System</span><span class="o">.</span><span class="na">out</span><span class="o">.</span><span class="na">println</span><span class="o">(</span><span class="s">"anonymous popcorn"</span><span class="o">);</span>
+    <span class="o">}</span>
+  <span class="o">};</span>
+<span class="o">}</span>
+</code></pre>
+</div>
+
+<div class="language-java highlighter-rouge"><pre class="highlight"><code><span class="kd">class</span> <span class="nc">Popcorn</span> <span class="o">{</span>
+   <span class="kd">public</span> <span class="kt">void</span> <span class="nf">pop</span><span class="o">()</span> <span class="o">{</span>
+      <span class="n">System</span><span class="o">.</span><span class="na">out</span><span class="o">.</span><span class="na">println</span><span class="o">(</span><span class="s">"popcorn"</span><span class="o">);</span>
+   <span class="o">}</span>
+<span class="o">}</span>
+<span class="kd">class</span> <span class="nc">Food</span> <span class="o">{</span>
+   <span class="n">Popcorn</span> <span class="n">p</span> <span class="o">=</span> <span class="k">new</span> <span class="n">Popcorn</span><span class="o">()</span> <span class="o">{</span>
+      <span class="kd">public</span> <span class="kt">void</span> <span class="nf">sizzle</span><span class="o">()</span> <span class="o">{</span>
+        <span class="n">System</span><span class="o">.</span><span class="na">out</span><span class="o">.</span><span class="na">println</span><span class="o">(</span><span class="s">"anonymous sizzling popcorn"</span><span class="o">);</span>
+      <span class="o">}</span>
+      <span class="kd">public</span> <span class="kt">void</span> <span class="nf">pop</span><span class="o">()</span> <span class="o">{</span>
+        <span class="n">System</span><span class="o">.</span><span class="na">out</span><span class="o">.</span><span class="na">println</span><span class="o">(</span><span class="s">"anonymous popcorn"</span><span class="o">);</span>
+      <span class="o">}</span>
+    <span class="o">};</span>
+    <span class="kd">public</span> <span class="kt">void</span> <span class="nf">popIt</span><span class="o">()</span> <span class="o">{</span>
+      <span class="n">p</span><span class="o">.</span><span class="na">pop</span><span class="o">();</span>     <span class="c1">// OK, Popcorn has a pop() method</span>
+      <span class="n">p</span><span class="o">.</span><span class="na">sizzle</span><span class="o">();</span>  <span class="c1">// Not Legal! Popcorn does not have sizzle()</span>
+    <span class="o">}</span> 
+  <span class="o">}</span>
+</code></pre>
+</div>
+
+<p>上边的会报错，因为polymorphism</p>
+
+<p><strong><em>flavor two</em></strong></p>
+
+<p>this time the new just-in-time class is an implementer of the Cookable interface.</p>
+
+<div class="language-java highlighter-rouge"><pre class="highlight"><code><span class="kd">interface</span> <span class="nc">Cookable</span> <span class="o">{</span>
+  <span class="kd">public</span> <span class="kt">void</span> <span class="nf">cook</span><span class="o">();</span>
+<span class="o">}</span>
+
+<span class="kd">class</span> <span class="nc">Food</span> <span class="o">{</span>
+  <span class="n">Cookable</span> <span class="n">c</span> <span class="o">=</span> <span class="k">new</span> <span class="n">Cookable</span><span class="o">()</span> <span class="o">{</span>
+    <span class="kd">public</span> <span class="kt">void</span> <span class="nf">cook</span><span class="o">()</span> <span class="o">{</span>
+      <span class="n">System</span><span class="o">.</span><span class="na">out</span><span class="o">.</span><span class="na">println</span><span class="o">(</span><span class="s">"anonymous cookable implementer"</span><span class="o">);</span>
+    <span class="o">}</span>
+  <span class="o">};</span> 
+<span class="o">}</span>
+</code></pre>
+</div>
+
+<p>anonymouse class写在参数的位置</p>
+
+<div class="language-java highlighter-rouge"><pre class="highlight"><code><span class="kd">class</span> <span class="nc">MyWonderfulClass</span> <span class="o">{</span>
+  <span class="kt">void</span> <span class="nf">go</span><span class="o">()</span> <span class="o">{</span>
+    <span class="n">Bar</span> <span class="n">b</span> <span class="o">=</span> <span class="k">new</span> <span class="n">Bar</span><span class="o">();</span>
+    <span class="n">b</span><span class="o">.</span><span class="na">doStuff</span><span class="o">(</span><span class="k">new</span> <span class="n">Foo</span><span class="o">()</span> <span class="o">{</span>
+      <span class="kd">public</span> <span class="kt">void</span> <span class="nf">foof</span><span class="o">()</span> <span class="o">{</span>
+        <span class="n">System</span><span class="o">.</span><span class="na">out</span><span class="o">.</span><span class="na">println</span><span class="o">(</span><span class="s">"foofy"</span><span class="o">);</span>
+      <span class="o">}</span> <span class="c1">// end foof method</span>
+    <span class="o">});</span> <span class="c1">// end inner class def, arg, and b.doStuff stmt.</span>
+  <span class="o">}</span> <span class="c1">// end go()</span>
+<span class="o">}</span> <span class="c1">// end class</span>
+
+<span class="kd">interface</span> <span class="nc">Foo</span> <span class="o">{</span>
+  <span class="kt">void</span> <span class="nf">foof</span><span class="o">();</span>
+<span class="o">}</span>
+
+<span class="kd">class</span> <span class="nc">Bar</span> <span class="o">{</span>
+  <span class="kt">void</span> <span class="nf">doStuff</span><span class="o">(</span><span class="n">Foo</span> <span class="n">f</span><span class="o">)</span> <span class="o">{</span> <span class="o">}</span>
+<span class="o">}</span>
+</code></pre>
+</div>
+
+<h3 id="static-nested-classes">static nested classes</h3>
+
+<p>It is simply a non-inner (also called “top-level”) class scoped within another.</p>
+
+<p>A static nested class is simply a class that’s a static member of the enclosing class:</p>
+
+<div class="language-java highlighter-rouge"><pre class="highlight"><code><span class="kd">class</span> <span class="nc">BigOuter</span> <span class="o">{</span>
+  <span class="kd">static</span> <span class="kd">class</span> <span class="nc">Nested</span> <span class="o">{</span> <span class="o">}</span>
+<span class="o">}</span>
+</code></pre>
+</div>
+
+<p><strong><em>instantiate</em></strong></p>
+
+<div class="language-java highlighter-rouge"><pre class="highlight"><code><span class="kd">class</span> <span class="nc">BigOuter</span> <span class="o">{</span>
+  <span class="kd">static</span> <span class="kd">class</span> <span class="nc">Nest</span> <span class="o">{</span><span class="kt">void</span> <span class="nf">go</span><span class="o">()</span> <span class="o">{</span> <span class="n">System</span><span class="o">.</span><span class="na">out</span><span class="o">.</span><span class="na">println</span><span class="o">(</span><span class="s">"hi"</span><span class="o">);</span> <span class="o">}</span> <span class="o">}</span>
+<span class="o">}</span>
+
+<span class="kd">class</span> <span class="nc">Broom</span> <span class="o">{</span>
+  <span class="kd">static</span> <span class="kd">class</span> <span class="nc">B2</span> <span class="o">{</span><span class="kt">void</span> <span class="nf">goB2</span><span class="o">()</span> <span class="o">{</span> <span class="n">System</span><span class="o">.</span><span class="na">out</span><span class="o">.</span><span class="na">println</span><span class="o">(</span><span class="s">"hi 2"</span><span class="o">);</span> <span class="o">}</span> <span class="o">}</span>
+  <span class="kd">public</span> <span class="kd">static</span> <span class="kt">void</span> <span class="nf">main</span><span class="o">(</span><span class="n">String</span><span class="o">[]</span> <span class="n">args</span><span class="o">)</span> <span class="o">{</span>
+    <span class="n">BigOuter</span><span class="o">.</span><span class="na">Nest</span> <span class="n">n</span> <span class="o">=</span> <span class="k">new</span> <span class="n">BigOuter</span><span class="o">.</span><span class="na">Nest</span><span class="o">();</span>   <span class="c1">// both class names</span>
+    <span class="n">n</span><span class="o">.</span><span class="na">go</span><span class="o">();</span>
+    <span class="n">B2</span> <span class="n">b2</span> <span class="o">=</span> <span class="k">new</span> <span class="n">B2</span><span class="o">();</span>
+    <span class="n">b2</span><span class="o">.</span><span class="na">goB2</span><span class="o">();</span> 
+  <span class="o">}</span>
+<span class="o">}</span>
+</code></pre>
+</div>
+
+<h3 id="polymorphism">polymorphism</h3>
+
+<div class="language-java highlighter-rouge"><pre class="highlight"><code><span class="n">PlayerPiece</span> <span class="n">player</span> <span class="o">=</span> <span class="k">new</span> <span class="n">PlayerPiece</span><span class="o">();</span>
+<span class="n">Object</span> <span class="n">o</span> <span class="o">=</span> <span class="n">player</span><span class="o">;</span>
+<span class="n">GameShape</span> <span class="n">shape</span> <span class="o">=</span> <span class="n">player</span><span class="o">;</span>
+<span class="n">Animatable</span> <span class="n">mover</span> <span class="o">=</span> <span class="n">player</span><span class="o">;</span>
+</code></pre>
+</div>
+
+<div class="language-java highlighter-rouge"><pre class="highlight"><code><span class="n">SuperClass</span> <span class="n">a</span> <span class="o">=</span> <span class="k">new</span> <span class="n">ChildClass</span><span class="o">()</span>
+</code></pre>
+</div>
+
+<p>都有<code class="highlighter-rouge">shit()</code> method，<code class="highlighter-rouge">child</code> 覆盖了 <code class="highlighter-rouge">super</code> 的</p>
+
+<p>尽管<code class="highlighter-rouge">a</code>的<code class="highlighter-rouge">type</code>是<code class="highlighter-rouge">SuperClass</code>，调用的时候还是调用<code class="highlighter-rouge">ChildClass</code>覆盖后的版本</p>
+
+<h3 id="override">override</h3>
+
+<p>static methods can’t be overridden</p>
+
+<p>感觉exception方面还不太清楚</p>
+
+<p>To summarize, <code class="highlighter-rouge">which overridden version of the method to call</code> (in other words, from which class in the inheritance tree) is decided at runtime based on object type, 
+but <code class="highlighter-rouge">which overloaded version of the method to call</code> is based on the reference type of the argument passed at compile time.</p>
+
+<div class="language-java highlighter-rouge"><pre class="highlight"><code><span class="kd">public</span> <span class="kd">class</span> <span class="nc">Animal</span> <span class="o">{</span>
+   <span class="kd">public</span> <span class="kt">void</span> <span class="nf">eat</span><span class="o">()</span> <span class="o">{</span>
+      <span class="n">System</span><span class="o">.</span><span class="na">out</span><span class="o">.</span><span class="na">println</span><span class="o">(</span><span class="s">"Generic Animal Eating Generically"</span><span class="o">);</span>
+   <span class="o">}</span>
+<span class="o">}</span>
+<span class="kd">public</span> <span class="kd">class</span> <span class="nc">Horse</span> <span class="kd">extends</span> <span class="n">Animal</span> <span class="o">{</span>
+   <span class="kd">public</span> <span class="kt">void</span> <span class="nf">eat</span><span class="o">()</span> <span class="o">{</span>
+       <span class="n">System</span><span class="o">.</span><span class="na">out</span><span class="o">.</span><span class="na">println</span><span class="o">(</span><span class="s">"Horse eating hay "</span><span class="o">);</span>
+   <span class="o">}</span>
+   <span class="kd">public</span> <span class="kt">void</span> <span class="nf">eat</span><span class="o">(</span><span class="n">String</span> <span class="n">s</span><span class="o">)</span> <span class="o">{</span>
+      <span class="n">System</span><span class="o">.</span><span class="na">out</span><span class="o">.</span><span class="na">println</span><span class="o">(</span><span class="s">"Horse eating "</span> <span class="o">+</span> <span class="n">s</span><span class="o">);</span>
+   <span class="o">}</span>
+<span class="o">}</span>
+</code></pre>
+</div>
+
+<p>Animal a2 = new Animal();
+a2.eat(“treats”);</p>
+
+<p>报错，animal没有eat(String s)方法</p>
+
+<p>Animal ah2 = new Horse(); 
+ah2.eat(“Carrots”);</p>
+
+<p>报错，还是一样，animal class没有eat(String s)方法</p>
+
+<h3 id="cast-downcast">cast downcast</h3>
+
+<p><code class="highlighter-rouge">Animal animal = new Dog();</code>的时候，我么不能调用dog class的方法，可以这样<code class="highlighter-rouge">Dog d = (Dog) animal;</code></p>
+
+<p>其实upcast也是存在的，只是没有什么特别需要注意的</p>
+
+<div class="language-java highlighter-rouge"><pre class="highlight"><code><span class="n">Dog</span> <span class="n">d</span> <span class="o">=</span> <span class="k">new</span> <span class="n">Dog</span><span class="o">();</span>
+<span class="n">Animal</span> <span class="n">a1</span> <span class="o">=</span> <span class="n">d</span><span class="o">;</span>           <span class="c1">// upcast ok with no explicit cast</span>
+<span class="n">Animal</span> <span class="n">a2</span> <span class="o">=</span> <span class="o">(</span><span class="n">Animal</span><span class="o">)</span> <span class="n">d</span><span class="o">;</span>  <span class="c1">// upcast ok with an explicit cast</span>
+</code></pre>
+</div>
+
+<h3 id="equals--">equals == ===</h3>
+
+<p>java并没有<code class="highlighter-rouge">===</code></p>
+
+<p>The <code class="highlighter-rouge">equals()</code> method in class Object uses only the <code class="highlighter-rouge">==</code> operator for comparisons, so unless you override <code class="highlighter-rouge">equals()</code>, two objects are considered equal only if the two references refer to the same object.</p>
+
+<p>override <code class="highlighter-rouge">equals</code>使其更有意义</p>
+
+<h3 id="generics">generics</h3>
+
+<p>Why can’t you pass an ArrayList<Dog> into a method with an argument of ArrayList<Animal>?</Animal></Dog></p>
+
+<p>In other words, at runtime the JVM KNOWS the type of arrays, but does NOT know the type of a collection.</p>
+
+<p><code class="highlighter-rouge">&lt;? extends Animal&gt;</code>
+can be EITHER a subclass of a class (abstract or concrete) OR a type that implements the interface after the word extends.</p>
+
+<div class="language-java highlighter-rouge"><pre class="highlight"><code><span class="kt">void</span> <span class="nf">foo</span><span class="o">(</span><span class="n">List</span><span class="o">&lt;?</span> <span class="kd">extends</span> <span class="n">Serializable</span><span class="o">&gt;</span> <span class="n">list</span><span class="o">)</span> <span class="c1">// odd, but correct</span>
+                                            <span class="c1">// to use "extends"</span>
+</code></pre>
+</div>
+
+<p>List<? extends Object> and List<?> are absolutely identical! But neither of
+them are the same as List<object></object></p>
+
+<p>But List<? extends Dog> could mean List<Beagle>, List<Poodle>, and so on. Of course List<?> could be… anything at all.</p>
+
+<p>wildcards can be used only for reference declarations (including arguments, variables, return types, and so on).</p>
+
+<hr />
+
+<p>###ItelliJ IDEA</p>
 
 
   </div>

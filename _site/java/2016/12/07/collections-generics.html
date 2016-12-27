@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html>
+
+  <head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  <title>collections generics</title>
+  <meta name="description" content="ordered">
+
+  <link rel="stylesheet" href="/css/main.css">
+  <link rel="canonical" href="http://localhost:4000/java/2016/12/07/collections-generics.html">
+  <link rel="alternate" type="application/rss+xml" title="" href="http://localhost:4000/feed.xml">
+</head>
+
+
+  <body>
+
+    <header class="site-header">
+
+  <div class="wrapper">
+
+    <a class="site-title" href="/"></a>
+
+    <nav class="site-nav">
+      <a href="#" class="menu-icon">
+        <svg viewBox="0 0 18 15">
+          <path fill="#424242" d="M18,1.484c0,0.82-0.665,1.484-1.484,1.484H1.484C0.665,2.969,0,2.304,0,1.484l0,0C0,0.665,0.665,0,1.484,0 h15.031C17.335,0,18,0.665,18,1.484L18,1.484z"/>
+          <path fill="#424242" d="M18,7.516C18,8.335,17.335,9,16.516,9H1.484C0.665,9,0,8.335,0,7.516l0,0c0-0.82,0.665-1.484,1.484-1.484 h15.031C17.335,6.031,18,6.696,18,7.516L18,7.516z"/>
+          <path fill="#424242" d="M18,13.516C18,14.335,17.335,15,16.516,15H1.484C0.665,15,0,14.335,0,13.516l0,0 c0-0.82,0.665-1.484,1.484-1.484h15.031C17.335,12.031,18,12.696,18,13.516L18,13.516z"/>
+        </svg>
+      </a>
+
+      <div class="trigger">
+        
+          
+          <a class="page-link" href="/2017-12-13-java-exception.html">VDOM</a>
+          
+        
+          
+          <a class="page-link" href="/about/">About</a>
+          
+        
+          
+        
+          
+        
+          
+        
+      </div>
+    </nav>
+
+  </div>
+
+</header>
+
+
+    <div class="page-content">
+      <div class="wrapper">
+        <article class="post" itemscope itemtype="http://schema.org/BlogPosting">
+
+  <header class="post-header">
+    <h1 class="post-title" itemprop="name headline">collections generics</h1>
+    <p class="post-meta"><time datetime="2016-12-07T00:00:00+08:00" itemprop="datePublished">Dec 7, 2016</time></p>
+  </header>
+
+  <div class="post-content" itemprop="articleBody">
+    <p><strong><em>ordered</em></strong></p>
+
+<p>When a collection is ordered, it means you can iterate through the collection in a specific (not-random) order.</p>
+
+<p><strong><em>sorted</em></strong></p>
+
+<p>A sorted collection means that the order in the collection is determined according to some rule or rules, known as the sort order.</p>
+
+<h3 id="list-interface">List interface</h3>
+
+<p><strong><em>ArrayList</em></strong></p>
+
+<p>Think of this as a growable array. It gives you fast iteration and fast random access.</p>
+
+<p><strong><em>Vector</em></strong></p>
+
+<p>A Vector is basically the same as an ArrayList, but Vector methods are syn- chronized for thread safety.</p>
+
+<p><strong><em>LinkedList</em></strong></p>
+
+<p>LinkedList may iterate more slowly than an ArrayList, but it’s a good choice when you need fast insertion and deletion.</p>
+
+<h3 id="set-interface">Set interface</h3>
+
+<p><strong><em>Hashset</em></strong></p>
+
+<p>A HashSet is an unsorted, unordered Set.</p>
+
+<p><strong><em>LinkedHashSet</em></strong></p>
+
+<p>A LinkedHashSet is an ordered version of HashSet. Use this class instead of HashSet when you care about the iteration order.</p>
+
+<p><strong><em>TreeSet</em></strong></p>
+
+<p>TreeSet The TreeSet is one of two sorted collections</p>
+
+<h3 id="map-interface">Map interface</h3>
+
+<p><strong><em>HashMap</em></strong></p>
+
+<p>The HashMap gives you an unsorted, unordered Map.</p>
+
+<p><strong><em>Hashtable</em></strong></p>
+
+<p>Hashtable is the synchronized counterpart to HashMap.</p>
+
+<p><strong><em>LinkedHashMap</em></strong></p>
+
+<p>maintains insertion order
+Hashtable is the synchronized counterpart to HashMap.</p>
+
+<p><strong><em>TreeMap</em></strong></p>
+
+<p>a TreeMap is a sorted Map.</p>
+
+<h3 id="autoboxing-with-collections">Autoboxing with Collections</h3>
+
+<div class="language-java highlighter-rouge"><pre class="highlight"><code><span class="c1">// pre java5的时候要这么写</span>
+<span class="n">List</span> <span class="n">myInts</span> <span class="o">=</span> <span class="k">new</span> <span class="n">ArrayList</span><span class="o">();</span>
+<span class="n">myInts</span><span class="o">.</span><span class="na">add</span><span class="o">(</span><span class="k">new</span> <span class="n">Integer</span><span class="o">(</span><span class="mi">42</span><span class="o">));</span>
+
+<span class="c1">// 之后这么写, 因为autoboxing</span>
+<span class="n">myInts</span><span class="o">.</span><span class="na">add</span><span class="o">(</span><span class="mi">42</span><span class="o">);</span>
+</code></pre>
+</div>
+
+
+  </div>
+
+</article>
+
+      </div>
+    </div>
+
+    <footer class="site-footer">
+
+  <div class="wrapper">
+
+    <h2 class="footer-heading"></h2>
+
+    <div class="footer-col-wrapper">
+      <div class="footer-col footer-col-1">
+        <ul class="contact-list">
+          <li></li>
+          <li><a href="mailto:"></a></li>
+        </ul>
+      </div>
+
+      <div class="footer-col footer-col-2">
+        <ul class="social-media-list">
+          
+
+          
+        </ul>
+      </div>
+
+      <div class="footer-col footer-col-3">
+        <p></p>
+      </div>
+    </div>
+
+  </div>
+
+</footer>
+
+
+  </body>
+
+</html>

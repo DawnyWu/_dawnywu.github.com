@@ -75,3 +75,7 @@ console.log(newState.equals(newState1)); //false
 
 
 ### 普通obj可以嵌套immutable obj么？
+
+
+
+

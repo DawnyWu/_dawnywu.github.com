@@ -1,0 +1,196 @@
+<!DOCTYPE html>
+<html>
+
+  <head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  <title>java wrapper class</title>
+  <meta name="description" content="The Wrapper Constructors">
+
+  <link rel="stylesheet" href="/css/main.css">
+  <link rel="canonical" href="http://localhost:4000/java/2016/12/12/java-wrapper-class.html">
+  <link rel="alternate" type="application/rss+xml" title="" href="http://localhost:4000/feed.xml">
+</head>
+
+
+  <body>
+
+    <header class="site-header">
+
+  <div class="wrapper">
+
+    <a class="site-title" href="/"></a>
+
+    <nav class="site-nav">
+      <a href="#" class="menu-icon">
+        <svg viewBox="0 0 18 15">
+          <path fill="#424242" d="M18,1.484c0,0.82-0.665,1.484-1.484,1.484H1.484C0.665,2.969,0,2.304,0,1.484l0,0C0,0.665,0.665,0,1.484,0 h15.031C17.335,0,18,0.665,18,1.484L18,1.484z"/>
+          <path fill="#424242" d="M18,7.516C18,8.335,17.335,9,16.516,9H1.484C0.665,9,0,8.335,0,7.516l0,0c0-0.82,0.665-1.484,1.484-1.484 h15.031C17.335,6.031,18,6.696,18,7.516L18,7.516z"/>
+          <path fill="#424242" d="M18,13.516C18,14.335,17.335,15,16.516,15H1.484C0.665,15,0,14.335,0,13.516l0,0 c0-0.82,0.665-1.484,1.484-1.484h15.031C17.335,12.031,18,12.696,18,13.516L18,13.516z"/>
+        </svg>
+      </a>
+
+      <div class="trigger">
+        
+          
+          <a class="page-link" href="/2017-12-13-java-exception.html">VDOM</a>
+          
+        
+          
+          <a class="page-link" href="/about/">About</a>
+          
+        
+          
+        
+          
+        
+          
+        
+      </div>
+    </nav>
+
+  </div>
+
+</header>
+
+
+    <div class="page-content">
+      <div class="wrapper">
+        <article class="post" itemscope itemtype="http://schema.org/BlogPosting">
+
+  <header class="post-header">
+    <h1 class="post-title" itemprop="name headline">java wrapper class</h1>
+    <p class="post-meta"><time datetime="2016-12-12T00:00:00+08:00" itemprop="datePublished">Dec 12, 2016</time></p>
+  </header>
+
+  <div class="post-content" itemprop="articleBody">
+    <h3 id="the-wrapper-constructors">The Wrapper Constructors</h3>
+
+<p>All of the wrapper classes except Character provide two constructors:</p>
+
+<ul>
+  <li>one that takes a primitive of the type being constructed</li>
+  <li>one that takes a String representation of the type being constructed—for example</li>
+</ul>
+
+<div class="language-java highlighter-rouge"><pre class="highlight"><code><span class="n">Integer</span> <span class="n">i1</span> <span class="o">=</span> <span class="k">new</span> <span class="n">Integer</span><span class="o">(</span><span class="mi">42</span><span class="o">);</span>
+<span class="n">Integer</span> <span class="n">i2</span> <span class="o">=</span> <span class="k">new</span> <span class="n">Integer</span><span class="o">(</span><span class="s">"42"</span><span class="o">);</span>
+
+<span class="n">Float</span> <span class="n">f1</span> <span class="o">=</span> <span class="k">new</span> <span class="n">Float</span><span class="o">(</span><span class="mf">3.14f</span><span class="o">);</span>
+<span class="n">Float</span> <span class="n">f2</span> <span class="o">=</span> <span class="k">new</span> <span class="n">Float</span><span class="o">(</span><span class="s">"3.14f"</span><span class="o">);</span>
+
+<span class="c1">// character只有这一种</span>
+<span class="n">Character</span> <span class="n">c1</span> <span class="o">=</span> <span class="k">new</span> <span class="n">Character</span><span class="o">(</span><span class="sc">'c'</span><span class="o">);</span>
+</code></pre>
+</div>
+
+<h3 id="the-valueof-methods">The valueOf() Methods</h3>
+
+<p>Integer i2 = Integer.valueOf(“101011”, 2);</p>
+
+<h3 id="boxing-and-unboxing">boxing and unboxing</h3>
+
+<div class="language-java highlighter-rouge"><pre class="highlight"><code><span class="c1">// pre–Java 5 days</span>
+<span class="n">Integer</span> <span class="n">y</span> <span class="o">=</span> <span class="k">new</span> <span class="n">Integer</span><span class="o">(</span><span class="mi">567</span><span class="o">);</span>
+<span class="kt">int</span> <span class="n">x</span> <span class="o">=</span> <span class="n">y</span><span class="o">.</span><span class="na">intValue</span><span class="o">();</span>
+<span class="n">x</span><span class="o">++;</span>
+<span class="n">y</span> <span class="o">=</span> <span class="k">new</span> <span class="n">Integer</span><span class="o">(</span><span class="n">x</span><span class="o">);</span>
+<span class="n">System</span><span class="o">.</span><span class="na">out</span><span class="o">.</span><span class="na">println</span><span class="o">(</span><span class="s">"y = "</span> <span class="o">+</span> <span class="n">y</span><span class="o">);</span>  
+
+<span class="c1">// java5 autoboxing</span>
+<span class="n">Integer</span> <span class="n">y</span> <span class="o">=</span> <span class="k">new</span> <span class="n">Integer</span><span class="o">(</span><span class="mi">567</span><span class="o">);</span>    <span class="c1">// make it</span>
+<span class="n">y</span><span class="o">++;</span>                             <span class="c1">// unwrap it, increment it,</span>
+                                 <span class="c1">// rewrap it</span>
+<span class="n">System</span><span class="o">.</span><span class="na">out</span><span class="o">.</span><span class="na">println</span><span class="o">(</span><span class="s">"y = "</span> <span class="o">+</span> <span class="n">y</span><span class="o">);</span>  <span class="c1">// print it</span>
+</code></pre>
+</div>
+
+<p>这里用了<code class="highlighter-rouge">y++</code>,Earlier we mentioned that wrapper objects are immutable…,这是怎么回事？</p>
+
+<div class="language-java highlighter-rouge"><pre class="highlight"><code><span class="kt">int</span> <span class="n">x2</span> <span class="o">=</span> <span class="n">y</span><span class="o">.</span><span class="na">intValue</span><span class="o">();</span>
+<span class="n">x2</span><span class="o">++;</span>
+<span class="n">y</span> <span class="o">=</span> <span class="k">new</span> <span class="n">Integer</span><span class="o">(</span><span class="n">x2</span><span class="o">);</span>
+</code></pre>
+</div>
+
+<p><code class="highlighter-rouge">y++</code>的时候指向了另一个新的<code class="highlighter-rouge">obj</code></p>
+
+<h3 id="equals-">equals ==</h3>
+
+<p><code class="highlighter-rouge">equals</code> For now all we have to know is that the intention of the <code class="highlighter-rouge">equals()</code> method is to determine whether two instances of a given class are “meaningfully equivalent.”</p>
+
+<p><code class="highlighter-rouge">==</code>是严格的，比对所指向对象是否为一个</p>
+
+<div class="language-java highlighter-rouge"><pre class="highlight"><code><span class="n">Integer</span> <span class="n">i1</span> <span class="o">=</span> <span class="mi">1000</span><span class="o">;</span>
+<span class="n">Integer</span> <span class="n">i2</span> <span class="o">=</span> <span class="mi">1000</span><span class="o">;</span>
+
+<span class="k">if</span><span class="o">(</span><span class="n">i1</span> <span class="o">!=</span> <span class="n">i2</span><span class="o">)</span> <span class="n">System</span><span class="o">.</span><span class="na">out</span><span class="o">.</span><span class="na">println</span><span class="o">(</span><span class="s">"different objects"</span><span class="o">);</span> <span class="c1">// different objects</span>
+
+<span class="k">if</span><span class="o">(</span><span class="n">i1</span><span class="o">.</span><span class="na">equals</span><span class="o">(</span><span class="n">i2</span><span class="o">))</span> <span class="n">System</span><span class="o">.</span><span class="na">out</span><span class="o">.</span><span class="na">println</span><span class="o">(</span><span class="s">"meaningfully equal"</span><span class="o">);</span> <span class="c1">// meaningfully equal</span>
+</code></pre>
+</div>
+
+<p>再看一个</p>
+
+<div class="language-java highlighter-rouge"><pre class="highlight"><code><span class="n">Integer</span> <span class="n">i3</span> <span class="o">=</span> <span class="mi">10</span><span class="o">;</span>
+<span class="n">Integer</span> <span class="n">i4</span> <span class="o">=</span> <span class="mi">10</span><span class="o">;</span>
+<span class="k">if</span><span class="o">(</span><span class="n">i3</span> <span class="o">==</span> <span class="n">i4</span><span class="o">)</span> <span class="n">System</span><span class="o">.</span><span class="na">out</span><span class="o">.</span><span class="na">println</span><span class="o">(</span><span class="s">"same object"</span><span class="o">);</span>
+<span class="k">if</span><span class="o">(</span><span class="n">i3</span><span class="o">.</span><span class="na">equals</span><span class="o">(</span><span class="n">i4</span><span class="o">))</span> <span class="n">System</span><span class="o">.</span><span class="na">out</span><span class="o">.</span><span class="na">println</span><span class="o">(</span><span class="s">"meaningfully equal"</span><span class="o">);</span>
+</code></pre>
+</div>
+
+<p>In order to save memory, two instances of the following wrapper objects (created through boxing), will always be == when their primitive values are the same:</p>
+
+<ul>
+  <li>Boolean</li>
+  <li>Byte</li>
+  <li>Character from \u0000 to \u007f (7f is 127 in decimal)</li>
+  <li>Short and Integer from -128 to 127</li>
+</ul>
+
+<p>Note: When <code class="highlighter-rouge">==</code> is used to compare a primitive to a wrapper, the wrapper will be unwrapped and the comparison will be primitive to primitive.</p>
+
+  </div>
+
+</article>
+
+      </div>
+    </div>
+
+    <footer class="site-footer">
+
+  <div class="wrapper">
+
+    <h2 class="footer-heading"></h2>
+
+    <div class="footer-col-wrapper">
+      <div class="footer-col footer-col-1">
+        <ul class="contact-list">
+          <li></li>
+          <li><a href="mailto:"></a></li>
+        </ul>
+      </div>
+
+      <div class="footer-col footer-col-2">
+        <ul class="social-media-list">
+          
+
+          
+        </ul>
+      </div>
+
+      <div class="footer-col footer-col-3">
+        <p></p>
+      </div>
+    </div>
+
+  </div>
+
+</footer>
+
+
+  </body>
+
+</html>

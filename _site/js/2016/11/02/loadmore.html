@@ -35,6 +35,10 @@
       <div class="trigger">
         
           
+          <a class="page-link" href="/2017-12-13-java-exception.html">VDOM</a>
+          
+        
+          
           <a class="page-link" href="/about/">About</a>
           
         
@@ -118,9 +122,30 @@
 
 <p>一个div出现滚动条后，你能看到的区域高度就是clientHeight,是框住部分的高度，和浏览器的window.height()有点像</p>
 
+<hr />
+
 <h3 id="scrollheight">scrollHeight</h3>
 
 <p>是出现滚动条后，里边内容的高度，挡住的和没挡住的都算上的，有点类似$(document).height(),当然padding是包括的了，但不会包括scrollBar</p>
+
+<h3 id="pagex-and-pagey">pageX and pageY:</h3>
+
+<p>Relative to the top left of the fully rendered content area in the browser. This reference point is below the url bar and back button in the upper left. This point could be anywhere in the browser window and can actually change location if there are embedded scrollable pages embedded within pages and the user moves a scrollbar.</p>
+
+<h3 id="screenx-and-screeny">screenX and screenY:</h3>
+
+<p>Relative to the top left of the physical screen/monitor, this reference point only moves if you increase or decrease the number of monitors or the monitor resolution.</p>
+
+<p>clientX and clientY:
+Relative to the upper left edge of the content area (the viewport) of the browser window. This point does not move even if the user moves a scrollbar from within the browser.</p>
+
+<hr />
+
+<h3 id="windowpageyoffset-windowscrolly">window.pageYOffset window.scrollY</h3>
+
+<p>window.pageYOffset is an alias for window.scrollY</p>
+
+<p>window.pageYOffset == window.scrollY; // always true</p>
 
   </div>
 

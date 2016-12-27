@@ -48,6 +48,81 @@ mount /dev/sda2 /mnt
 
 vim /etc/ssh/sshd_config
 
+### source package list
+
+`cat /etc/apt/sources.list`
+
+### update source list
+
+`sudo apt-get update`
+
+这个只是知道有那些软件可以更新，但是并没有更新，要运行
+
+`sudo apt-get upgrade` 
+
+才会真的更新
+
+`apt-get autoremove` 自动删除不要的package
+
+### add user
+
+`sudo adduser student`
+
+仅仅创建了一个user,登陆后是没有办法使用sudo的
+
+`student is not in the sudoers file.  This incident will be reported.`
+
+允许使用sudo的配置文件为 /etc/sudoers,可是这个文件有可能在系统升级的时候被覆盖掉，所以最好在这个文件夹里改
+
+`/etc/sudoers.d`
+
+### 删除一个人的密码，强制下次登录重新设置密码
+
+`sudo passwd -e student`
+
+### 强制每一个都用key pare登录
+
+`/etc/ssh/sshd_config`文件中修改 `passwordAuthenticaon no`,然后重启服务
+
+`sudo service ssh restart`
+
+### file permission
+
+chmod
+
+`-rwxrwxrwx` owner group everyone
+
+r = 4
+w = 2
+x = 1
+
+### chown chgrp
+
+### ports
+
+```shell
+http: 80
+https: 443
+ssh: 22
+ftp: 21
+pop3: 110
+smtp: 25
+```
+
+### ubuntu firewall
+
+```shell
+sudo ufw status
+sudo ufw default deny incoming
+sudo ufw allow ssh
+sudo ufw enable
+```
+
+
+
+
+
+
 
 
 

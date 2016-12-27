@@ -1,0 +1,42 @@
+---
+layout: post
+title:  "VDOM"
+date:   2016-12-12
+categories: java
+---
+
+### typeof [1,2,3]是不能检测array的
+
+### Node.removeChild()
+
+### children childNodes方法的区别
+
+```js
+var el = document.createElement("div");
+el.textContent = "foo"
+el.childNodes.length === 1; // 包含text
+el.children.length === 0; // 不包含text
+```
+
+### replaceChild
+
+```js
+replacedNode = parentNode.replaceChild(newChild, oldChild);
+```
+
+### 更改dom的几种情况
+
+* 新的有，就得没有
+* 
+
+    <div>
+      should not show
+    </div>
+
+    <div>
+      <h1>hello</h1><h1>hello</h1>
+      <div>inner</div>
+    </div>
+
+### element node区别
+

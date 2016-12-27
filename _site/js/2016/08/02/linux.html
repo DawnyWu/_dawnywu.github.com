@@ -35,6 +35,10 @@
       <div class="trigger">
         
           
+          <a class="page-link" href="/2017-12-13-java-exception.html">VDOM</a>
+          
+        
+          
           <a class="page-link" href="/about/">About</a>
           
         
@@ -104,6 +108,76 @@ mount /dev/sda2 /mnt
 <h3 id="ssh">SSH</h3>
 
 <p>vim /etc/ssh/sshd_config</p>
+
+<h3 id="source-package-list">source package list</h3>
+
+<p><code class="highlighter-rouge">cat /etc/apt/sources.list</code></p>
+
+<h3 id="update-source-list">update source list</h3>
+
+<p><code class="highlighter-rouge">sudo apt-get update</code></p>
+
+<p>这个只是知道有那些软件可以更新，但是并没有更新，要运行</p>
+
+<p><code class="highlighter-rouge">sudo apt-get upgrade</code></p>
+
+<p>才会真的更新</p>
+
+<p><code class="highlighter-rouge">apt-get autoremove</code> 自动删除不要的package</p>
+
+<h3 id="add-user">add user</h3>
+
+<p><code class="highlighter-rouge">sudo adduser student</code></p>
+
+<p>仅仅创建了一个user,登陆后是没有办法使用sudo的</p>
+
+<p><code class="highlighter-rouge">student is not in the sudoers file.  This incident will be reported.</code></p>
+
+<p>允许使用sudo的配置文件为 /etc/sudoers,可是这个文件有可能在系统升级的时候被覆盖掉，所以最好在这个文件夹里改</p>
+
+<p><code class="highlighter-rouge">/etc/sudoers.d</code></p>
+
+<h3 id="section">删除一个人的密码，强制下次登录重新设置密码</h3>
+
+<p><code class="highlighter-rouge">sudo passwd -e student</code></p>
+
+<h3 id="key-pare">强制每一个都用key pare登录</h3>
+
+<p><code class="highlighter-rouge">/etc/ssh/sshd_config</code>文件中修改 <code class="highlighter-rouge">passwordAuthenticaon no</code>,然后重启服务</p>
+
+<p><code class="highlighter-rouge">sudo service ssh restart</code></p>
+
+<h3 id="file-permission">file permission</h3>
+
+<p>chmod</p>
+
+<p><code class="highlighter-rouge">-rwxrwxrwx</code> owner group everyone</p>
+
+<p>r = 4
+w = 2
+x = 1</p>
+
+<h3 id="chown-chgrp">chown chgrp</h3>
+
+<h3 id="ports">ports</h3>
+
+<div class="language-shell highlighter-rouge"><pre class="highlight"><code>http: 80
+https: 443
+ssh: 22
+ftp: 21
+pop3: 110
+smtp: 25
+</code></pre>
+</div>
+
+<h3 id="ubuntu-firewall">ubuntu firewall</h3>
+
+<div class="language-shell highlighter-rouge"><pre class="highlight"><code>sudo ufw status
+sudo ufw default deny incoming
+sudo ufw allow ssh
+sudo ufw <span class="nb">enable</span>
+</code></pre>
+</div>
 
 
   </div>

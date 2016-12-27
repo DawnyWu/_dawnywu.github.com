@@ -55,3 +55,22 @@ categories: js
 <img src="http://imgcache.qq.com/ptlogin/head/1_100.gif" 
      width="100" height="100">
 </div>
+
+
+### google post
+
+```html
+<div class="container”>
+  <div class="parallax-container”>
+    <div class="parallax-child”></div>
+  </div>
+</div>
+```
+
+In the above HTML, the .parallax-container is new, and it will effectively flatten the perspective value and we lose the parallax effect. The solution, in most cases, is fairly straightforward: you add transform-style: preserve-3d to the element, causing it to propagate any 3D effects (like our perspective value) that have been applied further up the tree.
+
+```css
+.parallax-container {
+  transform-style: preserve-3d;
+}
+```
