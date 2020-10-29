@@ -7,3 +7,5 @@ gem 'kramdown'
 gem 'rouge'
 gem 'jekyll-watch'
 gem 'jekyll'
+gem 'jekyll-include-cache'
+gem "minimal-mistakes-jekyll"
